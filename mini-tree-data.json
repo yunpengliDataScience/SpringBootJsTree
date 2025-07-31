@@ -1,0 +1,16 @@
+[ {
+  "id" : "1",
+  "text" : "Root",
+  "data" : {
+    "field1" : "field1 value",
+    "field2" : "field2 value"
+  },
+  "children" : [ {
+    "id" : "1753992374035",
+    "text" : "a",
+    "data" : {
+      "field1" : "q",
+      "field2" : "qq"
+    }
+  } ]
+} ]

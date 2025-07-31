@@ -21,6 +21,7 @@
   <button onclick="addNode()">Add Child Node</button>
   <button onclick="deleteNode()">Delete Node</button>
   <button onclick="saveTree()">Save Tree to DB</button>
+  <button onclick="saveMiniTree()">Save Mini Tree to DB</button>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
@@ -105,18 +106,59 @@ function deleteNode() {
 }
 
 function saveTree() {
-  const treeData = $('#jstree').jstree(true).get_json('#', { flat: false });
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  alert(JSON.stringify(fullTree));
+  
+  url = "[[@{'/api/tree/saveTree/full-tree-data.json'}]]";
 
-  alert(JSON.stringify(treeData));
-  url = "[[@{'/api/tree/saveTree'}]]";
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(fullTree),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveMiniTree() {
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  
+  const minimalTree = simplifyTree(fullTree);
+  alert(JSON.stringify(minimalTree));
+  
+  console.log(JSON.stringify(minimalTree, null, 2));
+
+  url = "[[@{'/api/tree/saveTree/mini-tree-data.json'}]]";
   
   $.ajax({
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(treeData),
+    data: JSON.stringify(minimalTree),
     success: () => alert("Tree saved successfully!"),
     error: () => alert("Error saving tree.")
+  });
+}
+
+function simplifyTree(fullTreeNodes) {
+  return fullTreeNodes.map(node => {
+    const simplified = {  //keep id and text fields
+      id: node.id,
+      text: node.text
+    };
+
+    // Include 'data' if it exists
+    if (node.data) {
+      simplified.data = node.data;
+    }
+
+    // Recursively simplify children if they exist
+    if (node.children && node.children.length > 0) {
+      simplified.children = simplifyTree(node.children);
+    }
+
+    return simplified;
   });
 }
   </script>
