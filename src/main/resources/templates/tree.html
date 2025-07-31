@@ -1,0 +1,124 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <br/>
+  <br/>
+  <div id="editModal" style="display:none;">
+    <label>Node Name: <input type="text" id="nodeName" /></label><br/>
+    <label>Field1: <input type="text" id="field1Id" /></label><br/>
+    <label>Field2: <input type="text" id="field2Id" /></label><br/>
+    <button onclick="saveNode()">Save</button>
+  </div>
+
+  <br/>
+  <br/>
+  <button onclick="addNode()">Add Child Node</button>
+  <button onclick="deleteNode()">Delete Node</button>
+  <button onclick="saveTree()">Save Tree to DB</button>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+
+  <script>
+    let selectedNode = null;
+
+$(function () {
+  $('#jstree').jstree({
+    'core': {
+      'check_callback': true,
+      'data': [
+        { "id": "1", "parent": "#", "text": "Root", "data": { "field1": "field1 value",  "field2": "field2 value"} }
+      ]
+    }
+  });
+
+  //When a node is selected
+  $('#jstree').on("select_node.jstree", function (e, data) {
+    selectedNode = data.node;
+    $('#nodeName').val(data.node.text);
+    $('#field1Id').val(data.node.data?.field1 || '');
+    $('#field2Id').val(data.node.data?.field2 || '');
+    $('#editModal').show();
+  });
+});
+
+function saveNode() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#nodeName').val();
+  const newField1 = $('#field1Id').val();
+  const newField2 = $('#field2Id').val();
+
+  if (selectedNode) {
+    tree.rename_node(selectedNode, newText);
+    selectedNode.data = selectedNode.data || {};
+    selectedNode.data.field1 = newField1;
+    selectedNode.data.field2 = newField2;
+  }
+
+  $('#editModal').hide();
+}
+
+function addNode() {
+  const tree = $('#jstree').jstree(true);
+  if (!selectedNode) {
+    alert("Select a node to add a child to.");
+    return;
+  }
+
+  const newNodeId = Date.now().toString(); // unique ID
+  const newNode = tree.create_node(selectedNode, {
+    id: newNodeId,
+    text: "New Node",
+    data: { field1: "", field2: "" }
+  });
+
+  if (newNode) {
+    //tree.edit(newNode); // allow inline renaming
+  }
+  
+  // Immediately select the newly created node
+	if (newNodeId) {
+	  // Use setTimeout to ensure the node is created/rendered before selection
+	  setTimeout(() => {
+	    tree.deselect_all();
+	    tree.select_node(newNodeId); // This will fire select_node.jstree
+	  }, 0);
+	}
+}
+
+function deleteNode() {
+	
+  	const tree = $('#jstree').jstree(true);
+	if (selectedNode) {
+	    tree.delete_node(selectedNode);
+	    selectedNode = null;
+	} else {
+	    alert('Please select a node to delete.');
+	}
+
+}
+
+function saveTree() {
+  const treeData = $('#jstree').jstree(true).get_json('#', { flat: false });
+
+  alert(JSON.stringify(treeData));
+  url = "[[@{'/api/tree/saveTree'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(treeData),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+  </script>
+</body>
+</html>
