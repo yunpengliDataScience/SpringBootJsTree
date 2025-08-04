@@ -1,13 +1,19 @@
 package org.dragon.yunpeng.jstree.controllers;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tree")
@@ -33,4 +39,15 @@ public class TreeController {
 			return ResponseEntity.status(500).body("Error: " + e.getMessage());
 		}
 	}
+	
+	@GetMapping("/loadTree/{fileName}")
+    public List<Map<String, Object>> loadTreeData(@PathVariable String fileName) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+       
+        File file = new File(fileName);  // relative path
+        if (!file.exists()) {
+            throw new RuntimeException("JSON file not found at " + file.getAbsolutePath());
+        }
+        return mapper.readValue(file, new TypeReference<List<Map<String, Object>>>() {});
+    }
 }

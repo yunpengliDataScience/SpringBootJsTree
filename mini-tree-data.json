@@ -7,10 +7,42 @@
   },
   "children" : [ {
     "id" : "1753992374035",
-    "text" : "a",
+    "text" : "A",
     "data" : {
-      "field1" : "q",
-      "field2" : "qq"
-    }
+      "field1" : "a1",
+      "field2" : "a2"
+    },
+    "children" : [ {
+      "id" : "1754344716180",
+      "text" : "B",
+      "data" : {
+        "field1" : "b1",
+        "field2" : "b2"
+      },
+      "children" : [ {
+        "id" : "1754344731091",
+        "text" : "C",
+        "data" : {
+          "field1" : "c1",
+          "field2" : "c2"
+        },
+        "children" : [ {
+          "id" : "1754346212952",
+          "text" : "D",
+          "data" : {
+            "field1" : "d1",
+            "field2" : "d2"
+          },
+          "children" : [ {
+            "id" : "1754346320954",
+            "text" : "E",
+            "data" : {
+              "field1" : "e1",
+              "field2" : "e2"
+            }
+          } ]
+        } ]
+      } ]
+    } ]
   } ]
 } ]

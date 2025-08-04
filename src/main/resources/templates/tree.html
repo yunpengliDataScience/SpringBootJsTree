@@ -30,6 +30,8 @@
     let selectedNode = null;
 
 $(function () {
+  
+  /*
   $('#jstree').jstree({
     'core': {
       'check_callback': true,
@@ -38,13 +40,42 @@ $(function () {
       ]
     }
   });
+  */
+  
+  //Load json tree file when page is loaded.
+  initialUrl = "[[@{'/api/tree/loadTree/mini-tree-data.json'}]]";
+  
+  $.ajax({
+    url: initialUrl,
+    method: 'GET',
+    success: function (data) {
+      $('#jstree').jstree({
+        'core': {
+		  'check_callback': true,
+          'data': data
+        }
+      });
+    },
+    error: function () {
+      alert('Failed to load tree data');
+    }
+  });
+  
+  // Expand tree after ready
+  $('#jstree').on('ready.jstree', function () {
+    $(this).jstree('open_all');
+  });
 
   //When a node is selected
-  $('#jstree').on("select_node.jstree", function (e, data) {
-    selectedNode = data.node;
-    $('#nodeName').val(data.node.text);
-    $('#field1Id').val(data.node.data?.field1 || '');
-    $('#field2Id').val(data.node.data?.field2 || '');
+  $('#jstree').on("select_node.jstree", function (e, nodeData) {
+	  
+	//nodeData: {node: {…}, selected: Array(1), event: {…}, instance: {…}}
+	console.log("Full data object:", nodeData);
+	  
+    selectedNode = nodeData.node;
+    $('#nodeName').val(nodeData.node.text);
+    $('#field1Id').val(nodeData.node.data?.field1 || '');
+    $('#field2Id').val(nodeData.node.data?.field2 || '');
     $('#editModal').show();
   });
 });
