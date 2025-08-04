@@ -27,15 +27,38 @@
           "field2" : "c2"
         },
         "children" : [ {
-          "id" : "1754346212952",
+          "id" : "1754350020333",
           "text" : "D",
           "data" : {
             "field1" : "d1",
             "field2" : "d2"
           },
           "children" : [ {
-            "id" : "1754346320954",
+            "id" : "1754350371275",
             "text" : "E",
+            "data" : {
+              "field1" : "e1",
+              "field2" : "e2"
+            }
+          } ]
+        } ]
+      }, {
+        "id" : "1754350071253",
+        "text" : "C2",
+        "data" : {
+          "field1" : "c1",
+          "field2" : "c2"
+        },
+        "children" : [ {
+          "id" : "1754350312278",
+          "text" : "D2",
+          "data" : {
+            "field1" : "d1",
+            "field2" : "d2"
+          },
+          "children" : [ {
+            "id" : "1754350326826",
+            "text" : "E2",
             "data" : {
               "field1" : "e1",
               "field2" : "e2"

@@ -21,7 +21,7 @@
   },
   "children" : [ {
     "id" : "1753992374035",
-    "text" : "a",
+    "text" : "A",
     "icon" : true,
     "li_attr" : {
       "id" : "1753992374035"
@@ -37,31 +37,163 @@
       "disabled" : false
     },
     "data" : {
-      "field1" : "q",
-      "field2" : "qq"
+      "field1" : "a1",
+      "field2" : "a2"
     },
     "children" : [ {
-      "id" : "1753992416178",
-      "text" : "b",
+      "id" : "1754344716180",
+      "text" : "B",
       "icon" : true,
       "li_attr" : {
-        "id" : "1753992416178"
+        "id" : "1754344716180"
       },
       "a_attr" : {
         "href" : "#",
-        "id" : "1753992416178_anchor"
+        "id" : "1754344716180_anchor"
       },
       "state" : {
         "loaded" : true,
-        "opened" : false,
-        "selected" : true,
+        "opened" : true,
+        "selected" : false,
         "disabled" : false
       },
       "data" : {
-        "field1" : "bb",
-        "field2" : "bbbb"
+        "field1" : "b1",
+        "field2" : "b2"
       },
-      "children" : [ ]
+      "children" : [ {
+        "id" : "1754344731091",
+        "text" : "C",
+        "icon" : true,
+        "li_attr" : {
+          "id" : "1754344731091"
+        },
+        "a_attr" : {
+          "href" : "#",
+          "id" : "1754344731091_anchor"
+        },
+        "state" : {
+          "loaded" : true,
+          "opened" : true,
+          "selected" : false,
+          "disabled" : false
+        },
+        "data" : {
+          "field1" : "c1",
+          "field2" : "c2"
+        },
+        "children" : [ {
+          "id" : "1754350020333",
+          "text" : "D",
+          "icon" : true,
+          "li_attr" : {
+            "id" : "1754350020333"
+          },
+          "a_attr" : {
+            "href" : "#",
+            "id" : "1754350020333_anchor"
+          },
+          "state" : {
+            "loaded" : true,
+            "opened" : true,
+            "selected" : false,
+            "disabled" : false
+          },
+          "data" : {
+            "field1" : "d1",
+            "field2" : "d2"
+          },
+          "children" : [ {
+            "id" : "1754350371275",
+            "text" : "E",
+            "icon" : true,
+            "li_attr" : {
+              "id" : "1754350371275"
+            },
+            "a_attr" : {
+              "href" : "#",
+              "id" : "1754350371275_anchor"
+            },
+            "state" : {
+              "loaded" : true,
+              "opened" : false,
+              "selected" : false,
+              "disabled" : false
+            },
+            "data" : {
+              "field1" : "e1",
+              "field2" : "e2"
+            },
+            "children" : [ ]
+          } ]
+        } ]
+      }, {
+        "id" : "1754350071253",
+        "text" : "C2",
+        "icon" : true,
+        "li_attr" : {
+          "id" : "1754350071253"
+        },
+        "a_attr" : {
+          "href" : "#",
+          "id" : "1754350071253_anchor"
+        },
+        "state" : {
+          "loaded" : true,
+          "opened" : true,
+          "selected" : false,
+          "disabled" : false
+        },
+        "data" : {
+          "field1" : "c1",
+          "field2" : "c2"
+        },
+        "children" : [ {
+          "id" : "1754350312278",
+          "text" : "D2",
+          "icon" : true,
+          "li_attr" : {
+            "id" : "1754350312278"
+          },
+          "a_attr" : {
+            "href" : "#",
+            "id" : "1754350312278_anchor"
+          },
+          "state" : {
+            "loaded" : true,
+            "opened" : true,
+            "selected" : false,
+            "disabled" : false
+          },
+          "data" : {
+            "field1" : "d1",
+            "field2" : "d2"
+          },
+          "children" : [ {
+            "id" : "1754350326826",
+            "text" : "E2",
+            "icon" : true,
+            "li_attr" : {
+              "id" : "1754350326826"
+            },
+            "a_attr" : {
+              "href" : "#",
+              "id" : "1754350326826_anchor"
+            },
+            "state" : {
+              "loaded" : true,
+              "opened" : false,
+              "selected" : true,
+              "disabled" : false
+            },
+            "data" : {
+              "field1" : "e1",
+              "field2" : "e2"
+            },
+            "children" : [ ]
+          } ]
+        } ]
+      } ]
     } ]
   } ]
 } ]
