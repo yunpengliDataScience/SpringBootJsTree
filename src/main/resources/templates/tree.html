@@ -37,6 +37,25 @@
         <button type="button" class="btn btn-primary" onclick="saveNode()">Save</button>
       </form>
       
+      <form id="editModalA" style="display:none;">
+        <div class="form-group">
+          <label for="nodeText">Node Name:</label>
+          <input type="text" class="form-control" id="typeANodeName">
+        </div>
+        <div class="form-group">
+          <label for="typeAField1Id">Field 1:</label>
+          <input type="text" class="form-control" id="typeAField1Id">
+        </div>
+        <div class="form-group">
+          <label for="typeAField2Id">Field 2:</label>
+          <input type="text" class="form-control" id="typeAField2Id">
+        </div>
+        <div class="form-group">
+          <label for="typeAField3Id">Field 3:</label>
+          <input type="text" class="form-control" id="typeAField3Id">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveTypeANode()">Save</button>
+      </form>
       
 	  <br/>
 	  <br/>
@@ -100,10 +119,26 @@ $(function () {
 	console.log("Full data object:", nodeData);
 	  
     selectedNode = nodeData.node;
-    $('#nodeName').val(nodeData.node.text);
-    $('#field1Id').val(nodeData.node.data?.field1 || '');
-    $('#field2Id').val(nodeData.node.data?.field2 || '');
-    $('#editModal').show();
+    
+    nodeType = nodeData.node.data?.type || '';
+    
+    //alert("nodeType: "+nodeType);
+    
+    if(nodeType === 'A'){
+		$('#typeANodeName').val(nodeData.node.text);
+    	$('#typeAField1Id').val(nodeData.node.data?.field1 || '');
+    	$('#typeAField2Id').val(nodeData.node.data?.field2 || '');
+    	$('#typeAField3Id').val(nodeData.node.data?.field3 || '');
+    	$('#editModalA').show();
+    	$('#editModal').hide();
+	}else{
+		$('#nodeName').val(nodeData.node.text);
+    	$('#field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#field2Id').val(nodeData.node.data?.field2 || '');
+    	$('#editModal').show();
+    	$('#editModalA').hide();
+	}
+   
   });
 });
 
@@ -121,6 +156,24 @@ function saveNode() {
   }
 
   $('#editModal').hide();
+}
+
+function saveTypeANode() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#typeANodeName').val();
+  const newField1 = $('#typeAField1Id').val();
+  const newField2 = $('#typeAField2Id').val();
+  const newField3 = $('#typeAField3Id').val();
+
+  if (selectedNode) {
+    tree.rename_node(selectedNode, newText);
+    selectedNode.data = selectedNode.data || {};
+    selectedNode.data.field1 = newField1;
+    selectedNode.data.field2 = newField2;
+    selectedNode.data.field3 = newField3;
+  }
+
+  $('#editModalA').hide();
 }
 
 function addNode() {
