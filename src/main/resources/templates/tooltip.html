@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Tooltip Example</title>
+
+  <!-- Bootstrap 4 CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- jsTree CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
+
+  <style>
+    body {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Hover over a node to see tooltip</h3>
+  <div id="jstree"></div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+  <!-- jsTree JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+
+  <script>
+    const treeData = [
+      {
+        "id": "1",
+        "text": "Root",
+        "data": {
+          "field1": "field1 value",
+          "field2": "field2 value"
+        },
+        "children": [
+          {
+            "id": "2",
+            "text": "Child A",
+            "data": {
+              "field1": "a1",
+              "field2": "a2"
+            }
+          }
+        ]
+      }
+    ];
+
+    $(function () {
+      $('#jstree').jstree({
+        'core': {
+          'data': treeData
+        }
+      });
+
+      // Enable Bootstrap tooltips
+      $('body').tooltip({
+        selector: '[data-toggle="node-tooltip"]',
+        placement: 'right',
+        html: true,
+        trigger: 'hover'
+      });
+
+      $('#jstree').on('ready.jstree', function () {
+        $('#jstree').on('mouseover', '.jstree-anchor', function () {
+          const nodeId = $(this).closest('li').attr('id');
+          const tree = $('#jstree').jstree(true);
+          const node = tree.get_node(nodeId);
+
+          const field1 = node.data?.field1 || 'N/A';
+          const field2 = node.data?.field2 || 'N/A';
+
+          $(this)
+            .attr('data-toggle', 'node-tooltip')
+            .attr('title', `Field1: ${field1}<br>Field2: ${field2}`)
+            .tooltip('dispose')
+            .tooltip('show');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
