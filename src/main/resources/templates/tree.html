@@ -21,7 +21,7 @@
     <div class="col-md-5">
       <h5>Node Form</h5>
       
-      <form id="editModal" style="display:none;">
+      <form id="defaultForm" style="display:none;">
         <div class="form-group">
           <label for="nodeName">Node Name:</label>
           <input type="text" class="form-control" id="nodeName">
@@ -34,10 +34,10 @@
           <label for="field2Id">Field 2:</label>
           <input type="text" class="form-control" id="field2Id">
         </div>
-        <button type="button" class="btn btn-primary" onclick="saveNode()">Save</button>
+        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM()">Save Node to DOM</button>
       </form>
       
-      <form id="editModalA" style="display:none;">
+      <form id="3fieldsForm" style="display:none;">
         <div class="form-group">
           <label for="typeANodeName">Node Name:</label>
           <input type="text" class="form-control" id="typeANodeName">
@@ -54,7 +54,7 @@
           <label for="typeAField3Id">Field 3:</label>
           <input type="text" class="form-control" id="typeAField3Id">
         </div>
-        <button type="button" class="btn btn-primary" onclick="saveTypeANode()">Save</button>
+        <button type="button" class="btn btn-primary" onclick="save3FieldNodeToDOM()">Save Form to DOM</button>
       </form>
       
 	  <br/>
@@ -146,14 +146,14 @@ $(function () {
     	$('#typeAField1Id').val(nodeData.node.data?.field1 || '');
     	$('#typeAField2Id').val(nodeData.node.data?.field2 || '');
     	$('#typeAField3Id').val(nodeData.node.data?.field3 || '');
-    	$('#editModalA').show();
-    	$('#editModal').hide();
+    	$('#3fieldsForm').show();
+    	$('#defaultForm').hide();
 	}else{
 		$('#nodeName').val(nodeData.node.text);
     	$('#field1Id').val(nodeData.node.data?.field1 || '');
     	$('#field2Id').val(nodeData.node.data?.field2 || '');
-    	$('#editModal').show();
-    	$('#editModalA').hide();
+    	$('#defaultForm').show();
+    	$('#3fieldsForm').hide();
 	}
    
   });
@@ -186,7 +186,7 @@ $(function () {
   
 });
 
-function saveNode() {
+function saveNodeToDOM() {
   const tree = $('#jstree').jstree(true);
   const newText = $('#nodeName').val();
   const newField1 = $('#field1Id').val();
@@ -199,10 +199,10 @@ function saveNode() {
     selectedNode.data.field2 = newField2;
   }
 
-  $('#editModal').hide();
+  $('#defaultForm').hide();
 }
 
-function saveTypeANode() {
+function save3FieldNodeToDOM() {
   const tree = $('#jstree').jstree(true);
   const newText = $('#typeANodeName').val();
   const newField1 = $('#typeAField1Id').val();
@@ -217,7 +217,7 @@ function saveTypeANode() {
     selectedNode.data.field3 = newField3;
   }
 
-  $('#editModalA').hide();
+  $('#3fieldsForm').hide();
 }
 
 //Increment LV0 to LV1 or LVn to LVn+1
