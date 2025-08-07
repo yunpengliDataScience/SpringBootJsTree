@@ -3,70 +3,61 @@
   "text" : "Root",
   "data" : {
     "field1" : "field1 value",
-    "field2" : "field2 value"
+    "field2" : "field2 value",
+    "type" : "LV0"
   },
   "children" : [ {
-    "id" : "1753992374035",
-    "text" : "A",
+    "id" : "1754582417160",
+    "text" : "A1",
     "data" : {
       "field1" : "a1",
       "field2" : "a2",
       "field3" : "a3",
-      "type" : "A"
+      "type" : "LV1"
     },
     "children" : [ {
-      "id" : "1754344716180",
-      "text" : "B",
+      "id" : "1754582435456",
+      "text" : "B1",
       "data" : {
         "field1" : "b1",
-        "field2" : "b2"
+        "field2" : "b2",
+        "type" : "LV2"
       },
       "children" : [ {
-        "id" : "1754344731091",
-        "text" : "C",
+        "id" : "1754582520873",
+        "text" : "C1",
         "data" : {
           "field1" : "c1",
-          "field2" : "c2"
-        },
-        "children" : [ {
-          "id" : "1754350020333",
-          "text" : "D",
-          "data" : {
-            "field1" : "d1",
-            "field2" : "d2"
-          },
-          "children" : [ {
-            "id" : "1754350371275",
-            "text" : "E",
-            "data" : {
-              "field1" : "e1",
-              "field2" : "e2"
-            }
-          } ]
-        } ]
-      }, {
-        "id" : "1754350071253",
+          "field2" : "c2",
+          "type" : "LV3"
+        }
+      } ]
+    } ]
+  }, {
+    "id" : "1754582454920",
+    "text" : "A2",
+    "data" : {
+      "field1" : "a1",
+      "field2" : "a2",
+      "field3" : "a3",
+      "type" : "LV1"
+    },
+    "children" : [ {
+      "id" : "1754582494552",
+      "text" : "B2",
+      "data" : {
+        "field1" : "b1",
+        "field2" : "b2",
+        "type" : "LV2"
+      },
+      "children" : [ {
+        "id" : "1754582534000",
         "text" : "C2",
         "data" : {
           "field1" : "c1",
-          "field2" : "c2"
-        },
-        "children" : [ {
-          "id" : "1754350312278",
-          "text" : "D2",
-          "data" : {
-            "field1" : "d1",
-            "field2" : "d2"
-          },
-          "children" : [ {
-            "id" : "1754350326826",
-            "text" : "E2",
-            "data" : {
-              "field1" : "e1",
-              "field2" : "e2"
-            }
-          } ]
-        } ]
+          "field2" : "c2",
+          "type" : "LV3"
+        }
       } ]
     } ]
   } ]

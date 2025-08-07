@@ -141,7 +141,7 @@ $(function () {
     
     //alert("nodeType: "+nodeType);
     
-    if(nodeType === 'A'){
+    if(nodeType === 'LV1'){
 		$('#typeANodeName').val(nodeData.node.text);
     	$('#typeAField1Id').val(nodeData.node.data?.field1 || '');
     	$('#typeAField2Id').val(nodeData.node.data?.field2 || '');
@@ -220,6 +220,13 @@ function saveTypeANode() {
   $('#editModalA').hide();
 }
 
+//Increment LV0 to LV1 or LVn to LVn+1
+function incrementLevel(levelStr) {
+  const prefix = levelStr.match(/[^\d]+/)[0]; // Extract non-digit part (e.g., 'LV')
+  const number = parseInt(levelStr.match(/\d+/)[0]); // Extract number part (e.g., 0)
+  return `${prefix}${number + 1}`;
+}
+
 function addNode() {
   const tree = $('#jstree').jstree(true);
   if (!selectedNode) {
@@ -228,11 +235,27 @@ function addNode() {
   }
 
   const newNodeId = Date.now().toString(); // unique ID
-  const newNode = tree.create_node(selectedNode, {
-    id: newNodeId,
-    text: "New Node",
-    data: { field1: "", field2: "" }
-  });
+  
+  parentNodeType = selectedNode.data?.type || '';
+  
+  nodeObject = {};
+  
+  //Add different properties for child node based on parent node type 
+  if(parentNodeType === 'LV0'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { field1: "", field2: "", field3: "", "type" : "LV1" }
+	  }
+  }else{
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { field1: "", field2: "", "type" : incrementLevel(parentNodeType) }
+	  }
+  }
+  
+  const newNode = tree.create_node(selectedNode, nodeObject);
 
   if (newNode) {
     //tree.edit(newNode); // allow inline renaming
