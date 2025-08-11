@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
-        
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />    
 </head>
 <body>
 	
@@ -64,6 +64,7 @@
 	  <button type="button" class="btn btn-primary mr-2" onclick="deleteNode()">Delete Node</button>
 	  <button type="button" class="btn btn-primary mr-2" onclick="saveTree()">Save Tree to DB</button>
 	  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to DB</button>
+	  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Reset Status</button>
     </div>
   </div>
 </div>
@@ -119,8 +120,12 @@ $(function () {
   // Expand tree after ready
   $('#jstree').on('ready.jstree', function () {
     $(this).jstree('open_all');
+    
+    //colorNodes();
   });
 
+  $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree', colorNodes);
+  
   // Enable Bootstrap tooltips globally
   $('body').tooltip({
     selector: '[data-toggle="node-tooltip"]',
@@ -197,6 +202,9 @@ function saveNodeToDOM() {
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
     selectedNode.data.field2 = newField2;
+    
+    selectedNode.data.status = 'Modified';
+    tree.redraw(true);
   }
 
   $('#defaultForm').hide();
@@ -215,6 +223,9 @@ function save3FieldNodeToDOM() {
     selectedNode.data.field1 = newField1;
     selectedNode.data.field2 = newField2;
     selectedNode.data.field3 = newField3;
+    
+    selectedNode.data.status = 'Modified';
+    tree.redraw(true);
   }
 
   $('#3fieldsForm').hide();
@@ -339,6 +350,30 @@ function simplifyTree(fullTreeNodes) {
     return simplified;
   });
 }
+
+function colorNodes() {
+	//alert("colorNodes");
+    $('#jstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
+        const $anchor = $('#' + node.id + '_anchor');
+        if (node.data && node.data.status === 'Modified') {
+            $anchor.addClass('red-node');
+        } else {
+            $anchor.removeClass('red-node');
+        }
+    });
+}
+
+function resetStatus() {
+    const tree = $('#jstree').jstree(true);
+    tree.get_json('#', { flat: true }).forEach(function (node) {
+        if (node.data && node.data.status === 'Modified') {
+            const liveNode = tree.get_node(node.id); // live reference so as to persist change to the DOM.
+            $('#' + node.id + '_anchor').removeClass('red-node');
+            delete liveNode.data.status;
+        }
+    });
+}
+
 </script>
 </body>
 </html>

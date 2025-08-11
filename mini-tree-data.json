@@ -12,7 +12,7 @@
     "data" : {
       "field1" : "a1",
       "field2" : "a2",
-      "field3" : "a3",
+      "field3" : "a32",
       "type" : "LV1"
     },
     "children" : [ {
@@ -20,7 +20,7 @@
       "text" : "B1",
       "data" : {
         "field1" : "b1",
-        "field2" : "b2",
+        "field2" : "b2s",
         "type" : "LV2"
       },
       "children" : [ {
@@ -47,7 +47,7 @@
       "text" : "B2",
       "data" : {
         "field1" : "b1",
-        "field2" : "b2",
+        "field2" : "b2s",
         "type" : "LV2"
       },
       "children" : [ {
@@ -57,7 +57,16 @@
           "field1" : "c1",
           "field2" : "c2",
           "type" : "LV3"
-        }
+        },
+        "children" : [ {
+          "id" : "1754948502872",
+          "text" : "D2",
+          "data" : {
+            "field1" : "d1",
+            "field2" : "d2",
+            "type" : "LV4"
+          }
+        } ]
       } ]
     } ]
   } ]
