@@ -12,16 +12,18 @@
     "data" : {
       "field1" : "a1",
       "field2" : "a2",
-      "field3" : "a32",
-      "type" : "LV1"
+      "field3" : "a3",
+      "type" : "LV1",
+      "status" : "Modified"
     },
     "children" : [ {
       "id" : "1754582435456",
       "text" : "B1",
       "data" : {
         "field1" : "b1",
-        "field2" : "b2s",
-        "type" : "LV2"
+        "field2" : "b2",
+        "type" : "LV2",
+        "status" : "Modified"
       },
       "children" : [ {
         "id" : "1754582520873",
@@ -47,8 +49,9 @@
       "text" : "B2",
       "data" : {
         "field1" : "b1",
-        "field2" : "b2s",
-        "type" : "LV2"
+        "field2" : "b2",
+        "type" : "LV2",
+        "status" : "Modified"
       },
       "children" : [ {
         "id" : "1754582534000",
