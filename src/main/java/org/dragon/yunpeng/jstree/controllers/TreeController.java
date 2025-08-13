@@ -1,5 +1,8 @@
 package org.dragon.yunpeng.jstree.controllers;
 
+import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
+import org.dragon.yunpeng.jstree.services.JsTreeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +25,9 @@ public class TreeController {
 	// private static final Path TREE_FILE = Paths.get("tree-data.json");
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
+	
+	@Autowired
+	private JsTreeService jsTreeService;
 
 	@PostMapping("/saveTree/{fileName}")
 	public ResponseEntity<String> saveTree(@RequestBody Object jsonTree, @PathVariable String fileName) {
@@ -49,5 +55,13 @@ public class TreeController {
             throw new RuntimeException("JSON file not found at " + file.getAbsolutePath());
         }
         return mapper.readValue(file, new TypeReference<List<Map<String, Object>>>() {});
+    }
+	
+	@GetMapping("/jstree-data")
+    public ResponseEntity<List<JsTreeNode>> getJsTreeData() {
+        List<JsTreeNode> nodes = jsTreeService.getJsTreeData();
+        
+        
+        return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
     }
 }

@@ -13,54 +13,90 @@
   <div class="row">
     <!-- Left: Tree -->
     <div class="col-md-5">
-      <h5>Tree Structure</h5>
+      <h5>Symbol Tree</h5>
       <div id="jstree"></div>
-      
       <br/>
       <br/>
       <br/>
+      <div><a th:href="@{/demo}" target="_blank">Other Demo</a></div>
       <br/>
-      <div><a th:href="@{/}" target="_blank">Symbol Tree</a></div>
+      <div><a th:href="@{/h2-console}" target="_blank">Access H2 Database</a></div>
     </div>
 
     <!-- Right: Form -->
     <div class="col-md-5">
       <h5>Node Form</h5>
       
-      <form id="defaultForm" style="display:none;">
+      <form id="1fieldForm" style="display:none;">
         <div class="form-group">
-          <label for="nodeName">Node Name:</label>
-          <input type="text" class="form-control" id="nodeName">
+          <label for="1fieldForm_nodeName">Node Name:</label>
+          <input type="text" class="form-control" id="1fieldForm_nodeName">
         </div>
         <div class="form-group">
-          <label for="field1Id">Field 1:</label>
-          <input type="text" class="form-control" id="field1Id">
+          <label for="1fieldForm_field1Id">Field 1:</label>
+          <input type="text" class="form-control" id="1fieldForm_field1Id">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM1()">Save Node to DOM</button>
+      </form>
+      
+      <form id="2fieldsForm" style="display:none;">
+        <div class="form-group">
+          <label for="2fieldsForm_nodeName">Node Name:</label>
+          <input type="text" class="form-control" id="2fieldsForm_nodeName">
         </div>
         <div class="form-group">
-          <label for="field2Id">Field 2:</label>
-          <input type="text" class="form-control" id="field2Id">
+          <label for="2fieldsForm_field1Id">Field 1:</label>
+          <input type="text" class="form-control" id="2fieldsForm_field1Id">
         </div>
-        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM()">Save Node to DOM</button>
+        <div class="form-group">
+          <label for="2fieldsForm_field2Id">Field 2:</label>
+          <input type="text" class="form-control" id="2fieldsForm_field2Id">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM2()">Save Node to DOM</button>
       </form>
       
       <form id="3fieldsForm" style="display:none;">
         <div class="form-group">
-          <label for="typeANodeName">Node Name:</label>
-          <input type="text" class="form-control" id="typeANodeName">
+          <label for="3fieldsForm_nodeName">Node Name:</label>
+          <input type="text" class="form-control" id="3fieldsForm_nodeName">
         </div>
         <div class="form-group">
-          <label for="typeAField1Id">Field 1:</label>
-          <input type="text" class="form-control" id="typeAField1Id">
+          <label for="3fieldsForm_field1Id">Field 1:</label>
+          <input type="text" class="form-control" id="3fieldsForm_field1Id">
         </div>
         <div class="form-group">
-          <label for="typeAField2Id">Field 2:</label>
-          <input type="text" class="form-control" id="typeAField2Id">
+          <label for="3fieldsForm_field2Id">Field 2:</label>
+          <input type="text" class="form-control" id="3fieldsForm_field2Id">
         </div>
         <div class="form-group">
-          <label for="typeAField3Id">Field 3:</label>
-          <input type="text" class="form-control" id="typeAField3Id">
+          <label for="3fieldsForm_field3Id">Field 3:</label>
+          <input type="text" class="form-control" id="3fieldsForm_field3Id">
         </div>
-        <button type="button" class="btn btn-primary" onclick="save3FieldNodeToDOM()">Save Form to DOM</button>
+        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM3()">Save Form to DOM</button>
+      </form>
+      
+      <form id="4fieldsForm" style="display:none;">
+        <div class="form-group">
+          <label for="4fieldsForm_nodeName">Node Name:</label>
+          <input type="text" class="form-control" id="4fieldsForm_nodeName">
+        </div>
+        <div class="form-group">
+          <label for="4fieldsForm_field1Id">Field 1:</label>
+          <input type="text" class="form-control" id="4fieldsForm_field1Id">
+        </div>
+        <div class="form-group">
+          <label for="4fieldsForm_field2Id">Field 2:</label>
+          <input type="text" class="form-control" id="4fieldsForm_field2Id">
+        </div>
+        <div class="form-group">
+          <label for="4fieldsForm_field3Id">Field 3:</label>
+          <input type="text" class="form-control" id="4fieldsForm_field3Id">
+        </div>
+         <div class="form-group">
+          <label for="4fieldsForm_field4Id">Field 4:</label>
+          <input type="text" class="form-control" id="4fieldsForm_field4Id">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveNodeToDOM4()">Save Form to DOM</button>
       </form>
       
 	  <br/>
@@ -105,12 +141,15 @@ $(function () {
   */
   
   //Load json tree file when page is loaded.
-  initialUrl = "[[@{'/api/tree/loadTree/mini-tree-data.json'}]]";
+  initialUrl = "[[@{'/api/tree/jstree-data'}]]";
   
   $.ajax({
     url: initialUrl,
     method: 'GET',
     success: function (data) {
+		
+	console.log("Tree data:", data);
+		
       $('#jstree').jstree({
         'core': {
 		  'check_callback': true,
@@ -148,22 +187,47 @@ $(function () {
 	  
     selectedNode = nodeData.node;
     
-    nodeType = nodeData.node.data?.type || '';
+    nodeLevel = nodeData.node.data?.level || '';
     
-    //alert("nodeType: "+nodeType);
+    //alert("nodeLevel: " + nodeLevel);
     
-    if(nodeType === 'LV1'){
-		$('#typeANodeName').val(nodeData.node.text);
-    	$('#typeAField1Id').val(nodeData.node.data?.field1 || '');
-    	$('#typeAField2Id').val(nodeData.node.data?.field2 || '');
-    	$('#typeAField3Id').val(nodeData.node.data?.field3 || '');
+    if(nodeLevel === 'LV1'){
+		$('#1fieldForm_nodeName').val(nodeData.node.text);
+    	$('#1fieldForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	
+    	$('#1fieldForm').show();
+    	$('#2fieldsForm').hide();
+    	$('#3fieldsForm').hide();
+    	$('#4fieldsForm').hide();
+	}else if(nodeLevel === 'LV2'){
+		$('#2fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#2fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#2fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	
+    	$('#2fieldsForm').show();
+    	$('#1fieldForm').hide();
+    	$('#3fieldsForm').hide();
+    	$('#4fieldsForm').hide();
+	}else if(nodeLevel === 'LV3'){
+		$('#3fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#3fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#3fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	$('#3fieldsForm_field3Id').val(nodeData.node.data?.field3 || '');
+    	
     	$('#3fieldsForm').show();
-    	$('#defaultForm').hide();
-	}else{
-		$('#nodeName').val(nodeData.node.text);
-    	$('#field1Id').val(nodeData.node.data?.field1 || '');
-    	$('#field2Id').val(nodeData.node.data?.field2 || '');
-    	$('#defaultForm').show();
+    	$('#1fieldForm').hide();
+    	$('#2fieldsForm').hide();
+    	$('#4fieldsForm').hide();
+	}else if(nodeLevel === 'LV4'){
+		$('#4fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#4fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#4fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	$('#4fieldsForm_field3Id').val(nodeData.node.data?.field3 || '');
+    	$('#4fieldsForm_field4Id').val(nodeData.node.data?.field4 || '');
+    	
+    	$('#4fieldsForm').show();
+    	$('#1fieldForm').hide();
+    	$('#2fieldsForm').hide();
     	$('#3fieldsForm').hide();
 	}
    
@@ -197,45 +261,90 @@ $(function () {
   
 });
 
-function saveNodeToDOM() {
+function saveNodeToDOM1() {
   const tree = $('#jstree').jstree(true);
-  const newText = $('#nodeName').val();
-  const newField1 = $('#field1Id').val();
-  const newField2 = $('#field2Id').val();
+  const newText = $('#1fieldForm_nodeName').val();
+  const newField1 = $('#1fieldForm_field1Id').val();
+  
+  if (selectedNode) {
+    tree.rename_node(selectedNode, newText);
+    selectedNode.data = selectedNode.data || {};
+    selectedNode.data.field1 = newField1;
+   
+    selectedNode.data.name = newText;
+    selectedNode.data.status = 'Modified';
+    tree.redraw(true);
+  }
 
+  $('#1fieldForm').hide();
+}
+
+function saveNodeToDOM2() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#2fieldsForm_nodeName').val();
+  const newField1 = $('#2fieldsForm_field1Id').val();
+  const newField2 = $('#2fieldsForm_field2Id').val();
+  
   if (selectedNode) {
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
     selectedNode.data.field2 = newField2;
-    
+   
+    selectedNode.data.name = newText;
     selectedNode.data.status = 'Modified';
     tree.redraw(true);
   }
 
-  $('#defaultForm').hide();
+  $('#2fieldsForm').hide();
 }
 
-function save3FieldNodeToDOM() {
+function saveNodeToDOM3() {
   const tree = $('#jstree').jstree(true);
-  const newText = $('#typeANodeName').val();
-  const newField1 = $('#typeAField1Id').val();
-  const newField2 = $('#typeAField2Id').val();
-  const newField3 = $('#typeAField3Id').val();
-
+  const newText = $('#3fieldsForm_nodeName').val();
+  const newField1 = $('#3fieldsForm_field1Id').val();
+  const newField2 = $('#3fieldsForm_field2Id').val();
+  const newField3 = $('#3fieldsForm_field3Id').val();
+  
   if (selectedNode) {
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
     selectedNode.data.field2 = newField2;
     selectedNode.data.field3 = newField3;
-    
+   
+    selectedNode.data.name = newText;
     selectedNode.data.status = 'Modified';
     tree.redraw(true);
   }
 
   $('#3fieldsForm').hide();
 }
+
+function saveNodeToDOM4() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#4fieldsForm_nodeName').val();
+  const newField1 = $('#4fieldsForm_field1Id').val();
+  const newField2 = $('#4fieldsForm_field2Id').val();
+  const newField3 = $('#4fieldsForm_field3Id').val();
+  const newField4 = $('#4fieldsForm_field4Id').val();
+  
+  if (selectedNode) {
+    tree.rename_node(selectedNode, newText);
+    selectedNode.data = selectedNode.data || {};
+    selectedNode.data.field1 = newField1;
+    selectedNode.data.field2 = newField2;
+    selectedNode.data.field3 = newField3;
+    selectedNode.data.field4 = newField4;
+   
+    selectedNode.data.name = newText;
+    selectedNode.data.status = 'Modified';
+    tree.redraw(true);
+  }
+
+  $('#4fieldsForm').hide();
+}
+
 
 //Increment LV0 to LV1 or LVn to LVn+1
 function incrementLevel(levelStr) {
@@ -253,23 +362,32 @@ function addNode() {
 
   const newNodeId = Date.now().toString(); // unique ID
   
-  parentNodeType = selectedNode.data?.type || '';
+  parentNodeType = selectedNode.data?.level || '';
   
   nodeObject = {};
   
   //Add different properties for child node based on parent node type 
-  if(parentNodeType === 'LV0'){
+  if(parentNodeType === 'LV1'){
 	  nodeObject = {
 		   	id: newNodeId,
     		text: "New Node",
-    		data: { field1: "", field2: "", field3: "", "type" : "LV1" }
+    		data: { name: "", databaseId: "", field1: "", field2: "", level : "LV2" }
+	  }
+  }else if(parentNodeType === 'LV2'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { name: "", databaseId: "", field1: "", field2: "", field3: "", level : "LV3" }
+	  }
+  }else if(parentNodeType === 'LV3'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { name: "", databaseId: "", field1: "", field2: "", field3: "", field4: "", level : "LV4" }
 	  }
   }else{
-	  nodeObject = {
-		   	id: newNodeId,
-    		text: "New Node",
-    		data: { field1: "", field2: "", "type" : incrementLevel(parentNodeType) }
-	  }
+	  alert("Cannot add a child node due to level limit.");
+      return;
   }
   
   const newNode = tree.create_node(selectedNode, nodeObject);
@@ -304,7 +422,7 @@ function saveTree() {
   const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
   alert(JSON.stringify(fullTree));
   
-  url = "[[@{'/api/tree/saveTree/full-tree-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/full-symboltree-data.json'}]]";
 
   $.ajax({
     url: url,
@@ -324,7 +442,7 @@ function saveMiniTree() {
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTree/mini-tree-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/mini-symboltree-data.json'}]]";
   
   $.ajax({
     url: url,

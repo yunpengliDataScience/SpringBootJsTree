@@ -9,7 +9,13 @@ public class HomeController {
 	@GetMapping("/")
 	public String showHomePage() {
 
+		return "symboltree";
+	}
+
+	@GetMapping("/demo")
+	public String showTree2Page() {
+
 		return "tree";
 	}
-	
+
 }

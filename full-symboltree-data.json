@@ -1,0 +1,283 @@
+[ {
+  "id" : "LV1-1",
+  "text" : "A1",
+  "icon" : true,
+  "li_attr" : {
+    "id" : "LV1-1"
+  },
+  "a_attr" : {
+    "href" : "#",
+    "id" : "LV1-1_anchor"
+  },
+  "state" : {
+    "loaded" : true,
+    "opened" : true,
+    "selected" : false,
+    "disabled" : false
+  },
+  "data" : {
+    "field1" : "field1_A1",
+    "level" : "LV1",
+    "name" : "A1",
+    "databaseId" : 1
+  },
+  "children" : [ {
+    "id" : "LV2-1",
+    "text" : "B1",
+    "icon" : true,
+    "li_attr" : {
+      "id" : "LV2-1"
+    },
+    "a_attr" : {
+      "href" : "#",
+      "id" : "LV2-1_anchor"
+    },
+    "state" : {
+      "loaded" : true,
+      "opened" : true,
+      "selected" : false,
+      "disabled" : false
+    },
+    "data" : {
+      "field1" : "field1_B1",
+      "level" : "LV2",
+      "name" : "B1",
+      "databaseId" : 1,
+      "field2" : "field2_B1"
+    },
+    "children" : [ {
+      "id" : "LV3-1",
+      "text" : "C1",
+      "icon" : true,
+      "li_attr" : {
+        "id" : "LV3-1"
+      },
+      "a_attr" : {
+        "href" : "#",
+        "id" : "LV3-1_anchor"
+      },
+      "state" : {
+        "loaded" : true,
+        "opened" : true,
+        "selected" : false,
+        "disabled" : false
+      },
+      "data" : {
+        "field1" : "field1_C1",
+        "level" : "LV3",
+        "name" : "C1",
+        "databaseId" : 1,
+        "field3" : "field3_C1",
+        "field2" : "field2_C1"
+      },
+      "children" : [ {
+        "id" : "LV4-1",
+        "text" : "D1",
+        "icon" : true,
+        "li_attr" : {
+          "id" : "LV4-1"
+        },
+        "a_attr" : {
+          "href" : "#",
+          "id" : "LV4-1_anchor"
+        },
+        "state" : {
+          "loaded" : true,
+          "opened" : false,
+          "selected" : false,
+          "disabled" : false
+        },
+        "data" : {
+          "field1" : "field1_D1",
+          "level" : "LV4",
+          "name" : "D1",
+          "databaseId" : 1,
+          "field3" : "field3_D1",
+          "field2" : "field2_D1",
+          "field4" : "field4_D1"
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  }, {
+    "id" : "LV2-2",
+    "text" : "B2",
+    "icon" : true,
+    "li_attr" : {
+      "id" : "LV2-2"
+    },
+    "a_attr" : {
+      "href" : "#",
+      "id" : "LV2-2_anchor"
+    },
+    "state" : {
+      "loaded" : true,
+      "opened" : true,
+      "selected" : false,
+      "disabled" : false
+    },
+    "data" : {
+      "field1" : "field1_B2",
+      "level" : "LV2",
+      "name" : "B2",
+      "databaseId" : 2,
+      "field2" : "field2_B2"
+    },
+    "children" : [ {
+      "id" : "LV3-2",
+      "text" : "C2",
+      "icon" : true,
+      "li_attr" : {
+        "id" : "LV3-2"
+      },
+      "a_attr" : {
+        "href" : "#",
+        "id" : "LV3-2_anchor"
+      },
+      "state" : {
+        "loaded" : true,
+        "opened" : true,
+        "selected" : false,
+        "disabled" : false
+      },
+      "data" : {
+        "field1" : "field1_C2",
+        "level" : "LV3",
+        "name" : "C2",
+        "databaseId" : 2,
+        "field3" : "field3_C2",
+        "field2" : "field2_C2"
+      },
+      "children" : [ {
+        "id" : "LV4-2",
+        "text" : "D2",
+        "icon" : true,
+        "li_attr" : {
+          "id" : "LV4-2"
+        },
+        "a_attr" : {
+          "href" : "#",
+          "id" : "LV4-2_anchor"
+        },
+        "state" : {
+          "loaded" : true,
+          "opened" : false,
+          "selected" : false,
+          "disabled" : false
+        },
+        "data" : {
+          "field1" : "field1_D2",
+          "level" : "LV4",
+          "name" : "D2",
+          "databaseId" : 2,
+          "field3" : "field3_D2",
+          "field2" : "field2_D2",
+          "field4" : "field4_D2"
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  } ]
+}, {
+  "id" : "LV1-2",
+  "text" : "A2",
+  "icon" : true,
+  "li_attr" : {
+    "id" : "LV1-2"
+  },
+  "a_attr" : {
+    "href" : "#",
+    "id" : "LV1-2_anchor"
+  },
+  "state" : {
+    "loaded" : true,
+    "opened" : true,
+    "selected" : false,
+    "disabled" : false
+  },
+  "data" : {
+    "field1" : "field1_A2",
+    "level" : "LV1",
+    "name" : "A2",
+    "databaseId" : 2
+  },
+  "children" : [ {
+    "id" : "LV2-3",
+    "text" : "B3",
+    "icon" : true,
+    "li_attr" : {
+      "id" : "LV2-3"
+    },
+    "a_attr" : {
+      "href" : "#",
+      "id" : "LV2-3_anchor"
+    },
+    "state" : {
+      "loaded" : true,
+      "opened" : true,
+      "selected" : false,
+      "disabled" : false
+    },
+    "data" : {
+      "field1" : "field1_B3",
+      "level" : "LV2",
+      "name" : "B3",
+      "databaseId" : 3,
+      "field2" : "field2_B3"
+    },
+    "children" : [ {
+      "id" : "LV3-3",
+      "text" : "C3",
+      "icon" : true,
+      "li_attr" : {
+        "id" : "LV3-3"
+      },
+      "a_attr" : {
+        "href" : "#",
+        "id" : "LV3-3_anchor"
+      },
+      "state" : {
+        "loaded" : true,
+        "opened" : true,
+        "selected" : false,
+        "disabled" : false
+      },
+      "data" : {
+        "field1" : "field1_C3",
+        "level" : "LV3",
+        "name" : "C3",
+        "databaseId" : 3,
+        "field3" : "field3_C3",
+        "field2" : "field2_C3"
+      },
+      "children" : [ {
+        "id" : "LV4-3",
+        "text" : "D3",
+        "icon" : true,
+        "li_attr" : {
+          "id" : "LV4-3"
+        },
+        "a_attr" : {
+          "href" : "#",
+          "id" : "LV4-3_anchor"
+        },
+        "state" : {
+          "loaded" : true,
+          "opened" : false,
+          "selected" : false,
+          "disabled" : false
+        },
+        "data" : {
+          "field1" : "field1_D3",
+          "level" : "LV4",
+          "name" : "D3",
+          "databaseId" : 3,
+          "field3" : "field3_D3",
+          "field2" : "field2_D3",
+          "field4" : "field4_D3"
+        },
+        "children" : [ ]
+      } ]
+    } ]
+  } ]
+} ]

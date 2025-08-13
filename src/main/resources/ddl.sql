@@ -1,0 +1,43 @@
+-- Root table: LV1_SYMB (1 column + id)
+CREATE TABLE LV1_SYMB (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
+    level VARCHAR(255),
+    field1 VARCHAR(255)
+);
+
+-- Child table: LV2_SYMB (2 columns + id)
+CREATE TABLE LV2_SYMB (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    lv1_id BIGINT,  -- FK to LV1_SYMB
+    name VARCHAR(255),
+    level VARCHAR(255),
+    field1 VARCHAR(255),
+    field2 VARCHAR(255),
+    CONSTRAINT fk_lv2_lv1 FOREIGN KEY (lv1_id) REFERENCES LV1_SYMB(id)
+);
+
+-- Child table: LV3_SYMB (3 columns + id)
+CREATE TABLE LV3_SYMB (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    lv2_id BIGINT,  -- FK to LV2_SYMB
+    name VARCHAR(255),
+    level VARCHAR(255),
+    field1 VARCHAR(255),
+    field2 VARCHAR(255),
+    field3 VARCHAR(255),
+    CONSTRAINT fk_lv3_lv2 FOREIGN KEY (lv2_id) REFERENCES LV2_SYMB(id)
+);
+
+-- Child table: LV4_SYMB (4 columns + id)
+CREATE TABLE LV4_SYMB (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    lv3_id BIGINT,  -- FK to LV3_SYMB
+    name VARCHAR(255),
+    level VARCHAR(255),
+    field1 VARCHAR(255),
+    field2 VARCHAR(255),
+    field3 VARCHAR(255),
+    field4 VARCHAR(255),
+    CONSTRAINT fk_lv4_lv3 FOREIGN KEY (lv3_id) REFERENCES LV3_SYMB(id)
+);
