@@ -12,7 +12,7 @@
 <div class="container">
   <div class="row">
     <!-- Left: Tree -->
-    <div class="col-md-5">
+    <div class="col-md-6">
       <h5>Symbol Tree</h5>
       <div id="jstree"></div>
       <br/>
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Right: Form -->
-    <div class="col-md-5">
+    <div class="col-md-6">
       <h5>Node Form</h5>
       
       <form id="1fieldForm" style="display:none;">
@@ -101,13 +101,31 @@
       
 	  <br/>
 	  <br/>
-	 <div class="btn-group" role="group">
-	  <button type="button" class="btn btn-primary mr-2" onclick="addNode()">Add Child Node</button>
-	  <button type="button" class="btn btn-primary mr-2" onclick="deleteNode()">Delete Node</button>
-	  <button type="button" class="btn btn-primary mr-2" onclick="saveTree()">Save Full Tree to File</button>
-	  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
-	  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Reset Status</button>
+	  
+	<div class="row">
+		<div class="col-md-6">
+		<div class="btn-group" role="group">
+		  <button type="button" class="btn btn-primary mr-2" onclick="addNode()">Add Child Node</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="deleteNode()">Delete Node</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveTree()">Save Full Tree to File</button>
+	    </div>
+	    </div>
     </div>
+    <div class="row">
+		<div class="col-md-6">
+		<br/>
+		</div>
+	</div>
+    <div class="row">
+		<div class="col-md-6">
+	    <div class="btn-group" role="group">
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTreeToDatabase()">Save Mini Tree to DB</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Reset Status</button>
+	    </div>
+	    </div>
+    </div>
+    
   </div>
 </div>
 	
@@ -169,6 +187,7 @@ $(function () {
     //colorNodes();
   });
 
+  // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree', colorNodes);
   
   // Enable Bootstrap tooltips globally
@@ -443,6 +462,26 @@ function saveMiniTree() {
   console.log(JSON.stringify(minimalTree, null, 2));
 
   url = "[[@{'/api/tree/saveTree/mini-symboltree-data.json'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(minimalTree),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveMiniTreeToDatabase() {
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  
+  const minimalTree = simplifyTree(fullTree);
+  alert(JSON.stringify(minimalTree));
+  
+  console.log(JSON.stringify(minimalTree, null, 2));
+
+  url = "[[@{'/api/tree/saveTreeToDatabase'}]]";
   
   $.ajax({
     url: url,

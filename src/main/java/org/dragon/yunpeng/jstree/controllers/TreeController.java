@@ -1,6 +1,7 @@
 package org.dragon.yunpeng.jstree.controllers;
 
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
+import org.dragon.yunpeng.jstree.services.JsTreeSaveService;
 import org.dragon.yunpeng.jstree.services.JsTreeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -25,9 +26,12 @@ public class TreeController {
 	// private static final Path TREE_FILE = Paths.get("tree-data.json");
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	
+
 	@Autowired
 	private JsTreeService jsTreeService;
+	
+	@Autowired
+	private JsTreeSaveService jsTreeSaveService;
 
 	@PostMapping("/saveTree/{fileName}")
 	public ResponseEntity<String> saveTree(@RequestBody Object jsonTree, @PathVariable String fileName) {
@@ -45,23 +49,44 @@ public class TreeController {
 			return ResponseEntity.status(500).body("Error: " + e.getMessage());
 		}
 	}
-	
+
+	@PostMapping("/saveTreeToDatabase")
+	public ResponseEntity<String> saveTreeToDatabase(@RequestBody Object jsonTree) {
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		try {
+			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
+
+			List<JsTreeNode> nodes = mapper.readValue(prettyJson, new TypeReference<List<JsTreeNode>>() {
+			});
+
+			System.out.println(prettyJson);
+			
+			jsTreeSaveService.saveModifiedNodes(nodes);
+
+			return ResponseEntity.ok("Pretty JSON tree saved.");
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body("Error: " + e.getMessage());
+		}
+	}
+
 	@GetMapping("/loadTree/{fileName}")
-    public List<Map<String, Object>> loadTreeData(@PathVariable String fileName) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-       
-        File file = new File(fileName);  // relative path
-        if (!file.exists()) {
-            throw new RuntimeException("JSON file not found at " + file.getAbsolutePath());
-        }
-        return mapper.readValue(file, new TypeReference<List<Map<String, Object>>>() {});
-    }
-	
+	public List<Map<String, Object>> loadTreeData(@PathVariable String fileName) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+
+		File file = new File(fileName); // relative path
+		if (!file.exists()) {
+			throw new RuntimeException("JSON file not found at " + file.getAbsolutePath());
+		}
+		return mapper.readValue(file, new TypeReference<List<Map<String, Object>>>() {
+		});
+	}
+
 	@GetMapping("/jstree-data")
-    public ResponseEntity<List<JsTreeNode>> getJsTreeData() {
-        List<JsTreeNode> nodes = jsTreeService.getJsTreeData();
-        
-        
-        return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
-    }
+	public ResponseEntity<List<JsTreeNode>> getJsTreeData() {
+		List<JsTreeNode> nodes = jsTreeService.getJsTreeData();
+
+		return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
+	}
 }
