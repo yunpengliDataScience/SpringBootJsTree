@@ -2,9 +2,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+	
+  <!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  -->
+  <link rel="stylesheet" th:href="@{/jstree/3.3.17/themes/default/style.min.css}" />
+  
+  <!--
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  -->
+  <link rel="stylesheet" th:href="@{/bootstrap/4.5.3/css/bootstrap.min.css}" />
+  
+  <!--
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+  -->
+  
   <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />    
 </head>
 <body>
@@ -103,12 +115,10 @@
 	  <br/>
 	  
 	<div class="row">
-		<div class="col-md-6">
 		<div class="btn-group" role="group">
 		  <button type="button" class="btn btn-primary mr-2" onclick="addNode()">Add Child Node</button>
 		  <button type="button" class="btn btn-primary mr-2" onclick="deleteNode()">Delete Node</button>
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveTree()">Save Full Tree to File</button>
-	    </div>
 	    </div>
     </div>
     <div class="row">
@@ -117,12 +127,10 @@
 		</div>
 	</div>
     <div class="row">
-		<div class="col-md-6">
 	    <div class="btn-group" role="group">
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTreeToDatabase()">Save Mini Tree to DB</button>
 		  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Reset Status</button>
-	    </div>
 	    </div>
     </div>
     
@@ -131,16 +139,28 @@
 	
 	
   <!-- jQuery first -->
+  <!--
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+  -->
+  <script type="text/javascript" th:src="@{/jquery/3.6.0/jquery-3.6.0.min.js}"></script>
+  
   <!-- Popper.js (required by Bootstrap 4 tooltips) -->
+  <!--
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-
+  -->
+  <script type="text/javascript" th:src="@{/popper/1.16.1/popper.min.js}"></script>
+  
   <!-- Bootstrap 4 JS -->
+  <!--
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	-->
+  <script type="text/javascript" th:src="@{/bootstrap/4.5.3/js/bootstrap.min.js}"></script>
 
   <!-- jsTree JS -->
+  <!--
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+  -->
+  <script type="text/javascript" th:src="@{/jstree/3.3.17/jstree.min.js}"></script>
 
 <script>
 let selectedNode = null;
