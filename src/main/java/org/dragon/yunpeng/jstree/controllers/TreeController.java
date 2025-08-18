@@ -4,7 +4,6 @@ import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.services.JsTreeSaveService;
 import org.dragon.yunpeng.jstree.services.JsTreeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
@@ -29,7 +27,7 @@ public class TreeController {
 
 	@Autowired
 	private JsTreeService jsTreeService;
-	
+
 	@Autowired
 	private JsTreeSaveService jsTreeSaveService;
 
@@ -58,11 +56,13 @@ public class TreeController {
 		try {
 			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
 
+			jsTreeSaveService.saveAudit(prettyJson, "", "SYS_USER");
+
 			List<JsTreeNode> nodes = mapper.readValue(prettyJson, new TypeReference<List<JsTreeNode>>() {
 			});
 
 			System.out.println(prettyJson);
-			
+
 			jsTreeSaveService.saveModifiedNodes(nodes);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");

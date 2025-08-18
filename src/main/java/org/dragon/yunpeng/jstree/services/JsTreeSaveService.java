@@ -6,10 +6,12 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
+import org.dragon.yunpeng.jstree.entities.JsonAuditTrail;
 import org.dragon.yunpeng.jstree.entities.LV1Symb;
 import org.dragon.yunpeng.jstree.entities.LV2Symb;
 import org.dragon.yunpeng.jstree.entities.LV3Symb;
 import org.dragon.yunpeng.jstree.entities.LV4Symb;
+import org.dragon.yunpeng.jstree.repositories.JsonAuditTrailRepository;
 import org.dragon.yunpeng.jstree.repositories.LV1SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV2SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV3SymbRepository;
@@ -28,6 +30,8 @@ public class JsTreeSaveService {
 	private LV3SymbRepository lv3Repo;
 	@Autowired
 	private LV4SymbRepository lv4Repo;
+	@Autowired
+	private JsonAuditTrailRepository jsonAuditTrailRepository;
 
 	@Transactional
 	public void saveModifiedNodes(List<JsTreeNode> nodes) {
@@ -44,12 +48,12 @@ public class JsTreeSaveService {
 
 		String status = (String) data.get("status");
 		String databaseIdStr = "";
-		
+
 		Object databaseIdObj = data.get("databaseId");
-		if(databaseIdObj instanceof Integer) {
+		if (databaseIdObj instanceof Integer) {
 			databaseIdStr = ((Integer) databaseIdObj).toString();
 		}
-		
+
 		String level = (String) data.get("level");
 
 		if ("Modified".equalsIgnoreCase(status)) {
@@ -135,5 +139,14 @@ public class JsTreeSaveService {
 				processNode(child, thisId);
 			}
 		}
+	}
+
+	@Transactional
+	public void saveAudit(String json, String action, String userName) {
+		JsonAuditTrail audit = new JsonAuditTrail();
+		audit.setJsonContent(json);
+		audit.setAction(action);
+		audit.setUserName(userName);
+		jsonAuditTrailRepository.save(audit);
 	}
 }
