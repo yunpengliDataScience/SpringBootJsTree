@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jsTree Context Menu - Node Properties</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+</head>
+<body>
+    <h2>jsTree with Context Menu Showing Node Properties</h2>
+    <div id="jstree"></div>
+
+    <script>
+        $(function () {
+            $('#jstree').jstree({
+                'core': {
+                    'check_callback': true,
+                    'data': [
+                        { "id": "1", "parent": "#", "text": "Root node", "data": { "status": "Active", "owner": "Admin" } },
+                        { "id": "2", "parent": "1", "text": "Child node 1", "data": { "status": "Modified", "owner": "UserA" } },
+                        { "id": "3", "parent": "1", "text": "Child node 2", "data": { "status": "New", "owner": "UserB" } }
+                    ]
+                },
+                'plugins': ["contextmenu"],
+                'contextmenu': {
+                    "items": function (node) {
+                        let props = node.data || {};
+                        let items = {};
+
+                        // If no data, show a "No properties" message
+                        if ($.isEmptyObject(props)) {
+                            items["NoProps"] = {
+                                "label": "No properties available",
+                                "action": false
+                            };
+                        } else {
+                            // For each property in node.data, show as read-only menu item
+                            $.each(props, function (key, value) {
+                                items[key] = {
+                                    "label": key + ": " + value,
+                                    "action": false // no action, just display
+                                };
+                            });
+                        }
+
+                        return items;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

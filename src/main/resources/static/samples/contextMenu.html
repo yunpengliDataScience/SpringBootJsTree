@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jsTree Context Menu Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+</head>
+<body>
+    <h2>jsTree with Context Menu</h2>
+    <div id="jstree"></div>
+
+    <script>
+        $(function () {
+            $('#jstree').jstree({
+                'core': {
+                    'check_callback': true,  // allow create/rename/delete
+                    'data': [
+                        { "id": "1", "parent": "#", "text": "Root node" },
+                        { "id": "2", "parent": "1", "text": "Child node 1" },
+                        { "id": "3", "parent": "1", "text": "Child node 2" }
+                    ]
+                },
+                'plugins': ["contextmenu", "dnd", "types"],
+                'contextmenu': {
+                    "items": function (node) {
+                        var tree = $("#jstree").jstree(true);
+                        return {
+                            "Create": {
+                                "label": "➕ Add Child",
+                                "action": function () {
+                                    var newNode = tree.create_node(node, { "text": "New Node" });
+                                    tree.edit(newNode);
+                                }
+                            },
+                            "Rename": {
+                                "label": "✏️ Rename",
+                                "action": function () {
+                                    tree.edit(node);
+                                }
+                            },
+                            "Delete": {
+                                "label": "🗑️ Delete",
+                                "action": function () {
+                                    if (confirm("Delete this node?")) {
+                                        tree.delete_node(node);
+                                    }
+                                }
+                            }
+                        };
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

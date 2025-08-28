@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jsTree Alternative JSON Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+</head>
+<body>
+    <h2>jsTree with Alternative JSON</h2>
+    <div id="jstree"></div>
+
+    <script>
+        $(function () {
+            $('#jstree').jstree({
+                'core': {
+                    'data': [
+                        { "id": "1", "parent": "#", "text": "Root node 1" },
+                        { "id": "2", "parent": "1", "text": "Child node 1" },
+                        { "id": "3", "parent": "1", "text": "Child node 2" },
+                        { "id": "4", "parent": "#", "text": "Root node 2" },
+                        { "id": "5", "parent": "4", "text": "Child node 3" }
+                    ]
+                }
+            });
+        });
+    </script>
+</body>
+</html>
