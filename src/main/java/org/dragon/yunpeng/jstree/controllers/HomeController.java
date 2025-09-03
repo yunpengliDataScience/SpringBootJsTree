@@ -17,5 +17,11 @@ public class HomeController {
 
 		return "tree";
 	}
+	
+	@GetMapping("/ajtree")
+	public String showAlternativeJsonTreePage() {
+
+		return "alternativeJsonTree";
+	}
 
 }

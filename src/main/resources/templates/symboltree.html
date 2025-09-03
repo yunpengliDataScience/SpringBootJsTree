@@ -32,6 +32,8 @@
       <br/>
       <div><a th:href="@{/demo}" target="_blank">Other Demo</a></div>
       <br/>
+      <div><a th:href="@{/ajtree}" target="_blank">Alternative Json Tree</a></div>
+      <br/>
       <div><a th:href="@{/h2-console}" target="_blank">Access H2 Database</a></div>
     </div>
 
@@ -457,7 +459,7 @@ function deleteNode() {
 }
 
 function saveTree() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false }); // # means from root, flat:false means hierarchical
   alert(JSON.stringify(fullTree));
   
   url = "[[@{'/api/tree/saveTree/full-symboltree-data.json'}]]";

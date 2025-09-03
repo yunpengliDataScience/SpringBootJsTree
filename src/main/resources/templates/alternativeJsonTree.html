@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JsTree with Alternative JSON</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+</head>
+<body>
+    <h2>jsTree with Extra Data Export</h2>
+    <div id="jstree"></div>
+    <button id="exportBtn1">Export FLat JSON</button>
+    <pre id="output1"></pre>
+    <button id="exportBtn2">Export Hierarchical JSON</button>
+    <pre id="output2"></pre>
+
+    <script>
+        $(function () {
+            // Build tree with extra node data
+            $('#jstree').jstree({
+                'core': {
+                    'data': [
+                        { "id": "1", "parent": "#", "text": "Root node 1", "data": { "status": "Active", "owner": "Alice" } },
+                        { "id": "2", "parent": "1", "text": "Child node 1", "data": { "status": "Modified", "owner": "Bob" } },
+                        { "id": "3", "parent": "1", "text": "Child node 2", "data": { "status": "New", "owner": "Charlie" } },
+                        { "id": "4", "parent": "#", "text": "Root node 2", "data": { "status": "Archived", "owner": "Dana" } }
+                    ]
+                }
+            });
+
+            // Export button click
+            $('#exportBtn1').click(function () {
+                var tree = $('#jstree').jstree(true);
+                var nodes = tree.get_json('#', { flat: true }); 
+
+                var altJson = nodes.map(function (node) {
+                    return {
+                        id: node.id,
+                        parent: node.parent,
+                        text: node.text,
+                        data: node.data || {}   // include extra properties
+                    };
+                });
+
+                $('#output1').text(JSON.stringify(altJson, null, 2));
+            });
+            
+            // Export button click
+            $('#exportBtn2').click(function () {
+                var tree = $('#jstree').jstree(true);
+                var nodes = tree.get_json('#', { flat: false }); 
+
+                $('#output2').text(JSON.stringify(nodes, null, 2));
+            });
+        });
+    </script>
+</body>
+</html>
