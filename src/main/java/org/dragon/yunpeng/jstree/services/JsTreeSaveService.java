@@ -155,7 +155,7 @@ public class JsTreeSaveService {
 	@Transactional
 	public void saveModifiedNodes2(List<JsTreeNode2> nodes) {
 
-		Map<String, JsTreeNode2> idNodeMap = getIdAndNodeMap(nodes);
+		Map<String, JsTreeNode2> idNodeMap = constructIdAndNodeMap(nodes);
 
 		for (JsTreeNode2 node : nodes) {
 			Map<String, Object> data = node.getData();
@@ -285,7 +285,7 @@ public class JsTreeSaveService {
 		return parentDbId;
 	}
 
-	private Map<String, JsTreeNode2> getIdAndNodeMap(List<JsTreeNode2> nodes) {
+	private Map<String, JsTreeNode2> constructIdAndNodeMap(List<JsTreeNode2> nodes) {
 		Map<String, JsTreeNode2> idNodeMap = new HashMap<String, JsTreeNode2>();
 		for (JsTreeNode2 node : nodes) {
 			String nodeId = node.getId();
