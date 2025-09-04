@@ -1,11 +1,13 @@
 package org.dragon.yunpeng.jstree.services;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
+import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
 import org.dragon.yunpeng.jstree.entities.JsonAuditTrail;
 import org.dragon.yunpeng.jstree.entities.LV1Symb;
 import org.dragon.yunpeng.jstree.entities.LV2Symb;
@@ -148,5 +150,149 @@ public class JsTreeSaveService {
 		audit.setAction(action);
 		audit.setUserName(userName);
 		jsonAuditTrailRepository.save(audit);
+	}
+
+	@Transactional
+	public void saveModifiedNodes2(List<JsTreeNode2> nodes) {
+
+		Map<String, JsTreeNode2> idNodeMap = getIdAndNodeMap(nodes);
+
+		for (JsTreeNode2 node : nodes) {
+			Map<String, Object> data = node.getData();
+			if (data != null) {
+				String status = (String) data.get("status");
+				String databaseIdStr = "";
+
+				Object databaseIdObj = data.get("databaseId");
+				if (databaseIdObj instanceof Integer) {
+					databaseIdStr = ((Integer) databaseIdObj).toString();
+				}
+
+				String level = (String) data.get("level");
+				String nodeId = node.getId();
+				String parentId = node.getParent();
+
+				if ("Modified".equalsIgnoreCase(status)) {
+					if ("LV1".equalsIgnoreCase(level)) {
+						LV1Symb entity = null;
+						if (databaseIdStr == null || databaseIdStr.isEmpty()) {
+							entity = new LV1Symb();
+						} else {
+							entity = lv1Repo.findById(Long.parseLong(databaseIdStr)).orElse(new LV1Symb());
+						}
+						entity.setName(node.getText());
+						entity.setLevel(level);
+						entity.setField1((String) data.get("field1"));
+						lv1Repo.save(entity);
+
+						// update id for children
+						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
+						currentNode.getData().put("databaseId", entity.getId());
+
+					} else if ("LV2".equalsIgnoreCase(level)) {
+						LV2Symb entity = null;
+						if (databaseIdStr == null || databaseIdStr.isEmpty()) {
+							entity = new LV2Symb();
+
+							if (parentId != null) {
+								JsTreeNode2 parentNode = idNodeMap.get(parentId);
+
+								long parentDbId = retrieveParentDbId(parentNode);
+
+								LV1Symb parent = lv1Repo.getById(parentDbId);
+								entity.setLv1(parent);
+							}
+
+						} else {
+							entity = lv2Repo.findById(Long.parseLong(databaseIdStr)).orElse(new LV2Symb());
+						}
+						entity.setName(node.getText());
+						entity.setLevel(level);
+						entity.setField1((String) data.get("field1"));
+						entity.setField2((String) data.get("field2"));
+						lv2Repo.save(entity);
+
+						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
+						currentNode.getData().put("databaseId", entity.getId());
+
+					} else if ("LV3".equalsIgnoreCase(level)) {
+						LV3Symb entity = null;
+						if (databaseIdStr == null || databaseIdStr.isEmpty()) {
+							entity = new LV3Symb();
+
+							if (parentId != null) {
+								JsTreeNode2 parentNode = idNodeMap.get(parentId);
+								long parentDbId = retrieveParentDbId(parentNode);
+
+								LV2Symb parent = lv2Repo.getById(parentDbId);
+								entity.setLv2(parent);
+							}
+
+						} else {
+							entity = lv3Repo.findById(Long.parseLong(databaseIdStr)).orElse(new LV3Symb());
+						}
+						entity.setName(node.getText());
+						entity.setLevel(level);
+						entity.setField1((String) data.get("field1"));
+						entity.setField2((String) data.get("field2"));
+						entity.setField3((String) data.get("field3"));
+						lv3Repo.save(entity);
+
+						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
+						currentNode.getData().put("databaseId", entity.getId());
+
+					} else if ("LV4".equalsIgnoreCase(level)) {
+						LV4Symb entity = null;
+						if (databaseIdStr == null || databaseIdStr.isEmpty()) {
+							entity = new LV4Symb();
+
+							if (parentId != null) {
+								JsTreeNode2 parentNode = idNodeMap.get(parentId);
+								long parentDbId = retrieveParentDbId(parentNode);
+
+								LV3Symb parent = lv3Repo.getById(parentDbId);
+								entity.setLv3(parent);
+							}
+
+						} else {
+							entity = lv4Repo.findById(Long.parseLong(databaseIdStr)).orElse(new LV4Symb());
+						}
+						entity.setName(node.getText());
+						entity.setLevel(level);
+						entity.setField1((String) data.get("field1"));
+						entity.setField2((String) data.get("field2"));
+						entity.setField3((String) data.get("field3"));
+						entity.setField4((String) data.get("field4"));
+						lv4Repo.save(entity);
+
+						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
+						currentNode.getData().put("databaseId", entity.getId());
+					}
+				}
+			}
+
+		}
+	}
+
+	private long retrieveParentDbId(JsTreeNode2 parentNode) {
+		long parentDbId;
+		Object parentDbIdObj = parentNode.getData().get("databaseId");
+		if (parentDbIdObj instanceof Integer) {
+			parentDbId = ((Integer) parentDbIdObj).longValue();
+		} else {
+			parentDbId = (Long) parentDbIdObj;
+		}
+		return parentDbId;
+	}
+
+	private Map<String, JsTreeNode2> getIdAndNodeMap(List<JsTreeNode2> nodes) {
+		Map<String, JsTreeNode2> idNodeMap = new HashMap<String, JsTreeNode2>();
+		for (JsTreeNode2 node : nodes) {
+			String nodeId = node.getId();
+
+			idNodeMap.put(nodeId, node);
+		}
+
+		return idNodeMap;
 	}
 }

@@ -92,7 +92,7 @@ public class TreeController {
 			System.out.println("Flat JSON to save:");
 			System.out.println(prettyJson);
 
-			// jsTreeSaveService.saveModifiedNodes(nodes);
+			jsTreeSaveService.saveModifiedNodes2(nodes);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {
