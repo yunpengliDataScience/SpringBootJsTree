@@ -121,19 +121,51 @@
           "field4" : "field4_D3"
         }
       }, {
-        "id" : "1755121504541",
+        "id" : "LV4-4",
         "text" : "D4",
         "data" : {
-          "name" : "D4",
-          "databaseId" : "",
-          "field1" : "a",
-          "field2" : "b",
-          "field3" : "c",
-          "field4" : "d",
+          "field1" : "aa",
           "level" : "LV4",
-          "status" : "Modified"
+          "name" : "D4",
+          "databaseId" : 4,
+          "field3" : "cc",
+          "field2" : "bb",
+          "field4" : "dd"
         }
       } ]
+    } ]
+  }, {
+    "id" : "LV2-4",
+    "text" : "B4",
+    "data" : {
+      "field1" : "a",
+      "level" : "LV2",
+      "name" : "B4",
+      "databaseId" : 4,
+      "field2" : "b"
+    },
+    "children" : [ {
+      "id" : "LV3-4",
+      "text" : "C4",
+      "data" : {
+        "field1" : "aa",
+        "level" : "LV3",
+        "name" : "C4",
+        "databaseId" : 4,
+        "field3" : "cc",
+        "field2" : "bb"
+      }
+    }, {
+      "id" : "LV3-5",
+      "text" : "C5",
+      "data" : {
+        "field1" : "aa",
+        "level" : "LV3",
+        "name" : "C5",
+        "databaseId" : 5,
+        "field3" : "aa",
+        "field2" : "aa"
+      }
     } ]
   } ]
 } ]

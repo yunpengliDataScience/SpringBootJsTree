@@ -25,16 +25,14 @@
   <div class="row">
     <!-- Left: Tree -->
     <div class="col-md-6">
-      <h5>Symbol Tree</h5>
+      <h5>Symbol Tree 2 (Alternative JSON)</h5>
       <div id="jstree"></div>
       <br/>
       <br/>
       <br/>
       <div><a th:href="@{/demo}" target="_blank">Other Demo</a></div>
       <br/>
-      <div><a th:href="@{/symboltree2}" target="_blank">Symbol Tree 2 (Alternative JSON)</a></div>
-      <br/>
-      <div><a th:href="@{/ajtree}" target="_blank">Alternative Json Tree</a></div>
+      <div><a th:href="@{/}" target="_blank">Symbol Tree</a></div>
       <br/>
       <div><a th:href="@{/h2-console}" target="_blank">Access H2 Database</a></div>
     </div>
@@ -183,7 +181,7 @@ $(function () {
   */
   
   //Load json tree file when page is loaded.
-  initialUrl = "[[@{'/api/tree/jstree-data'}]]";
+  initialUrl = "[[@{'/api/tree/jstree-data2'}]]";
   
   $.ajax({
     url: initialUrl,
@@ -408,6 +406,7 @@ function addNode() {
   
   nodeObject = {};
   
+  //TODO: add parent id?
   //Add different properties for child node based on parent node type 
   if(parentNodeType === 'LV1'){
 	  nodeObject = {
@@ -497,14 +496,14 @@ function saveMiniTree() {
 }
 
 function saveMiniTreeToDatabase() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
   
   const minimalTree = simplifyTree(fullTree);
-  alert(JSON.stringify(minimalTree));
+  //alert(JSON.stringify(minimalTree));
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTreeToDatabase'}]]";
+  url = "[[@{'/api/tree/saveTreeToDatabase2'}]]";
   
   $.ajax({
     url: url,
@@ -520,17 +519,13 @@ function simplifyTree(fullTreeNodes) {
   return fullTreeNodes.map(node => {
     const simplified = {  //keep id and text fields
       id: node.id,
+      parent: node.parent,
       text: node.text
     };
 
     // Include 'data' if it exists
     if (node.data) {
       simplified.data = node.data;
-    }
-
-    // Recursively simplify children if they exist
-    if (node.children && node.children.length > 0) {
-      simplified.children = simplifyTree(node.children);
     }
 
     return simplified;
