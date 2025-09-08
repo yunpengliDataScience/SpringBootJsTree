@@ -133,6 +133,17 @@
           "field4" : "dd"
         }
       } ]
+    }, {
+      "id" : "LV3-6",
+      "text" : "SSS",
+      "data" : {
+        "field1" : "a",
+        "level" : "LV3",
+        "name" : "SSS",
+        "databaseId" : 6,
+        "field3" : "c",
+        "field2" : "b"
+      }
     } ]
   }, {
     "id" : "LV2-4",
@@ -166,6 +177,76 @@
         "field3" : "aa",
         "field2" : "aa"
       }
+    } ]
+  }, {
+    "id" : "LV2-7",
+    "text" : "X",
+    "data" : {
+      "field1" : "1",
+      "level" : "LV2",
+      "name" : "X",
+      "databaseId" : 7,
+      "field2" : "1"
+    },
+    "children" : [ {
+      "id" : "LV3-7",
+      "text" : "Y",
+      "data" : {
+        "field1" : "1",
+        "level" : "LV3",
+        "name" : "Y",
+        "databaseId" : 7,
+        "field3" : "3",
+        "field2" : "2"
+      },
+      "children" : [ {
+        "id" : "LV4-6",
+        "text" : "Z",
+        "data" : {
+          "field1" : "3",
+          "level" : "LV4",
+          "name" : "Z",
+          "databaseId" : 6,
+          "field3" : "3",
+          "field2" : "3",
+          "field4" : "3"
+        }
+      } ]
+    } ]
+  }, {
+    "id" : "LV2-8",
+    "text" : "B5",
+    "data" : {
+      "field1" : "aa",
+      "level" : "LV2",
+      "name" : "B5",
+      "databaseId" : 8,
+      "field2" : "aa"
+    },
+    "children" : [ {
+      "id" : "LV3-8",
+      "text" : "C5",
+      "data" : {
+        "field1" : "a",
+        "level" : "LV3",
+        "name" : "C5",
+        "databaseId" : 8,
+        "field3" : "a",
+        "field2" : "a"
+      },
+      "children" : [ {
+        "id" : "LV4-7",
+        "text" : "D5",
+        "data" : {
+          "field1" : "a",
+          "level" : "LV4",
+          "name" : "D5",
+          "databaseId" : 7,
+          "field3" : "a",
+          "field2" : "a",
+          "field4" : "a"
+        }
+      } ]
     } ]
   } ]
 } ]

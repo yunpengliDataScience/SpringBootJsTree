@@ -460,10 +460,10 @@ function deleteNode() {
 }
 
 function saveTree() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false }); // # means from root, flat:false means hierarchical
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
   alert(JSON.stringify(fullTree));
   
-  url = "[[@{'/api/tree/saveTree/full-symboltree-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/full-symboltree2-data.json'}]]";
 
   $.ajax({
     url: url,
@@ -476,14 +476,14 @@ function saveTree() {
 }
 
 function saveMiniTree() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: false });
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
   
   const minimalTree = simplifyTree(fullTree);
   alert(JSON.stringify(minimalTree));
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTree/mini-symboltree-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/mini-symboltree2-data.json'}]]";
   
   $.ajax({
     url: url,
