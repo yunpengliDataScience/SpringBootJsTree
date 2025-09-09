@@ -21,7 +21,7 @@
             $('#jstree').jstree({
                 'core': {
                     'data': [
-                        { "id": "1", "parent": "#", "text": "Root node 1", "data": { "status": "Active", "owner": "Alice" } },
+                        { "id": "1", "parent": "#", "text": "Root node 1", "data": { "olddata": { "status": "Disabled", "owner": "XYZ" }, "currentdata":{"status": "Active", "owner": "Alice" }, } },
                         { "id": "2", "parent": "1", "text": "Child node 1", "data": { "status": "Modified", "owner": "Bob" } },
                         { "id": "3", "parent": "1", "text": "Child node 2", "data": { "status": "New", "owner": "Charlie" } },
                         { "id": "4", "parent": "#", "text": "Root node 2", "data": { "status": "Archived", "owner": "Dana" } }
@@ -40,10 +40,11 @@
                         parent: node.parent,
                         text: node.text,
                         data: node.data || {}   // include extra properties
+                        
                     };
                 });
 
-                $('#output1').text(JSON.stringify(altJson, null, 2));
+                $('#output1').text(JSON.stringify(nodes, null, 2));
             });
             
             // Export button click
