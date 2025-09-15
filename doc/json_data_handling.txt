@@ -1,0 +1,16 @@
+User sandbox json will be stored in a sandbox table, saying User_Symb_SandBox, which has a clob column for storing the json and a status column storing "draft", "submitted", "reviewed", or "approved" status.
+
+When the jstree page is loaded:
+if no json is in the User_Symb_SandBox, then construct the json from the symbology tables.
+if json has "draft", "submitted", or "reviewed" status in the User_Symb_SandBox, load json from User_Symb_SandBox, but jstree is readonly (locked) when json status is "submitted" or "reviewed".
+if json has "approved" status, then construct the json from the symbology tables, so we want the json as freshed from database.
+
+When a User modifies the jstree, and saves data, the json is saved in the User_Symb_SandBox table with "draft" status.  The User can modify the sandbox json many times, but every time only the json with same database id is saved.  Metadata can be included in the json too.
+
+When a User submits the json, meaning it's ready for TFR manager to review, the status of the json changed to "submitted", and the User won't be able to modify the symbol tree until the status changed to "draft".
+
+After TFR manager reviews the change and send back to User, the json status changes back to "draft", so the User can continue working on it.
+After TFR manager feels happy and send to PMO for approval, the json status changes to "reviewed".
+After PMO approves the change, the json status changes to "approved" and all changes in the json are populated into the real symbology tables.
+
+The json with "approved" status is the end life cycle of that json, so next time when a User wants to make symbology changes, a new json record will be created.

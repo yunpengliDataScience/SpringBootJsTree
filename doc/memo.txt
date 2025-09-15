@@ -1,0 +1,12 @@
+If Change_Request table has a json with "draft" status
+	Then load json from Change_Request table.
+Else construct json from symbol tables.
+
+When "Save Draft" button is clicked:
+	Modify and save the json in Change_Request table.
+
+When "Submit Change Request" button is clicked:
+	Modify and save the json in Change_Request table.
+	Capture changes.
+	Merge the changes into symbol tables.
+	Mark the status of this json as "submitted" or "merged".
