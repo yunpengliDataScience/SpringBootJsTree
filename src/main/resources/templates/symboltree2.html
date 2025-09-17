@@ -307,6 +307,8 @@ function saveNodeToDOM1() {
   const newField1 = $('#1fieldForm_field1Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -326,6 +328,8 @@ function saveNodeToDOM2() {
   const newField2 = $('#2fieldsForm_field2Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -347,6 +351,8 @@ function saveNodeToDOM3() {
   const newField3 = $('#3fieldsForm_field3Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -370,6 +376,9 @@ function saveNodeToDOM4() {
   const newField4 = $('#4fieldsForm_field4Id').val();
   
   if (selectedNode) {
+	
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -385,7 +394,20 @@ function saveNodeToDOM4() {
   $('#4fieldsForm').hide();
 }
 
-
+//Backup the data in the data attribute to be the baseline data if the node was never modified before.
+function backupBaseLineData(node){
+	if(node){
+		//very first time modification, back up old values
+		if(node.data.status === null || node.data.status === undefined){
+			
+			// Create a DEEP COPY of the data object
+	        var baseLineData = JSON.parse(JSON.stringify(node.data || {}));
+	        
+	        // Assign the copy, not the reference
+	        node.data.baseLineData = baseLineData;
+		}
+	}
+}
 //Increment LV0 to LV1 or LVn to LVn+1
 function incrementLevel(levelStr) {
   const prefix = levelStr.match(/[^\d]+/)[0]; // Extract non-digit part (e.g., 'LV')

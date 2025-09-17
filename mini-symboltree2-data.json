@@ -3,10 +3,17 @@
   "parent" : "#",
   "text" : "A1",
   "data" : {
-    "field1" : "field1_A1",
+    "field1" : "fisadf",
     "level" : "LV1",
     "name" : "A1",
-    "databaseId" : 1
+    "databaseId" : 1,
+    "baseLineData" : {
+      "field1" : "field1_A1",
+      "level" : "LV1",
+      "name" : "A1",
+      "databaseId" : 1
+    },
+    "status" : "Modified"
   }
 }, {
   "id" : "LV2-1",
@@ -53,7 +60,15 @@
     "level" : "LV2",
     "name" : "B2",
     "databaseId" : 2,
-    "field2" : "field2_B2"
+    "field2" : "a",
+    "baseLineData" : {
+      "field1" : "field1_B2",
+      "level" : "LV2",
+      "name" : "B2",
+      "databaseId" : 2,
+      "field2" : "field2_B2"
+    },
+    "status" : "Modified"
   }
 }, {
   "id" : "LV3-2",
@@ -64,8 +79,17 @@
     "level" : "LV3",
     "name" : "C2",
     "databaseId" : 2,
-    "field3" : "field3_C2",
-    "field2" : "field2_C2"
+    "field3" : "ccccccccc",
+    "field2" : "field2_C2",
+    "baseLineData" : {
+      "field1" : "field1_C2",
+      "level" : "LV3",
+      "name" : "C2",
+      "databaseId" : 2,
+      "field3" : "field3_C2",
+      "field2" : "field2_C2"
+    },
+    "status" : "Modified"
   }
 }, {
   "id" : "LV4-2",
@@ -78,7 +102,36 @@
     "databaseId" : 2,
     "field3" : "field3_D2",
     "field2" : "field2_D2",
-    "field4" : "field4_D2"
+    "field4" : "afsfsff",
+    "baseLineData" : {
+      "field1" : "field1_D2",
+      "level" : "LV4",
+      "name" : "D2",
+      "databaseId" : 2,
+      "field3" : "field3_D2",
+      "field2" : "field2_D2",
+      "field4" : "field4_D2"
+    },
+    "status" : "Modified"
+  }
+}, {
+  "id" : "1758142522935",
+  "parent" : "LV1-1",
+  "text" : "dfs",
+  "data" : {
+    "name" : "dfs",
+    "databaseId" : "",
+    "field1" : "vxczxv",
+    "field2" : "xvv",
+    "level" : "LV2",
+    "baseLineData" : {
+      "name" : "",
+      "databaseId" : "",
+      "field1" : "",
+      "field2" : "",
+      "level" : "LV2"
+    },
+    "status" : "Modified"
   }
 }, {
   "id" : "LV1-2",
