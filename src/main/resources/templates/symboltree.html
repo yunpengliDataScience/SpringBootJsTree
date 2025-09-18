@@ -33,6 +33,8 @@
       
       <div><a th:href="@{/symboltree2}" target="_blank">Symbol Tree 2 (Flat JSON)</a></div>
       <br/>
+      <div><a th:href="@{/changeRequest}" target="_blank">Change Request</a></div>
+      <br/>
       <div><a th:href="@{/demo}" target="_blank">Other Demo</a></div>
       <br/>
       <div><a th:href="@{/ajtree}" target="_blank">Alternative Json Tree</a></div>
@@ -310,6 +312,8 @@ function saveNodeToDOM1() {
   const newField1 = $('#1fieldForm_field1Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -329,6 +333,8 @@ function saveNodeToDOM2() {
   const newField2 = $('#2fieldsForm_field2Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -350,6 +356,8 @@ function saveNodeToDOM3() {
   const newField3 = $('#3fieldsForm_field3Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -373,6 +381,8 @@ function saveNodeToDOM4() {
   const newField4 = $('#4fieldsForm_field4Id').val();
   
   if (selectedNode) {
+	backupBaseLineData(selectedNode);  
+	
     tree.rename_node(selectedNode, newText);
     selectedNode.data = selectedNode.data || {};
     selectedNode.data.field1 = newField1;
@@ -388,6 +398,20 @@ function saveNodeToDOM4() {
   $('#4fieldsForm').hide();
 }
 
+//Backup the data in the data attribute to be the baseline data if the node was never modified before.
+function backupBaseLineData(node){
+	if(node){
+		//very first time modification, back up old values
+		if(node.data.status === null || node.data.status === undefined){
+			
+			// Create a DEEP COPY of the data object
+	        var baseLineData = JSON.parse(JSON.stringify(node.data || {}));
+	        
+	        // Assign the copy, not the reference
+	        node.data.baseLineData = baseLineData;
+		}
+	}
+}
 
 //Increment LV0 to LV1 or LVn to LVn+1
 function incrementLevel(levelStr) {

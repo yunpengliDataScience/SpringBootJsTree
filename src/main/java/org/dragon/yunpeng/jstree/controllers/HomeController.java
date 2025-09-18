@@ -17,6 +17,12 @@ public class HomeController {
 
 		return "symboltree2";
 	}
+	
+	@GetMapping("/changeRequest")
+	public String showSymbolTree3() {
+
+		return "symboltree3";
+	}
 
 	@GetMapping("/demo")
 	public String showTree2Page() {

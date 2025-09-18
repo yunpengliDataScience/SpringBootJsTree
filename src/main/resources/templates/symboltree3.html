@@ -25,7 +25,7 @@
   <div class="row">
     <!-- Left: Tree -->
     <div class="col-md-6">
-      <h5>Symbol Tree 2 (Alternative JSON)</h5>
+      <h5>Symbol Tree 3 (Change Request)</h5>
       <div id="jstree"></div>
       <br/>
       <br/>
@@ -131,8 +131,8 @@
     <div class="row">
 	    <div class="btn-group" role="group">
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
-		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTreeToDatabase()">Save Mini Tree to DB</button>
-		  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Reset Status</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTreeToDatabase()">Save Changes</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Approve Changes</button>
 	    </div>
     </div>
     
@@ -181,7 +181,7 @@ $(function () {
   */
   
   //Load json tree file when page is loaded.
-  initialUrl = "[[@{'/api/tree/jstree-data2'}]]";
+  initialUrl = "[[@{'/api/tree/jstree-data3'}]]";
   
   $.ajax({
     url: initialUrl,
@@ -525,7 +525,7 @@ function saveMiniTreeToDatabase() {
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTreeToDatabase2'}]]";
+  url = "[[@{'/api/tree/saveTreeToDatabase3'}]]";
   
   $.ajax({
     url: url,

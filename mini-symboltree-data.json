@@ -182,11 +182,11 @@
     "id" : "LV2-7",
     "text" : "X",
     "data" : {
-      "field1" : "1",
+      "field1" : "1x",
       "level" : "LV2",
       "name" : "X",
       "databaseId" : 7,
-      "field2" : "1"
+      "field2" : "2x"
     },
     "children" : [ {
       "id" : "LV3-7",
@@ -203,13 +203,13 @@
         "id" : "LV4-6",
         "text" : "Z",
         "data" : {
-          "field1" : "3",
+          "field1" : "z1",
           "level" : "LV4",
           "name" : "Z",
           "databaseId" : 6,
-          "field3" : "3",
-          "field2" : "3",
-          "field4" : "3"
+          "field3" : "z3",
+          "field2" : "z2",
+          "field4" : "z4"
         }
       } ]
     } ]
@@ -247,6 +247,45 @@
           "field4" : "a"
         }
       } ]
+    } ]
+  }, {
+    "id" : "1758212503475",
+    "text" : "New Node",
+    "data" : {
+      "name" : "New Node",
+      "databaseId" : "",
+      "field1" : "之前",
+      "field2" : "xvv",
+      "level" : "LV2",
+      "baseLineData" : {
+        "name" : "",
+        "databaseId" : "",
+        "field1" : "",
+        "field2" : "",
+        "level" : "LV2"
+      },
+      "status" : "Modified"
+    },
+    "children" : [ {
+      "id" : "1758212522003",
+      "text" : "333",
+      "data" : {
+        "name" : "333",
+        "databaseId" : "",
+        "field1" : "只需向",
+        "field2" : "xczvvxz",
+        "field3" : "cv",
+        "level" : "LV3",
+        "baseLineData" : {
+          "name" : "",
+          "databaseId" : "",
+          "field1" : "",
+          "field2" : "",
+          "field3" : "",
+          "level" : "LV3"
+        },
+        "status" : "Modified"
+      }
     } ]
   } ]
 } ]

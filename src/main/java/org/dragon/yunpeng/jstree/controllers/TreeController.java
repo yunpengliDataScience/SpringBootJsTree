@@ -5,6 +5,7 @@ import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
 import org.dragon.yunpeng.jstree.services.JsTreeSaveService;
 import org.dragon.yunpeng.jstree.services.JsTreeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,7 +81,7 @@ public class TreeController {
 
 		System.out.println("jsonTree to save:");
 		System.out.println(jsonTree);
-		
+
 		try {
 			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
 
@@ -93,6 +94,27 @@ public class TreeController {
 			System.out.println(prettyJson);
 
 			jsTreeSaveService.saveModifiedNodes2(nodes);
+
+			return ResponseEntity.ok("Pretty JSON tree saved.");
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body("Error: " + e.getMessage());
+		}
+	}
+
+	// Alternative JSON format (flat)
+	@PostMapping("/saveTreeToDatabase3")
+	public ResponseEntity<String> saveTreeToDatabase3(@RequestBody Object jsonTree) {
+
+		System.out.println("jsonTree to save:");
+		System.out.println(jsonTree);
+
+		try {
+			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
+
+			jsTreeSaveService.saveChangeRequest(prettyJson, "Draft", "SYS_USER");
+
+			System.out.println("Flat JSON to save:");
+			System.out.println(prettyJson);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {
@@ -126,5 +148,23 @@ public class TreeController {
 		List<JsTreeNode2> nodes = jsTreeService.getJsTreeData2();
 
 		return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
+	}
+
+	@GetMapping("/jstree-data3")
+	public ResponseEntity<String> getJsTreeData3() {
+		try {
+			System.out.println("Retrieving data through /jstree-data3");
+
+			String jsonString = jsTreeService.getJsTreeData3();
+
+			// Return raw string, but flagged as JSON; otherwise, the JsTree is unable to
+			// consume the raw string.
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jsonString);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON)
+					.body("{\"error\":\"Failed to convert JsTreeNode2 list to JSON\"}");
+		}
 	}
 }

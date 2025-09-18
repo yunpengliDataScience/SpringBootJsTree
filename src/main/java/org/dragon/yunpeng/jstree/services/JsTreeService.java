@@ -2,16 +2,21 @@ package org.dragon.yunpeng.jstree.services;
 
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
+import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
 import org.dragon.yunpeng.jstree.entities.LV1Symb;
 import org.dragon.yunpeng.jstree.entities.LV2Symb;
 import org.dragon.yunpeng.jstree.entities.LV3Symb;
 import org.dragon.yunpeng.jstree.entities.LV4Symb;
+import org.dragon.yunpeng.jstree.repositories.ChangeRequestSandboxRepository;
 import org.dragon.yunpeng.jstree.repositories.LV1SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV2SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV3SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV4SymbRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +37,9 @@ public class JsTreeService {
 
 	@Autowired
 	private LV4SymbRepository lv4Repo;
+
+	@Autowired
+	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
 
 	public List<JsTreeNode> getJsTreeData() {
 		List<JsTreeNode> roots = new ArrayList<>();
@@ -221,5 +229,30 @@ public class JsTreeService {
 		}
 
 		return dataList;
+	}
+
+	public String getJsTreeData3() throws JsonProcessingException {
+		String jsonString = null;
+
+		ChangeRequestSandbox changeRequestSandbox = changeRequestSandboxRepo
+				.getChangeRequestByNotEqualStatus("Approved");
+
+		if (changeRequestSandbox != null) {
+			System.out.println("Json is retrieved from CHANGE_REQUEST_SANDBOX table.");
+
+			jsonString = changeRequestSandbox.getJsonContent();
+		} else {
+			System.out.println("Json is constructed from database table.");
+
+			List<JsTreeNode2> nodes = getJsTreeData2();
+
+			// Convert List -> JSON string
+			ObjectMapper objectMapper = new ObjectMapper();
+			jsonString = objectMapper.writeValueAsString(nodes);
+		}
+
+		System.out.println(jsonString);
+		
+		return jsonString;
 	}
 }

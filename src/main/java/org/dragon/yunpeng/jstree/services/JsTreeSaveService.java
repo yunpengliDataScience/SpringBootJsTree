@@ -1,5 +1,6 @@
 package org.dragon.yunpeng.jstree.services;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,11 +9,13 @@ import javax.transaction.Transactional;
 
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
+import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
 import org.dragon.yunpeng.jstree.entities.JsonAuditTrail;
 import org.dragon.yunpeng.jstree.entities.LV1Symb;
 import org.dragon.yunpeng.jstree.entities.LV2Symb;
 import org.dragon.yunpeng.jstree.entities.LV3Symb;
 import org.dragon.yunpeng.jstree.entities.LV4Symb;
+import org.dragon.yunpeng.jstree.repositories.ChangeRequestSandboxRepository;
 import org.dragon.yunpeng.jstree.repositories.JsonAuditTrailRepository;
 import org.dragon.yunpeng.jstree.repositories.LV1SymbRepository;
 import org.dragon.yunpeng.jstree.repositories.LV2SymbRepository;
@@ -34,6 +37,8 @@ public class JsTreeSaveService {
 	private LV4SymbRepository lv4Repo;
 	@Autowired
 	private JsonAuditTrailRepository jsonAuditTrailRepository;
+	@Autowired
+	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
 
 	@Transactional
 	public void saveModifiedNodes(List<JsTreeNode> nodes) {
@@ -150,6 +155,24 @@ public class JsTreeSaveService {
 		audit.setAction(action);
 		audit.setUserName(userName);
 		jsonAuditTrailRepository.save(audit);
+	}
+
+	@Transactional
+	public void saveChangeRequest(String json, String status, String userName) {
+
+		// retrieve an unapproved change request
+		ChangeRequestSandbox changeRequest = changeRequestSandboxRepo.getChangeRequestByNotEqualStatus("Approved");
+
+		// create a new record if unapproved change request does not exist.
+		if (changeRequest == null) {
+			changeRequest = new ChangeRequestSandbox();
+		}
+		changeRequest.setJsonContent(json);
+		changeRequest.setStatus(status);
+		changeRequest.setUserName(userName);
+		changeRequest.setTimestamp(LocalDateTime.now());
+
+		changeRequestSandboxRepo.save(changeRequest);
 	}
 
 	@Transactional
