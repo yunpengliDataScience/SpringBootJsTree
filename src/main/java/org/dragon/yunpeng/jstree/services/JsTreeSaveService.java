@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import org.dragon.yunpeng.jstree.Constants;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
 import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
@@ -41,7 +42,7 @@ public class JsTreeSaveService {
 	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
 
 	@Transactional
-	public void saveModifiedNodes(List<JsTreeNode> nodes) {
+	public void saveModifiedNodesHierarchicalFormat(List<JsTreeNode> nodes) {
 		for (JsTreeNode node : nodes) {
 			processNode(node, null); // root level has no parent
 		}
@@ -160,8 +161,8 @@ public class JsTreeSaveService {
 	@Transactional
 	public void saveChangeRequest(String json, String status, String userName) {
 
-		// retrieve an unapproved change request
-		ChangeRequestSandbox changeRequest = changeRequestSandboxRepo.getChangeRequestByNotEqualStatus("Approved");
+		// retrieve an unapproved change request in json format
+		ChangeRequestSandbox changeRequest = changeRequestSandboxRepo.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);
 
 		// create a new record if unapproved change request does not exist.
 		if (changeRequest == null) {
@@ -176,7 +177,7 @@ public class JsTreeSaveService {
 	}
 
 	@Transactional
-	public void saveModifiedNodes2(List<JsTreeNode2> nodes) {
+	public void saveModifiedNodesFlatFormat(List<JsTreeNode2> nodes) {
 
 		Map<String, JsTreeNode2> idNodeMap = constructIdAndNodeMap(nodes);
 

@@ -131,8 +131,8 @@
     <div class="row">
 	    <div class="btn-group" role="group">
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
-		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTreeToDatabase()">Save Changes</button>
-		  <button type="button" class="btn btn-primary mr-2" onclick="resetStatus()">Approve Changes</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveDraftChangeRequest()">Save Changes</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveAndApproveChangeRequest()">Approve Changes</button>
 	    </div>
     </div>
     
@@ -181,7 +181,7 @@ $(function () {
   */
   
   //Load json tree file when page is loaded.
-  initialUrl = "[[@{'/api/tree/jstree-data3'}]]";
+  initialUrl = "[[@{'/api/tree/getJsTreeDataForChangeRequest'}]]";
   
   $.ajax({
     url: initialUrl,
@@ -485,7 +485,7 @@ function saveTree() {
   const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
   alert(JSON.stringify(fullTree));
   
-  url = "[[@{'/api/tree/saveTree/full-symboltree2-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/full-symboltree3-data.json'}]]";
 
   $.ajax({
     url: url,
@@ -505,7 +505,7 @@ function saveMiniTree() {
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTree/mini-symboltree2-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/mini-symboltree3-data.json'}]]";
   
   $.ajax({
     url: url,
@@ -517,7 +517,7 @@ function saveMiniTree() {
   });
 }
 
-function saveMiniTreeToDatabase() {
+function saveDraftChangeRequest() {
   const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
   
   const minimalTree = simplifyTree(fullTree);
@@ -525,7 +525,7 @@ function saveMiniTreeToDatabase() {
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTreeToDatabase3'}]]";
+  url = "[[@{'/api/tree/saveDraftChangeRequest'}]]";
   
   $.ajax({
     url: url,
@@ -533,6 +533,29 @@ function saveMiniTreeToDatabase() {
     contentType: 'application/json',
     data: JSON.stringify(minimalTree),
     success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveAndApproveChangeRequest() {
+  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
+  
+  const minimalTree = simplifyTree(fullTree);
+  //alert(JSON.stringify(minimalTree));
+  
+  console.log(JSON.stringify(minimalTree, null, 2));
+
+  url = "[[@{'/api/tree/saveAndApproveChangeRequest'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(minimalTree),
+    success: () => {alert("Tree saved successfully!");
+    				
+    				setTimeout(function() {location.reload();}, 100);  // delay a little so reload works after alert
+    				},
     error: () => alert("Error saving tree.")
   });
 }

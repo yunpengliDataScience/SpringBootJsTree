@@ -1,5 +1,6 @@
 package org.dragon.yunpeng.jstree.services;
 
+import org.dragon.yunpeng.jstree.Constants;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
 import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
@@ -41,7 +42,7 @@ public class JsTreeService {
 	@Autowired
 	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
 
-	public List<JsTreeNode> getJsTreeData() {
+	public List<JsTreeNode> getJsTreeDataHierarchicalFormat() {
 		List<JsTreeNode> roots = new ArrayList<>();
 		List<LV1Symb> lv1List = lv1Repo.findAll();
 
@@ -139,7 +140,8 @@ public class JsTreeService {
 		return children;
 	}
 
-	public List<JsTreeNode2> getJsTreeData2() {
+	// Get Tree data in flat Json format.
+	public List<JsTreeNode2> getJsTreeDataFlatFormat() {
 		List<JsTreeNode2> dataList = new ArrayList<>();
 
 		// Level 1
@@ -231,11 +233,13 @@ public class JsTreeService {
 		return dataList;
 	}
 
-	public String getJsTreeData3() throws JsonProcessingException {
+	// Get Json tree from CHANGE_REQUEST_SANDBOX table or construct Json from symbol
+	// tables.
+	public String getJsTreeDataForChangeRequest() throws JsonProcessingException {
 		String jsonString = null;
 
 		ChangeRequestSandbox changeRequestSandbox = changeRequestSandboxRepo
-				.getChangeRequestByNotEqualStatus("Approved");
+				.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);
 
 		if (changeRequestSandbox != null) {
 			System.out.println("Json is retrieved from CHANGE_REQUEST_SANDBOX table.");
@@ -244,7 +248,7 @@ public class JsTreeService {
 		} else {
 			System.out.println("Json is constructed from database table.");
 
-			List<JsTreeNode2> nodes = getJsTreeData2();
+			List<JsTreeNode2> nodes = getJsTreeDataFlatFormat();
 
 			// Convert List -> JSON string
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -252,7 +256,7 @@ public class JsTreeService {
 		}
 
 		System.out.println(jsonString);
-		
+
 		return jsonString;
 	}
 }

@@ -1,5 +1,6 @@
 package org.dragon.yunpeng.jstree.controllers;
 
+import org.dragon.yunpeng.jstree.Constants;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
 import org.dragon.yunpeng.jstree.services.JsTreeSaveService;
@@ -65,7 +66,7 @@ public class TreeController {
 
 			System.out.println(prettyJson);
 
-			jsTreeSaveService.saveModifiedNodes(nodes);
+			jsTreeSaveService.saveModifiedNodesHierarchicalFormat(nodes);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {
@@ -93,7 +94,7 @@ public class TreeController {
 			System.out.println("Flat JSON to save:");
 			System.out.println(prettyJson);
 
-			jsTreeSaveService.saveModifiedNodes2(nodes);
+			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {
@@ -102,8 +103,8 @@ public class TreeController {
 	}
 
 	// Alternative JSON format (flat)
-	@PostMapping("/saveTreeToDatabase3")
-	public ResponseEntity<String> saveTreeToDatabase3(@RequestBody Object jsonTree) {
+	@PostMapping("/saveAndApproveChangeRequest")
+	public ResponseEntity<String> saveAndApproveChangeRequest(@RequestBody Object jsonTree) {
 
 		System.out.println("jsonTree to save:");
 		System.out.println(jsonTree);
@@ -111,7 +112,36 @@ public class TreeController {
 		try {
 			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
 
-			jsTreeSaveService.saveChangeRequest(prettyJson, "Draft", "SYS_USER");
+			System.out.println("Flat JSON to save:");
+			System.out.println(prettyJson);
+
+			ObjectMapper mapper = new ObjectMapper();
+			List<JsTreeNode2> nodes = mapper.readValue(prettyJson, new TypeReference<List<JsTreeNode2>>() {
+			});
+
+			// Save data into real symbol tables.
+			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes);
+
+			// Mark change request as Approved.
+			jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_APPROVED, "SYS_USER");
+
+			return ResponseEntity.ok("Pretty JSON tree saved.");
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body("Error: " + e.getMessage());
+		}
+	}
+
+	// Alternative JSON format (flat)
+	@PostMapping("/saveDraftChangeRequest")
+	public ResponseEntity<String> saveDraftChangeRequest(@RequestBody Object jsonTree) {
+
+		System.out.println("jsonTree to save:");
+		System.out.println(jsonTree);
+
+		try {
+			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
+
+			jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_DRAFT, "SYS_USER");
 
 			System.out.println("Flat JSON to save:");
 			System.out.println(prettyJson);
@@ -134,28 +164,28 @@ public class TreeController {
 		});
 	}
 
-	@GetMapping("/jstree-data")
-	public ResponseEntity<List<JsTreeNode>> getJsTreeData() {
-		List<JsTreeNode> nodes = jsTreeService.getJsTreeData();
+	@GetMapping("/getJsTreeDataHierarchicalFormat")
+	public ResponseEntity<List<JsTreeNode>> getJsTreeDataHierarchicalFormat() {
+		List<JsTreeNode> nodes = jsTreeService.getJsTreeDataHierarchicalFormat();
 
 		return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
 	}
 
-	@GetMapping("/jstree-data2")
-	public ResponseEntity<List<JsTreeNode2>> getJsTreeData2() {
+	@GetMapping("/getJsTreeDataFlatFormat")
+	public ResponseEntity<List<JsTreeNode2>> getJsTreeDataFlatFormat() {
 
-		System.out.println("Retrieving data through /jstree-data2");
-		List<JsTreeNode2> nodes = jsTreeService.getJsTreeData2();
+		System.out.println("Retrieving data through /getJsTreeDataFlatFormat");
+		List<JsTreeNode2> nodes = jsTreeService.getJsTreeDataFlatFormat();
 
 		return ResponseEntity.ok(nodes); // Spring automatically converts to proper JSON
 	}
 
-	@GetMapping("/jstree-data3")
-	public ResponseEntity<String> getJsTreeData3() {
+	@GetMapping("/getJsTreeDataForChangeRequest")
+	public ResponseEntity<String> getJsTreeDataForChangeRequest() {
 		try {
-			System.out.println("Retrieving data through /jstree-data3");
+			System.out.println("Retrieving data through /getJsTreeDataForChangeRequest");
 
-			String jsonString = jsTreeService.getJsTreeData3();
+			String jsonString = jsTreeService.getJsTreeDataForChangeRequest();
 
 			// Return raw string, but flagged as JSON; otherwise, the JsTree is unable to
 			// consume the raw string.
