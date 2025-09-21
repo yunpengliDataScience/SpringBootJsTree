@@ -104,17 +104,7 @@
     "databaseId" : 9,
     "field3" : "c",
     "field2" : "b",
-    "field4" : "d",
-    "baseLineData" : {
-      "field1" : "a",
-      "level" : "LV4",
-      "name" : "EW",
-      "databaseId" : 9,
-      "field3" : "c",
-      "field2" : "b",
-      "field4" : "d"
-    },
-    "status" : "Modified"
+    "field4" : "d"
   }
 }, {
   "id" : "LV1-2",

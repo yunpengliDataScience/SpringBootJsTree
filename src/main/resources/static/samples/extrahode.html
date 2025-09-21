@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Extension Node Example</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+  <style>
+    .ext-node {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 2px 6px;
+      background: #eef;
+      border: 1px solid #99c;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #336;
+    }
+  </style>
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <script>
+    $(function () {
+      // initialize jstree
+      $('#jstree').jstree({
+        'core': {
+          'data': [
+            { "id": "n1", "text": "Node 1", "data": { "ext": "Extra A" } },
+            { "id": "n2", "text": "Node 2", "data": { "ext": "Extra B" } },
+            { "id": "n3", "text": "Node 3", "data": { "ext": "Extra C" } }
+          ]
+        }
+      });
+
+      // after redraw, add extension beside each node
+      $('#jstree').on('redraw.jstree', function () {
+        $('#jstree li').each(function () {
+          const nodeId = $(this).attr('id');
+          const node = $('#jstree').jstree(true).get_node(nodeId);
+
+          // avoid duplication
+          if ($(this).find('.ext-node').length === 0 && node.data && node.data.ext) {
+            $(this).find('a.jstree-anchor')
+                   .append('<span class="ext-node">' + node.data.ext + '</span>');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

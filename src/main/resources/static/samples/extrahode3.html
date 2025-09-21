@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree with Side Node</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+  <style>
+    .side-wrapper {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 10px;
+    }
+
+    .side-dash {
+      width: 20px;
+      height: 1px;
+      background: #666;
+      margin: 0 5px;
+    }
+
+    .side-node {
+      display: inline-block;
+    }
+
+    /* make side-node text look like jsTree anchor */
+    .side-node .jstree-anchor {
+      display: inline-block;
+      padding: 2px 5px;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .side-node .jstree-anchor:hover {
+      background: #e0e0e0;
+      border-color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <script>
+    $(function () {
+      $('#jstree').jstree({
+        'core': {
+          'data': [
+            { "id": "n1", "text": "Main A", "data": { "side": "Ext A" } },
+            { "id": "n2", "text": "Main B", "data": { "side": "Ext B" } },
+            {
+              "id": "n3", "text": "Main C", "data": { "side": "Ext C" },
+              "children": [
+                { "id": "n3a", "text": "Child C1", "data": { "side": "Note 1" } },
+                { "id": "n3b", "text": "Child C2", "data": { "side": "Note 2" } }
+              ]
+            }
+          ]
+        }
+      });
+
+      // Add side nodes after redraw
+      $('#jstree').on('redraw.jstree', function () {
+        $('#jstree li').each(function () {
+          const nodeId = $(this).attr('id');
+          const tree = $('#jstree').jstree(true);
+          const node = tree.get_node(nodeId);
+
+          if (node.data && node.data.side && $(this).find('.side-wrapper').length === 0) {
+            $(this).find('a.jstree-anchor').after(
+              '<span class="side-wrapper">' +
+                '<span class="side-dash"></span>' +
+                '<span class="side-node">' +
+                  '<a href="#" class="jstree-anchor" tabindex="-1">' +
+                    node.data.side +
+                  '</a>' +
+                '</span>' +
+              '</span>'
+            );
+          }
+        });
+      });
+
+      // Example: handle clicks on side nodes
+      $(document).on('click', '.side-node .jstree-anchor', function (e) {
+        e.preventDefault();
+        alert('Clicked side node: ' + $(this).text());
+      });
+    });
+  </script>
+</body>
+</html>

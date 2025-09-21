@@ -14,3 +14,8 @@ After TFR manager feels happy and send to PMO for approval, the json status chan
 After PMO approves the change, the json status changes to "approved" and all changes in the json are populated into the real symbology tables.
 
 The json with "approved" status is the end life cycle of that json, so next time when a User wants to make symbology changes, a new json record will be created.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+You can add any user-defined key to your JSON — jsTree will simply keep it, but it won’t “do” anything with it unless you use it in your own logic.
+To access the user-defined key, use node.original.xxx
+

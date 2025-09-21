@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree with Side Extension Node</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+  <style>
+    /* container for extension */
+    .ext-wrapper {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 12px;
+    }
+
+    /* little dash connector */
+    .ext-dash {
+      width: 20px;
+      height: 1px;
+      background: #666;
+      margin: 0 5px;
+    }
+
+    /* extension node box */
+    .ext-node {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #f2f2ff;
+      border: 1px solid #9999cc;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #333366;
+    }
+  </style>
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <script>
+    $(function () {
+      $('#jstree').jstree({
+        'core': {
+          'data': [
+            { "id": "n1", "text": "Main A", "data": { "ext": "Side A" } },
+            { "id": "n2", "text": "Main B", "data": { "ext": "Side B" } },
+            {
+              "id": "n3", "text": "Main C", "data": { "ext": "Side C" },
+              "children": [
+                { "id": "n3a", "text": "Child C1", "data": { "ext": "Note 1" } },
+                { "id": "n3b", "text": "Child C2", "data": { "ext": "Note 2" } }
+              ]
+            }
+          ]
+        }
+      });
+
+      // hook into redraw and inject extension node
+      $('#jstree').on('redraw.jstree', function () {
+        $('#jstree li').each(function () {
+          const nodeId = $(this).attr('id');
+          const tree = $('#jstree').jstree(true);
+          const node = tree.get_node(nodeId);
+
+          if (node.data && node.data.ext && $(this).find('.ext-wrapper').length === 0) {
+            $(this).find('a.jstree-anchor').after(
+              '<span class="ext-wrapper">' +
+                '<span class="ext-dash"></span>' +
+                '<span class="ext-node">' + node.data.ext + '</span>' +
+              '</span>'
+            );
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

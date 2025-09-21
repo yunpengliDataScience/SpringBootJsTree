@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree with Custom Keys</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #output { margin-top: 20px; white-space: pre; background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>jsTree with User-defined Keys</h2>
+  <div id="jstree"></div>
+
+  <h3>Selected Node Info</h3>
+  <div id="output">Select a node to see its details...</div>
+
+  <script>
+    $(function () {
+      // Build jsTree with custom keys in JSON
+      $('#jstree').jstree({
+        'core': {
+          'data': [
+            {
+              "id": "n1",
+              "text": "Main Node",
+              "customInfo": "extra details here",
+              "priority": 5,
+              "data": { "owner": "Bill", "status": "active" },
+              "children": [
+                {
+                  "id": "n1c1",
+                  "text": "Child Node",
+                  "tag": "leaf",
+                  "data": { "owner": "Alice", "status": "draft" }
+                }
+              ]
+            },
+            {
+              "id": "n2",
+              "text": "Second Node",
+              "colorCode": "blue",
+              "data": { "owner": "Charlie", "status": "archived" }
+            }
+          ]
+        }
+      });
+
+      // When user selects a node, show both standard and custom fields
+      $('#jstree').on("select_node.jstree", function (e, data) {
+        let node = data.node;
+        let output = {
+          "id": node.id,
+          "text": node.text,
+          "customInfo": node.original.customInfo,
+          "priority": node.original.priority,
+          "tag": node.original.tag,
+          "colorCode": node.original.colorCode,  //put node.original.xxx to access customized json key
+          "data.owner": node.data ? node.data.owner : null,
+          "data.status": node.data ? node.data.status : null
+        };
+        $('#output').text(JSON.stringify(output, null, 2));
+      });
+    });
+  </script>
+</body>
+</html>
