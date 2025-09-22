@@ -298,6 +298,11 @@ $(function () {
         .tooltip('dispose')  // Reset tooltip
         .tooltip('show');
     });
+    
+    bindAutoSave('1fieldsForm');
+    bindAutoSave('2fieldsForm');
+    bindAutoSave('3fieldsForm');
+    bindAutoSave('4fieldsForm');
   
 });
 
@@ -658,6 +663,19 @@ function resetStatus() {
             $('#' + node.id + '_anchor').removeClass('red-node');
             delete liveNode.data.status;
         }
+    });
+}
+
+//--------- TODO ----------------------------------
+function bindAutoSave(formId) {
+  // Attach listener to *all inputs* in the form
+  $("#" + formId + " input, #" + formId + " select, #" + formId + " textarea")
+    .off("change input") // avoid duplicate bindings
+    .on("change input", function () {
+      //saveNodeToDOM(formId, fieldCount);
+      console.log('autosave!');
+      //this: is the specific form field that was modified
+      console.log("Field changed: " + this.id + " | New value: " + $(this).val());
     });
 }
 
