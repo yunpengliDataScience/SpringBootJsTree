@@ -301,24 +301,57 @@ $(function () {
   
 });
 
+function hasSameNameSibling(nodeId, nodeText) {
+  var tree = $('#jstree').jstree(true);
+  var node = tree.get_node(nodeId);
+
+  if (!node) {
+    return false; // invalid node
+  }
+
+  var parentId = node.parent;
+
+  // root node has no siblings
+  if (parentId === "#") {
+    return false;
+  }
+
+  var siblings = tree.get_node(parentId).children;
+
+  // check if any sibling has the same text
+  var sameNameSiblings = siblings.filter(function (siblingId) {
+    var sibling = tree.get_node(siblingId);
+    return sibling.text === nodeText && sibling.id !== node.id;
+  });
+
+  return sameNameSiblings.length > 0;
+}
+
+
 function saveNodeToDOM1() {
   const tree = $('#jstree').jstree(true);
   const newText = $('#1fieldForm_nodeName').val();
   const newField1 = $('#1fieldForm_field1Id').val();
   
   if (selectedNode) {
-	backupBaseLineData(selectedNode);
+	  
+	if(!hasSameNameSibling(selectedNode.id, newText)) {
+		backupBaseLineData(selectedNode);
 	
-    tree.rename_node(selectedNode, newText);
-    selectedNode.data = selectedNode.data || {};
-    selectedNode.data.field1 = newField1;
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
    
-    selectedNode.data.name = newText;
-    selectedNode.data.status = 'Modified';
-    tree.redraw(true);
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	$('#1fieldForm').hide();
+	} else {
+		alert("This node has a sibling with the same name!");
+	}
+	
   }
-
-  $('#1fieldForm').hide();
 }
 
 function saveNodeToDOM2() {
@@ -328,19 +361,25 @@ function saveNodeToDOM2() {
   const newField2 = $('#2fieldsForm_field2Id').val();
   
   if (selectedNode) {
-	backupBaseLineData(selectedNode);
+	if(!hasSameNameSibling(selectedNode.id, newText)) {
+		
+		backupBaseLineData(selectedNode);
 	
-    tree.rename_node(selectedNode, newText);
-    selectedNode.data = selectedNode.data || {};
-    selectedNode.data.field1 = newField1;
-    selectedNode.data.field2 = newField2;
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
+    	selectedNode.data.field2 = newField2;
    
-    selectedNode.data.name = newText;
-    selectedNode.data.status = 'Modified';
-    tree.redraw(true);
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	$('#2fieldsForm').hide();
+    } else {
+		alert("This node has a sibling with the same name!");
+	}
   }
 
-  $('#2fieldsForm').hide();
 }
 
 function saveNodeToDOM3() {
@@ -351,20 +390,26 @@ function saveNodeToDOM3() {
   const newField3 = $('#3fieldsForm_field3Id').val();
   
   if (selectedNode) {
-	backupBaseLineData(selectedNode);
+	if(!hasSameNameSibling(selectedNode.id, newText)){
+		backupBaseLineData(selectedNode);
 	
-    tree.rename_node(selectedNode, newText);
-    selectedNode.data = selectedNode.data || {};
-    selectedNode.data.field1 = newField1;
-    selectedNode.data.field2 = newField2;
-    selectedNode.data.field3 = newField3;
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
+    	selectedNode.data.field2 = newField2;
+    	selectedNode.data.field3 = newField3;
    
-    selectedNode.data.name = newText;
-    selectedNode.data.status = 'Modified';
-    tree.redraw(true);
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	$('#3fieldsForm').hide();
+	} else{
+		alert("This node has a sibling with the same name!");
+	}
+	
   }
-
-  $('#3fieldsForm').hide();
+  
 }
 
 function saveNodeToDOM4() {
@@ -377,21 +422,37 @@ function saveNodeToDOM4() {
   
   if (selectedNode) {
 	
-	backupBaseLineData(selectedNode);
+	if(!hasSameNameSibling(selectedNode.id, newText)){
+		backupBaseLineData(selectedNode);
 	
-    tree.rename_node(selectedNode, newText);
-    selectedNode.data = selectedNode.data || {};
-    selectedNode.data.field1 = newField1;
-    selectedNode.data.field2 = newField2;
-    selectedNode.data.field3 = newField3;
-    selectedNode.data.field4 = newField4;
+    	tree.rename_node(selectedNode, newText);
+	    selectedNode.data = selectedNode.data || {};
+	    selectedNode.data.field1 = newField1;
+	    selectedNode.data.field2 = newField2;
+	    selectedNode.data.field3 = newField3;
+	    selectedNode.data.field4 = newField4;
+	   
+	    selectedNode.data.name = newText;
+	    selectedNode.data.status = 'Modified';
+	    tree.redraw(true);backupBaseLineData(selectedNode);
+		
+	    tree.rename_node(selectedNode, newText);
+	    selectedNode.data = selectedNode.data || {};
+	    selectedNode.data.field1 = newField1;
+	    selectedNode.data.field2 = newField2;
+	    selectedNode.data.field3 = newField3;
+	    selectedNode.data.field4 = newField4;
    
-    selectedNode.data.name = newText;
-    selectedNode.data.status = 'Modified';
-    tree.redraw(true);
+	    selectedNode.data.name = newText;
+	    selectedNode.data.status = 'Modified';
+	    tree.redraw(true);
+	    
+	    $('#4fieldsForm').hide();
+	} else{
+		alert("This node has a sibling with the same name!");
+	}
+	
   }
-
-  $('#4fieldsForm').hide();
 }
 
 //Backup the data in the data attribute to be the baseline data if the node was never modified before.
