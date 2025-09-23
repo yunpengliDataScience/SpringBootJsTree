@@ -60,11 +60,11 @@
 }, {
   "id" : "LV2-2",
   "parent" : "LV1-1",
-  "text" : "BBB2",
+  "text" : "B2",
   "data" : {
     "field1" : "field1_B2",
     "level" : "LV2",
-    "name" : "BBB2",
+    "name" : "B2",
     "databaseId" : 2,
     "field2" : "field2_B2"
   }
@@ -104,7 +104,38 @@
     "databaseId" : 9,
     "field3" : "c",
     "field2" : "b",
-    "field4" : "d"
+    "field4" : "d",
+    "baseLineData" : {
+      "field1" : "a",
+      "level" : "LV4",
+      "name" : "EASY2",
+      "databaseId" : 9,
+      "field3" : "c",
+      "field2" : "b",
+      "field4" : "d"
+    },
+    "status" : "Modified"
+  }
+}, {
+  "id" : "1758642142368",
+  "parent" : "LV2-2",
+  "text" : "MyNew",
+  "data" : {
+    "name" : "MyNew",
+    "databaseId" : "",
+    "field1" : "a",
+    "field2" : "b",
+    "field3" : "c",
+    "level" : "LV3",
+    "baseLineData" : {
+      "name" : "",
+      "databaseId" : "",
+      "field1" : "",
+      "field2" : "",
+      "field3" : "",
+      "level" : "LV3"
+    },
+    "status" : "Modified"
   }
 }, {
   "id" : "LV1-2",
