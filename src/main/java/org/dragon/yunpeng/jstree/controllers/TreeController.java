@@ -3,6 +3,7 @@ package org.dragon.yunpeng.jstree.controllers;
 import org.dragon.yunpeng.jstree.Constants;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
+import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
 import org.dragon.yunpeng.jstree.services.JsTreeSaveService;
 import org.dragon.yunpeng.jstree.services.JsTreeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,8 @@ public class TreeController {
 		}
 	}
 
-	// Alternative JSON format (flat)
+	// 1. Save the flat JSON and approve the change request.
+	// 2. Save data into symbol tables.
 	@PostMapping("/saveAndApproveChangeRequest")
 	public ResponseEntity<String> saveAndApproveChangeRequest(@RequestBody Object jsonTree) {
 
@@ -115,15 +117,17 @@ public class TreeController {
 			System.out.println("Flat JSON to save:");
 			System.out.println(prettyJson);
 
+			// Mark change request as Approved.
+			ChangeRequestSandbox changeRequest = jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_APPROVED,
+					"SYS_USER");
+
 			ObjectMapper mapper = new ObjectMapper();
 			List<JsTreeNode2> nodes = mapper.readValue(prettyJson, new TypeReference<List<JsTreeNode2>>() {
 			});
 
+			//TODO: combine jsTreeSaveService.saveChangeRequest() in one transaction.
 			// Save data into real symbol tables.
-			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes);
-
-			// Mark change request as Approved.
-			jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_APPROVED, "SYS_USER");
+			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes, changeRequest.getId()); //TODO
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {

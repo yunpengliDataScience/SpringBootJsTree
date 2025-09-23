@@ -1,7 +1,9 @@
 package org.dragon.yunpeng.jstree.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -10,12 +12,14 @@ import javax.transaction.Transactional;
 import org.dragon.yunpeng.jstree.Constants;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode;
 import org.dragon.yunpeng.jstree.dtos.JsTreeNode2;
+import org.dragon.yunpeng.jstree.entities.ChangeLog;
 import org.dragon.yunpeng.jstree.entities.ChangeRequestSandbox;
 import org.dragon.yunpeng.jstree.entities.JsonAuditTrail;
 import org.dragon.yunpeng.jstree.entities.LV1Symb;
 import org.dragon.yunpeng.jstree.entities.LV2Symb;
 import org.dragon.yunpeng.jstree.entities.LV3Symb;
 import org.dragon.yunpeng.jstree.entities.LV4Symb;
+import org.dragon.yunpeng.jstree.repositories.ChangeLogRepository;
 import org.dragon.yunpeng.jstree.repositories.ChangeRequestSandboxRepository;
 import org.dragon.yunpeng.jstree.repositories.JsonAuditTrailRepository;
 import org.dragon.yunpeng.jstree.repositories.LV1SymbRepository;
@@ -40,6 +44,8 @@ public class JsTreeSaveService {
 	private JsonAuditTrailRepository jsonAuditTrailRepository;
 	@Autowired
 	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
+	@Autowired
+	private ChangeLogRepository changeLogRepo;
 
 	@Transactional
 	public void saveModifiedNodesHierarchicalFormat(List<JsTreeNode> nodes) {
@@ -159,10 +165,11 @@ public class JsTreeSaveService {
 	}
 
 	@Transactional
-	public void saveChangeRequest(String json, String status, String userName) {
+	public ChangeRequestSandbox saveChangeRequest(String json, String status, String userName) {
 
 		// retrieve an unapproved change request in json format
-		ChangeRequestSandbox changeRequest = changeRequestSandboxRepo.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);
+		ChangeRequestSandbox changeRequest = changeRequestSandboxRepo
+				.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);
 
 		// create a new record if unapproved change request does not exist.
 		if (changeRequest == null) {
@@ -173,11 +180,60 @@ public class JsTreeSaveService {
 		changeRequest.setUserName(userName);
 		changeRequest.setTimestamp(LocalDateTime.now());
 
-		changeRequestSandboxRepo.save(changeRequest);
+		return changeRequestSandboxRepo.save(changeRequest);
+	}
+
+	private List<ChangeLog> constructChangeLogList(Map<String, Object> modifiedData, Map<String, String> baseLineData,
+			Long changeRequestId, Long entityId, String tableName) {
+		List<ChangeLog> changeLogList = new ArrayList<ChangeLog>();
+
+		Iterator<String> keySetIterator = baseLineData.keySet().iterator();
+
+		while (keySetIterator.hasNext()) {
+			String key = keySetIterator.next();
+
+			if (!"level".equals(key) && !("databaseId").equals(key)) {
+				String oldValue = baseLineData.get(key);
+				String newValue = (String) modifiedData.get(key);
+
+				if (!newValue.equals(oldValue)) {
+					ChangeLog changeLog = new ChangeLog();
+
+					changeLog.setChangeRequestId(changeRequestId);
+					changeLog.setTableName(tableName);
+					changeLog.setColumnName(key);
+					changeLog.setEntityId(entityId);
+					changeLog.setOldValue(oldValue);
+					changeLog.setNewValue(newValue);
+
+					if (oldValue.trim() == null || "".equals(oldValue)) {
+						changeLog.setOperationType(Constants.INSERT);
+					} else {
+						changeLog.setOperationType(Constants.UPDATE);
+					}
+
+					changeLogList.add(changeLog);
+				}
+			}
+		}
+
+		return changeLogList;
+	}
+
+	@Transactional
+	public void saveChangeLogRecords(List<ChangeLog> changeLogList) {
+		for (ChangeLog changeLog : changeLogList) {
+			changeLogRepo.save(changeLog);
+		}
 	}
 
 	@Transactional
 	public void saveModifiedNodesFlatFormat(List<JsTreeNode2> nodes) {
+		this.saveModifiedNodesFlatFormat(nodes, 0l);
+	}
+
+	@Transactional
+	public void saveModifiedNodesFlatFormat(List<JsTreeNode2> nodes, Long changeRequestId) {
 
 		Map<String, JsTreeNode2> idNodeMap = constructIdAndNodeMap(nodes);
 
@@ -197,6 +253,10 @@ public class JsTreeSaveService {
 				String parentId = node.getParent();
 
 				if ("Modified".equalsIgnoreCase(status)) {
+
+					Map<String, String> baseLineData = (Map<String, String>) data.get("baseLineData");
+					System.out.println("baseLineData: " + baseLineData);
+
 					if ("LV1".equalsIgnoreCase(level)) {
 						LV1Symb entity = null;
 						if (databaseIdStr == null || databaseIdStr.isEmpty()) {
@@ -207,7 +267,11 @@ public class JsTreeSaveService {
 						entity.setName(node.getText());
 						entity.setLevel(level);
 						entity.setField1((String) data.get("field1"));
-						lv1Repo.save(entity);
+						LV1Symb savedLV1Symb = lv1Repo.save(entity);
+
+						List<ChangeLog> changeLogList = this.constructChangeLogList(data, baseLineData, changeRequestId,
+								savedLV1Symb.getId(), "LV1_SYMB");
+						this.saveChangeLogRecords(changeLogList);
 
 						// update id for children
 						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
@@ -234,7 +298,11 @@ public class JsTreeSaveService {
 						entity.setLevel(level);
 						entity.setField1((String) data.get("field1"));
 						entity.setField2((String) data.get("field2"));
-						lv2Repo.save(entity);
+						LV2Symb savedLV2Symb = lv2Repo.save(entity);
+
+						List<ChangeLog> changeLogList = this.constructChangeLogList(data, baseLineData, changeRequestId,
+								savedLV2Symb.getId(), "LV2_SYMB");
+						this.saveChangeLogRecords(changeLogList);
 
 						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
 						currentNode.getData().put("databaseId", entity.getId());
@@ -260,7 +328,12 @@ public class JsTreeSaveService {
 						entity.setField1((String) data.get("field1"));
 						entity.setField2((String) data.get("field2"));
 						entity.setField3((String) data.get("field3"));
-						lv3Repo.save(entity);
+
+						LV3Symb savedLV3Symb = lv3Repo.save(entity);
+
+						List<ChangeLog> changeLogList = this.constructChangeLogList(data, baseLineData, changeRequestId,
+								savedLV3Symb.getId(), "LV3_SYMB");
+						this.saveChangeLogRecords(changeLogList);
 
 						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
 						currentNode.getData().put("databaseId", entity.getId());
@@ -287,7 +360,12 @@ public class JsTreeSaveService {
 						entity.setField2((String) data.get("field2"));
 						entity.setField3((String) data.get("field3"));
 						entity.setField4((String) data.get("field4"));
-						lv4Repo.save(entity);
+
+						LV4Symb savedLV4Symb = lv4Repo.save(entity);
+
+						List<ChangeLog> changeLogList = this.constructChangeLogList(data, baseLineData, changeRequestId,
+								savedLV4Symb.getId(), "LV4_SYMB");
+						this.saveChangeLogRecords(changeLogList);
 
 						JsTreeNode2 currentNode = idNodeMap.get(nodeId);
 						currentNode.getData().put("databaseId", entity.getId());
