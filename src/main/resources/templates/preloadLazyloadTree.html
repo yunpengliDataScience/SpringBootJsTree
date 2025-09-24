@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hybrid jsTree Example</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <script>
+    $(function() {
+	  
+	  preloadUrl = "[[@{'/api/tree/preloaded'}]]";
+	  lazyloadUrl = "[[@{'/api/tree/children/'}]]";
+	  
+	  //[[@{'/api/tree/preloaded'}]]
+      // Get preloaded JSON from backend
+      $.getJSON(preloadUrl, function(preloadedData) {
+        $('#jstree').jstree({
+          'core': {
+            'data': function (node, cb) {
+              if (node.id === '#') {
+                // Use preloaded JSON for the root
+                cb(preloadedData);
+              } else {
+                // Lazy load children from backend
+                $.getJSON(lazyloadUrl + node.id, function (data) {
+                  cb(data);
+                });
+              }
+            }
+          }
+        })
+        .on('loaded.jstree', function () {
+	      var tree = $('#jstree').jstree(true);
+	
+	      // Loop through preloaded nodes
+	      preloadedData.forEach(function (n) {
+	        // If node has parent (not root), open its parent
+	        if (n.parent && n.parent !== "#") {
+	          tree.open_node(n.parent);
+	        }
+	      });
+	    });
+        
+        
+      });
+    });
+  </script>
+</body>
+</html>

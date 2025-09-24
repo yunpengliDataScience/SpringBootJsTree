@@ -36,4 +36,9 @@ public class HomeController {
 		return "alternativeJsonTree";
 	}
 
+	@GetMapping("/preloadLazyloadTree")
+	public String preloadLazyloadTree() {
+
+		return "preloadLazyloadTree";
+	}
 }

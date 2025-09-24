@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,9 +127,9 @@ public class TreeController {
 			List<JsTreeNode2> nodes = mapper.readValue(prettyJson, new TypeReference<List<JsTreeNode2>>() {
 			});
 
-			//TODO: combine jsTreeSaveService.saveChangeRequest() in one transaction.
+			// TODO: combine jsTreeSaveService.saveChangeRequest() in one transaction.
 			// Save data into real symbol tables.
-			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes, changeRequest.getId()); //TODO
+			jsTreeSaveService.saveModifiedNodesFlatFormat(nodes, changeRequest.getId()); // TODO
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
 		} catch (IOException e) {
@@ -201,4 +203,72 @@ public class TreeController {
 					.body("{\"error\":\"Failed to convert JsTreeNode2 list to JSON\"}");
 		}
 	}
+
+	// --------------------------------------------------------------
+	private Map<String, Object> node(String id, String parent, String text, boolean hasChildren) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("id", id);
+		map.put("parent", parent);
+		map.put("text", text);
+		if (hasChildren) {
+			map.put("children", true); // jsTree will lazy load this
+		}
+		return map;
+	}
+
+	// Preloaded flat JSON (comes from DB in your real case) 
+	@GetMapping("/preloaded")
+	public List<Map<String, Object>> getPreloadedTree() {
+	    List<Map<String, Object>> nodes = new ArrayList<>();
+
+	    // Root A
+	    nodes.add(node("1", "#", "Root A (Preloaded)", false));
+	    nodes.add(node("1_1", "1", "Child A1 (Preloaded)", false));
+	    nodes.add(node("1_2", "1", "Child A2 (Preloaded)", false));
+
+	    // Root B
+	    nodes.add(node("2", "#", "Root B (Preloaded)", false));
+	    nodes.add(node("2_1", "2", "Child B1 (Preloaded)", false));
+
+	    // Preloaded children under B1
+	    nodes.add(node("2_1_1", "2_1", "B1-Child 1 (Preloaded)", false));
+	    nodes.add(node("2_1_2", "2_1", "B1-Child 2 (Preloaded)", false));
+	    // B1-Child 3 now has lazy descendants
+	    nodes.add(node("2_1_3", "2_1", "B1-Child 3 (Preloaded, has lazy children)", true));
+
+	    nodes.add(node("2_2", "2", "Child B2 (Lazy)", true));
+
+	    // Root C (lazy load)
+	    nodes.add(node("3", "#", "Root C (Lazy)", true));
+
+	    return nodes;
+	}
+
+	// Lazy loaded children
+	@GetMapping("/children/{id}")
+	public List<Map<String, Object>> getChildren(@PathVariable String id) {
+
+	    System.out.println("Lazy loading children for node id: " + id);
+
+	    List<Map<String, Object>> children = new ArrayList<>();
+
+	    if ("2_1_3".equals(id)) {
+	        // Lazy children under B1-Child 3
+	        children.add(node("2_1_3_1", "2_1_3", "Lazy Child B1-3-1", false));
+	        children.add(node("2_1_3_2", "2_1_3", "Lazy Child B1-3-2", true)); // further lazy
+	    } else if ("2_2".equals(id)) {
+	        children.add(node("2_2_1", "2_2", "Lazy Child B2-1", false));
+	        children.add(node("2_2_2", "2_2", "Lazy Child B2-2", true));
+	    } else if ("3".equals(id)) {
+	        children.add(node("3_1", "3", "Lazy Child C1", false));
+	        children.add(node("3_2", "3", "Lazy Child C2", false));
+	    } else if ("2_2_2".equals(id)) {
+	        children.add(node("2_2_2_1", "2_2_2", "Deep Lazy Child B2-2-1", false));
+	        children.add(node("2_2_2_2", "2_2_2", "Deep Lazy Child B2-2-2", false));
+	    }
+
+	    return children;
+	}
+
+
 }
