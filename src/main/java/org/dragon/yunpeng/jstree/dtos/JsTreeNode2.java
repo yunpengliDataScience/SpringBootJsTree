@@ -16,11 +16,22 @@ public class JsTreeNode2 {
 
 	@JsonProperty("data")
 	private Map<String, Object> data;
+	
+	@JsonProperty("children")
+	private Boolean children;  // add this
 
 	// Constructors
 	public JsTreeNode2() {
 	}
 
+    public JsTreeNode2(String id, String text, String parent, Map<String, Object> data, Boolean children) {
+        this.id = id;
+        this.text = text;
+        this.parent = parent;
+        this.data = data;
+        this.children = children;
+    }
+    
 	public JsTreeNode2(String id, String text, String parent, Map<String, Object> data) {
 		this.id = id;
 		this.text = text;
@@ -59,5 +70,13 @@ public class JsTreeNode2 {
 
 	public void setParent(String parent) {
 		this.parent = parent;
+	}
+
+	public Boolean getChildren() {
+		return children;
+	}
+
+	public void setChildren(Boolean children) {
+		this.children = children;
 	}
 }

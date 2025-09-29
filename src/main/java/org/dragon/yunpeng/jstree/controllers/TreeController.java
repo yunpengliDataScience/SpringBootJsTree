@@ -277,5 +277,58 @@ public class TreeController {
 	    return children;
 	}
 
+	//---------------------------------------------------------------------------
+	
+	private final Gson gson = new Gson();
 
+//    private JsTreeNode2 node(String id, String parent, String text, String level, boolean hasChildren) {
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("level", level);
+//        
+//        return new JsTreeNode2(id, text, parent, data, hasChildren);
+//    }
+
+    @GetMapping("/getRootNodes")
+    public List<JsTreeNode2> getRootNodes() {
+        List<JsTreeNode2> nodes = new ArrayList<>();
+
+        Map<String, Object> data1 = new HashMap<>();
+        data1.put("level", "LV1");
+        nodes.add(new JsTreeNode2("LV1_1", "Root Node 1", "#", data1, true)); // 👈 true = expandable
+
+        Map<String, Object> data2 = new HashMap<>();
+        data2.put("level", "LV1");
+        nodes.add(new JsTreeNode2("LV1_2", "Root Node 2", "#", data2, true));
+
+        return nodes;
+    }
+
+
+    @GetMapping("/getChildren/{id}")
+    public List<JsTreeNode2> getChildren(@PathVariable("id") String id,
+                                         @RequestParam("level") String level) {
+        List<JsTreeNode2> nodes = new ArrayList<>();
+
+        if ("LV1".equals(level)) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("level", "LV2");
+            nodes.add(new JsTreeNode2(id + "_LV2_1", "Child A1", id, data, true));
+            nodes.add(new JsTreeNode2(id + "_LV2_2", "Child A2", id, data, true));
+        } else if ("LV2".equals(level)) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("level", "LV3");
+            nodes.add(new JsTreeNode2(id + "_LV3_1", "Child A1-1", id, data, true));
+        } else if ("LV3".equals(level)) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("level", "LV4");
+            nodes.add(new JsTreeNode2(id + "_LV4_1", "Leaf Node", id, data, false));
+        }
+
+        return nodes;
+    }
+
+
+	
+	
+	
 }

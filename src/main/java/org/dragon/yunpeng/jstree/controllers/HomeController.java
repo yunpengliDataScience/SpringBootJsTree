@@ -41,4 +41,10 @@ public class HomeController {
 
 		return "preloadLazyloadTree";
 	}
+	
+	@GetMapping("/lazyloadTree")
+	public String lazyloadTree() {
+
+		return "lazyloadSymbolTree";
+	}
 }
