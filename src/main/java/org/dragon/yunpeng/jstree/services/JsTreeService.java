@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -251,8 +253,12 @@ public class JsTreeService {
 			List<JsTreeNode2> nodes = getJsTreeDataFlatFormat();
 
 			// Convert List -> JSON string
-			ObjectMapper objectMapper = new ObjectMapper();
-			jsonString = objectMapper.writeValueAsString(nodes);
+			//ObjectMapper objectMapper = new ObjectMapper();
+			//jsonString = objectMapper.writeValueAsString(nodes);
+			
+			// Use Gson instead of ObjectMapper
+	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	        jsonString = gson.toJson(nodes);
 		}
 
 		System.out.println(jsonString);

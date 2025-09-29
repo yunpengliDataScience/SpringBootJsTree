@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -145,15 +147,20 @@ public class TreeController {
 		System.out.println(jsonTree);
 
 		try {
-			String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
+			
+			//String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
 
+			// Use Gson instead of Jackson ObjectMapper
+	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	        String prettyJson = gson.toJson(jsonTree);
+	        
 			jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_DRAFT, "SYS_USER");
 
 			System.out.println("Flat JSON to save:");
 			System.out.println(prettyJson);
 
 			return ResponseEntity.ok("Pretty JSON tree saved.");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			return ResponseEntity.status(500).body("Error: " + e.getMessage());
 		}
 	}
