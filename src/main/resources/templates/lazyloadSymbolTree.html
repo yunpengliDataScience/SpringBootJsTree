@@ -536,14 +536,26 @@ function deleteNode() {
 }
 
 function saveTree() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
+	
+  const tree = $('#jstree').jstree(true);
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
   
-  // Force children:true for every node
-  fullTree.forEach(n => {
-    n.children = true;
+  //Only add children:true (lazy loading indicator) for nodes that have no child loaded yet.
+  //If a node has child node loaded, adding children:true will cause errors.
+  fullTreeJson.forEach(n => {
+    // Look up the live node in jsTree
+    const liveNode = tree.get_node(n.id);
+
+    // If node has no children loaded, mark as lazy
+    if (!liveNode.children || liveNode.children.length === 0) {
+      n.children = true;
+    } else {
+      // Otherwise, remove children:true and let jsTree build array
+      delete n.children;
+    }
   });
   
-  alert(JSON.stringify(fullTree));
+  alert(JSON.stringify(fullTreeJson));
   
   url = "[[@{'/api/tree/saveTree/full-lazyloadSymbolTree-data.json'}]]";
 
@@ -551,19 +563,19 @@ function saveTree() {
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(fullTree),
+    data: JSON.stringify(fullTreeJson),
     success: () => alert("Tree saved successfully!"),
     error: () => alert("Error saving tree.")
   });
 }
 
 function saveMiniTree() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
   
-  const minimalTree = simplifyTree(fullTree);
-  alert(JSON.stringify(minimalTree));
+  const minimalTreeJson = simplifyTree(fullTreeJson);
+  alert(JSON.stringify(minimalTreeJson));
   
-  console.log(JSON.stringify(minimalTree, null, 2));
+  console.log(JSON.stringify(minimalTreeJson, null, 2));
 
   url = "[[@{'/api/tree/saveTree/mini-lazyloadSymbolTree-data.json'}]]";
   
@@ -571,24 +583,37 @@ function saveMiniTree() {
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(minimalTree),
+    data: JSON.stringify(minimalTreeJson),
     success: () => alert("Tree saved successfully!"),
     error: () => alert("Error saving tree.")
   });
 }
 
 function saveDraftChangeRequest() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
   
-  // Force children:true for every node
-  fullTree.forEach(n => {
-    n.children = true;
+  const tree = $('#jstree').jstree(true);
+  
+  //Only add children:true (lazy loading indicator) for nodes that have no child loaded yet.
+  //If a node has child node loaded, adding children:true will cause errors.
+  fullTreeJson.forEach(n => {
+    // Look up the live node in jsTree
+    const liveNode = tree.get_node(n.id);
+
+    // If node has no children loaded, mark as lazy
+    if (!liveNode.children || liveNode.children.length === 0) {
+      n.children = true;
+    } else {
+      // Otherwise, remove children:true and let jsTree build array
+      delete n.children;
+    }
   });
+  
   
   //const minimalTree = simplifyTree(fullTree);
   //alert(JSON.stringify(minimalTree));
   
-  console.log(JSON.stringify(fullTree, null, 2));
+  console.log(JSON.stringify(fullTreeJson, null, 2));
 
   url = "[[@{'/api/tree/saveDraftChangeRequest'}]]";
   
@@ -596,19 +621,19 @@ function saveDraftChangeRequest() {
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(fullTree),
+    data: JSON.stringify(fullTreeJson),
     success: () => alert("Tree saved successfully!"),
     error: () => alert("Error saving tree.")
   });
 }
 
 function saveAndApproveChangeRequest() {
-  const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
   
-  const minimalTree = simplifyTree(fullTree);
-  //alert(JSON.stringify(minimalTree));
+  const minimalTreeJson = simplifyTree(fullTreeJson);
+  //alert(JSON.stringify(minimalTreeJson));
   
-  console.log(JSON.stringify(minimalTree, null, 2));
+  console.log(JSON.stringify(minimalTreeJson, null, 2));
 
   url = "[[@{'/api/tree/saveAndApproveChangeRequest'}]]";
   
@@ -616,7 +641,7 @@ function saveAndApproveChangeRequest() {
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(minimalTree),
+    data: JSON.stringify(minimalTreeJson),
     success: () => {alert("Tree saved successfully!");
     				
     				setTimeout(function() {location.reload();}, 100);  // delay a little so reload works after alert

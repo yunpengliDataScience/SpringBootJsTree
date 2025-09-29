@@ -1,0 +1,90 @@
+[ {
+  "id" : "LV1-1",
+  "parent" : "#",
+  "text" : "A1",
+  "data" : {
+    "field1" : "field1_A1",
+    "level" : "LV1",
+    "name" : "A1",
+    "databaseId" : 1
+  }
+}, {
+  "id" : "LV1-2",
+  "parent" : "#",
+  "text" : "A2",
+  "data" : {
+    "field1" : "field1_A2",
+    "level" : "LV1",
+    "name" : "A2",
+    "databaseId" : 2
+  }
+}, {
+  "id" : "LV2-3",
+  "parent" : "LV1-2",
+  "text" : "B3",
+  "data" : {
+    "field1" : "field1_B3",
+    "level" : "LV2",
+    "name" : "B3",
+    "databaseId" : 3,
+    "field2" : "field2_B3"
+  }
+}, {
+  "id" : "LV2-4",
+  "parent" : "LV1-2",
+  "text" : "B4",
+  "data" : {
+    "field1" : "a",
+    "level" : "LV2",
+    "name" : "B4",
+    "databaseId" : 4,
+    "field2" : "b"
+  }
+}, {
+  "id" : "LV2-7",
+  "parent" : "LV1-2",
+  "text" : "X",
+  "data" : {
+    "field1" : "1x",
+    "level" : "LV2",
+    "name" : "X",
+    "databaseId" : 7,
+    "field2" : "2x"
+  }
+}, {
+  "id" : "LV3-7",
+  "parent" : "LV2-7",
+  "text" : "Y",
+  "data" : {
+    "field1" : "1",
+    "level" : "LV3",
+    "name" : "Y",
+    "databaseId" : 7,
+    "field3" : "3",
+    "field2" : "2"
+  }
+}, {
+  "id" : "LV4-6",
+  "parent" : "LV3-7",
+  "text" : "Z",
+  "data" : {
+    "field1" : "z1",
+    "level" : "LV4",
+    "name" : "Z",
+    "databaseId" : 6,
+    "field3" : "z3",
+    "field2" : "z2",
+    "field4" : "z4"
+  }
+}, {
+  "id" : "LV2-8",
+  "parent" : "LV1-2",
+  "text" : "B5",
+  "data" : {
+    "field1" : "aa",
+    "level" : "LV2",
+    "name" : "B5",
+    "databaseId" : 8,
+    "field2" : "aa"
+  }
+} ]
