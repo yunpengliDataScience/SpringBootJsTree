@@ -147,13 +147,14 @@ public class TreeController {
 		System.out.println(jsonTree);
 
 		try {
-			
-			//String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
+
+			// String prettyJson =
+			// objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonTree);
 
 			// Use Gson instead of Jackson ObjectMapper
-	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	        String prettyJson = gson.toJson(jsonTree);
-	        
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String prettyJson = gson.toJson(jsonTree);
+
 			jsTreeSaveService.saveChangeRequest(prettyJson, Constants.CR_DRAFT, "SYS_USER");
 
 			System.out.println("Flat JSON to save:");
@@ -223,112 +224,105 @@ public class TreeController {
 		return map;
 	}
 
-	// Preloaded flat JSON (comes from DB in your real case) 
+	// Preloaded flat JSON (comes from DB in your real case)
 	@GetMapping("/preloaded")
 	public List<Map<String, Object>> getPreloadedTree() {
-	    List<Map<String, Object>> nodes = new ArrayList<>();
+		List<Map<String, Object>> nodes = new ArrayList<>();
 
-	    // Root A
-	    nodes.add(node("1", "#", "Root A (Preloaded)", false));
-	    nodes.add(node("1_1", "1", "Child A1 (Preloaded)", false));
-	    nodes.add(node("1_2", "1", "Child A2 (Preloaded)", false));
+		// Root A
+		nodes.add(node("1", "#", "Root A (Preloaded)", false));
+		nodes.add(node("1_1", "1", "Child A1 (Preloaded)", false));
+		nodes.add(node("1_2", "1", "Child A2 (Preloaded)", false));
 
-	    // Root B
-	    nodes.add(node("2", "#", "Root B (Preloaded)", false));
-	    nodes.add(node("2_1", "2", "Child B1 (Preloaded)", false));
+		// Root B
+		nodes.add(node("2", "#", "Root B (Preloaded)", false));
+		nodes.add(node("2_1", "2", "Child B1 (Preloaded)", false));
 
-	    // Preloaded children under B1
-	    nodes.add(node("2_1_1", "2_1", "B1-Child 1 (Preloaded)", false));
-	    nodes.add(node("2_1_2", "2_1", "B1-Child 2 (Preloaded)", false));
-	    // B1-Child 3 now has lazy descendants
-	    nodes.add(node("2_1_3", "2_1", "B1-Child 3 (Preloaded, has lazy children)", true));
+		// Preloaded children under B1
+		nodes.add(node("2_1_1", "2_1", "B1-Child 1 (Preloaded)", false));
+		nodes.add(node("2_1_2", "2_1", "B1-Child 2 (Preloaded)", false));
+		// B1-Child 3 now has lazy descendants
+		nodes.add(node("2_1_3", "2_1", "B1-Child 3 (Preloaded, has lazy children)", true));
 
-	    nodes.add(node("2_2", "2", "Child B2 (Lazy)", true));
+		nodes.add(node("2_2", "2", "Child B2 (Lazy)", true));
 
-	    // Root C (lazy load)
-	    nodes.add(node("3", "#", "Root C (Lazy)", true));
+		// Root C (lazy load)
+		nodes.add(node("3", "#", "Root C (Lazy)", true));
 
-	    return nodes;
+		return nodes;
 	}
 
 	// Lazy loaded children
 	@GetMapping("/children/{id}")
 	public List<Map<String, Object>> getChildren(@PathVariable String id) {
 
-	    System.out.println("Lazy loading children for node id: " + id);
+		System.out.println("Lazy loading children for node id: " + id);
 
-	    List<Map<String, Object>> children = new ArrayList<>();
+		List<Map<String, Object>> children = new ArrayList<>();
 
-	    if ("2_1_3".equals(id)) {
-	        // Lazy children under B1-Child 3
-	        children.add(node("2_1_3_1", "2_1_3", "Lazy Child B1-3-1", false));
-	        children.add(node("2_1_3_2", "2_1_3", "Lazy Child B1-3-2", true)); // further lazy
-	    } else if ("2_2".equals(id)) {
-	        children.add(node("2_2_1", "2_2", "Lazy Child B2-1", false));
-	        children.add(node("2_2_2", "2_2", "Lazy Child B2-2", true));
-	    } else if ("3".equals(id)) {
-	        children.add(node("3_1", "3", "Lazy Child C1", false));
-	        children.add(node("3_2", "3", "Lazy Child C2", false));
-	    } else if ("2_2_2".equals(id)) {
-	        children.add(node("2_2_2_1", "2_2_2", "Deep Lazy Child B2-2-1", false));
-	        children.add(node("2_2_2_2", "2_2_2", "Deep Lazy Child B2-2-2", false));
-	    }
+		if ("2_1_3".equals(id)) {
+			// Lazy children under B1-Child 3
+			children.add(node("2_1_3_1", "2_1_3", "Lazy Child B1-3-1", false));
+			children.add(node("2_1_3_2", "2_1_3", "Lazy Child B1-3-2", true)); // further lazy
+		} else if ("2_2".equals(id)) {
+			children.add(node("2_2_1", "2_2", "Lazy Child B2-1", false));
+			children.add(node("2_2_2", "2_2", "Lazy Child B2-2", true));
+		} else if ("3".equals(id)) {
+			children.add(node("3_1", "3", "Lazy Child C1", false));
+			children.add(node("3_2", "3", "Lazy Child C2", false));
+		} else if ("2_2_2".equals(id)) {
+			children.add(node("2_2_2_1", "2_2_2", "Deep Lazy Child B2-2-1", false));
+			children.add(node("2_2_2_2", "2_2_2", "Deep Lazy Child B2-2-2", false));
+		}
 
-	    return children;
+		return children;
 	}
 
-	//---------------------------------------------------------------------------
-	
+	// ---------------------------------------------------------------------------
+
 	private final Gson gson = new Gson();
 
-//    private JsTreeNode2 node(String id, String parent, String text, String level, boolean hasChildren) {
-//        Map<String, Object> data = new HashMap<>();
-//        data.put("level", level);
-//        
-//        return new JsTreeNode2(id, text, parent, data, hasChildren);
-//    }
+	@GetMapping("/getRootNodes")
+	public List<JsTreeNode2> getRootNodes() {
+		System.out.println("getRootNodes() is called");
 
-    @GetMapping("/getRootNodes")
-    public List<JsTreeNode2> getRootNodes() {
-        List<JsTreeNode2> nodes = new ArrayList<>();
+		List<JsTreeNode2> nodes = new ArrayList<>();
 
-        Map<String, Object> data1 = new HashMap<>();
-        data1.put("level", "LV1");
-        nodes.add(new JsTreeNode2("LV1_1", "Root Node 1", "#", data1, true)); // 👈 true = expandable
+		Map<String, Object> data1 = new HashMap<>();
+		data1.put("level", "LV1");
+		nodes.add(new JsTreeNode2("LV1_1", "Root Node 1", "#", data1, true)); // 👈 true = expandable
 
-        Map<String, Object> data2 = new HashMap<>();
-        data2.put("level", "LV1");
-        nodes.add(new JsTreeNode2("LV1_2", "Root Node 2", "#", data2, true));
+		Map<String, Object> data2 = new HashMap<>();
+		data2.put("level", "LV1");
+		nodes.add(new JsTreeNode2("LV1_2", "Root Node 2", "#", data2, true));
 
-        return nodes;
-    }
+		return nodes;
+	}
 
+	@GetMapping("/getChildren/{parentId}")
+	public List<JsTreeNode2> getChildren(@PathVariable("parentId") String parentId,
+			@RequestParam("level") String level) {
 
-    @GetMapping("/getChildren/{id}")
-    public List<JsTreeNode2> getChildren(@PathVariable("id") String id,
-                                         @RequestParam("level") String level) {
-        List<JsTreeNode2> nodes = new ArrayList<>();
+		System.out.println("getChildren() is called, parentId=" + parentId);
 
-        if ("LV1".equals(level)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("level", "LV2");
-            nodes.add(new JsTreeNode2(id + "_LV2_1", "Child A1", id, data, true));
-            nodes.add(new JsTreeNode2(id + "_LV2_2", "Child A2", id, data, true));
-        } else if ("LV2".equals(level)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("level", "LV3");
-            nodes.add(new JsTreeNode2(id + "_LV3_1", "Child A1-1", id, data, true));
-        } else if ("LV3".equals(level)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("level", "LV4");
-            nodes.add(new JsTreeNode2(id + "_LV4_1", "Leaf Node", id, data, false));
-        }
+		List<JsTreeNode2> nodes = new ArrayList<>();
 
-        return nodes;
-    }
+		if ("LV1".equals(level)) {
+			Map<String, Object> data = new HashMap<>();
+			data.put("level", "LV2");
+			nodes.add(new JsTreeNode2(parentId + "_LV2_1", "Child A1", parentId, data, true));
+			nodes.add(new JsTreeNode2(parentId + "_LV2_2", "Child A2", parentId, data, true));
+		} else if ("LV2".equals(level)) {
+			Map<String, Object> data = new HashMap<>();
+			data.put("level", "LV3");
+			nodes.add(new JsTreeNode2(parentId + "_LV3_1", "Child A1-1", parentId, data, true));
+		} else if ("LV3".equals(level)) {
+			Map<String, Object> data = new HashMap<>();
+			data.put("level", "LV4");
+			nodes.add(new JsTreeNode2(parentId + "_LV4_1", "Leaf Node", parentId, data, false));
+		}
 
+		return nodes;
+	}
 
-	
-	
-	
 }

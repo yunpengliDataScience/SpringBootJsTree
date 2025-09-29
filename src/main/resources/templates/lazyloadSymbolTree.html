@@ -171,14 +171,14 @@ $(function () {
 	$('#jstree').jstree({
 	  'core': {
 	    'check_callback': true,
-	    //'multiple': true,         // allow selecting multiple nodes
+	    
 	    'data': {
 	      'url': function (node) {
 	        if (node.id === "#") {
 	          // First call, fetch root nodes
 	          return "[[@{'/api/tree/getRootNodes'}]]";
 	        } else {
-	          // Fetch children of expanded node
+	          // Fetch children of expanded node (pass current node id as parent id)
 	          return "[[@{'/api/tree/getChildren/'}]]" + node.id;
 	        }
 	      },
@@ -191,22 +191,10 @@ $(function () {
 	      }
 	    },
 	    
-	    //"expand_selected_onload": false, // Important for lazy loading
-	    
 	  },
 	  
-	  //"plugins": ["wholerow"]   // important
 	});
 	
-	//.on('before_open.jstree', function (e, data) {
-        // Simply return true to allow opening without closing others
-    //    return true;
-   // });
-
-  //$('#jstree').jstree('open_node', nodeId, false, false);
-
-    
-
   // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree', colorNodes);
   
