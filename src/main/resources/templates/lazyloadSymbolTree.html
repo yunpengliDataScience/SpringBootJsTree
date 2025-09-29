@@ -183,9 +183,10 @@ $(function () {
 	        }
 	      },
 	      'data': function (node) {
-	        // Pass both id and level
+	        // Pass node id, databaseId, and level as parameters to the backend.
 	        return {
 	          id: node.id,
+	          databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
 	          level: node.data && node.data.level ? node.data.level : "LV1" // fallback for root
 	        };
 	      }
@@ -536,9 +537,15 @@ function deleteNode() {
 
 function saveTree() {
   const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
+  
+  // Force children:true for every node
+  fullTree.forEach(n => {
+    n.children = true;
+  });
+  
   alert(JSON.stringify(fullTree));
   
-  url = "[[@{'/api/tree/saveTree/full-symboltree3-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/full-lazyloadSymbolTree-data.json'}]]";
 
   $.ajax({
     url: url,
@@ -558,7 +565,7 @@ function saveMiniTree() {
   
   console.log(JSON.stringify(minimalTree, null, 2));
 
-  url = "[[@{'/api/tree/saveTree/mini-symboltree3-data.json'}]]";
+  url = "[[@{'/api/tree/saveTree/mini-lazyloadSymbolTree-data.json'}]]";
   
   $.ajax({
     url: url,
@@ -573,10 +580,15 @@ function saveMiniTree() {
 function saveDraftChangeRequest() {
   const fullTree = $('#jstree').jstree(true).get_json('#', { flat: true });
   
-  const minimalTree = simplifyTree(fullTree);
+  // Force children:true for every node
+  fullTree.forEach(n => {
+    n.children = true;
+  });
+  
+  //const minimalTree = simplifyTree(fullTree);
   //alert(JSON.stringify(minimalTree));
   
-  console.log(JSON.stringify(minimalTree, null, 2));
+  console.log(JSON.stringify(fullTree, null, 2));
 
   url = "[[@{'/api/tree/saveDraftChangeRequest'}]]";
   
@@ -584,7 +596,7 @@ function saveDraftChangeRequest() {
     url: url,
     type: 'POST',
     contentType: 'application/json',
-    data: JSON.stringify(minimalTree),
+    data: JSON.stringify(fullTree),
     success: () => alert("Tree saved successfully!"),
     error: () => alert("Error saving tree.")
   });

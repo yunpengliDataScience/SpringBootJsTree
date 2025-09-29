@@ -142,6 +142,120 @@ public class JsTreeService {
 		return children;
 	}
 
+	public List<JsTreeNode2> getRootNodesFlatFormat() {
+		List<JsTreeNode2> nodeList = new ArrayList<>();
+
+		// Level 1
+		List<LV1Symb> lv1List = lv1Repo.findAll();
+		for (LV1Symb lv1 : lv1List) {
+			JsTreeNode2 node = new JsTreeNode2();
+			node.setId("LV1-" + lv1.getId());
+
+			node.setParent("#");
+			node.setText(lv1.getName());
+
+			Map<String, Object> data = new HashMap<String, Object>();
+
+			data.put("databaseId", lv1.getId());
+			data.put("name", lv1.getName());
+			data.put("level", lv1.getLevel());
+			data.put("field1", lv1.getField1());
+			
+			node.setData(data);
+			node.setChildren(true);
+
+			nodeList.add(node);
+		}
+
+		return nodeList;
+	}
+
+	public List<JsTreeNode2> getChildNodesFlatFormat(String parentLevel, String parentNodeId, String parentDatabaseId) {
+		List<JsTreeNode2> nodeList = new ArrayList<>();
+
+		if (!"".equals(parentDatabaseId) && !(parentDatabaseId == null)) {
+
+			long parentDBId = Long.parseLong(parentDatabaseId);
+
+			if ("LV1".equals(parentLevel)) {
+
+				// Level 2
+				List<LV2Symb> lv2List = lv2Repo.findByLv1Id(parentDBId);
+				for (LV2Symb lv2 : lv2List) {
+					JsTreeNode2 node = new JsTreeNode2();
+					node.setId("LV2-" + lv2.getId());
+
+					node.setParent(parentNodeId);
+					node.setText(lv2.getName());
+
+					Map<String, Object> data = new HashMap<String, Object>();
+
+					data.put("databaseId", lv2.getId());
+					data.put("name", lv2.getName());
+					data.put("level", lv2.getLevel());
+					data.put("field1", lv2.getField1());
+					data.put("field2", lv2.getField2());
+					
+					node.setData(data);
+					node.setChildren(true);
+
+					nodeList.add(node);
+				}
+			} else if ("LV2".equals(parentLevel)) {
+				// Level 3
+				List<LV3Symb> lv3List = lv3Repo.findByLv2Id(parentDBId);
+				for (LV3Symb lv3 : lv3List) {
+					JsTreeNode2 node = new JsTreeNode2();
+					node.setId("LV3-" + lv3.getId());
+
+					node.setParent(parentNodeId);
+					node.setText(lv3.getName());
+
+					Map<String, Object> data = new HashMap<String, Object>();
+
+					data.put("databaseId", lv3.getId());
+					data.put("name", lv3.getName());
+					data.put("level", lv3.getLevel());
+					data.put("field1", lv3.getField1());
+					data.put("field2", lv3.getField2());
+					data.put("field3", lv3.getField3());
+					
+					node.setData(data);
+					node.setChildren(true);
+
+					nodeList.add(node);
+				}
+			} else if ("LV3".equals(parentLevel)) {
+				// Level 4
+				List<LV4Symb> lv4List = lv4Repo.findByLv3Id(parentDBId);
+				for (LV4Symb lv4 : lv4List) {
+					JsTreeNode2 node = new JsTreeNode2();
+					node.setId("LV4-" + lv4.getId());
+
+					node.setParent(parentNodeId);
+					node.setText(lv4.getName());
+
+					Map<String, Object> data = new HashMap<String, Object>();
+
+					data.put("databaseId", lv4.getId());
+					data.put("name", lv4.getName());
+					data.put("level", lv4.getLevel());
+					data.put("field1", lv4.getField1());
+					data.put("field2", lv4.getField2());
+					data.put("field3", lv4.getField3());
+					data.put("field4", lv4.getField4());
+
+					node.setData(data);
+					node.setChildren(true);
+
+					nodeList.add(node);
+				}
+			}
+		}
+
+		return nodeList;
+	}
+
 	// Get Tree data in flat Json format.
 	public List<JsTreeNode2> getJsTreeDataFlatFormat() {
 		List<JsTreeNode2> dataList = new ArrayList<>();
@@ -253,12 +367,12 @@ public class JsTreeService {
 			List<JsTreeNode2> nodes = getJsTreeDataFlatFormat();
 
 			// Convert List -> JSON string
-			//ObjectMapper objectMapper = new ObjectMapper();
-			//jsonString = objectMapper.writeValueAsString(nodes);
-			
+			// ObjectMapper objectMapper = new ObjectMapper();
+			// jsonString = objectMapper.writeValueAsString(nodes);
+
 			// Use Gson instead of ObjectMapper
-	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	        jsonString = gson.toJson(nodes);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			jsonString = gson.toJson(nodes);
 		}
 
 		System.out.println(jsonString);

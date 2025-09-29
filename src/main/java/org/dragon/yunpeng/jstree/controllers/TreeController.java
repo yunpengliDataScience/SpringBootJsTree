@@ -286,6 +286,14 @@ public class TreeController {
 	public List<JsTreeNode2> getRootNodes() {
 		System.out.println("getRootNodes() is called");
 
+		// List<JsTreeNode2> nodes = generateDummyRootNodes();
+
+		List<JsTreeNode2> nodes = jsTreeService.getRootNodesFlatFormat();
+
+		return nodes;
+	}
+
+	private List<JsTreeNode2> generateDummyRootNodes() {
 		List<JsTreeNode2> nodes = new ArrayList<>();
 
 		Map<String, Object> data1 = new HashMap<>();
@@ -295,33 +303,40 @@ public class TreeController {
 		Map<String, Object> data2 = new HashMap<>();
 		data2.put("level", "LV1");
 		nodes.add(new JsTreeNode2("LV1_2", "Root Node 2", "#", data2, true));
-
 		return nodes;
 	}
 
 	@GetMapping("/getChildren/{parentId}")
 	public List<JsTreeNode2> getChildren(@PathVariable("parentId") String parentId,
-			@RequestParam("level") String level) {
+			@RequestParam("level") String parentLevel, @RequestParam("databaseId") String parentDatabaseId) {
 
-		System.out.println("getChildren() is called, parentId=" + parentId);
+		System.out.println("getChildren() is called, parentId=" + parentId + ", parentLevel=" + parentLevel
+				+ ", databaseId=" + parentDatabaseId);
 
+		// List<JsTreeNode2> nodes = generateDummyChildNodes(parentId, parentLevel);
+
+		List<JsTreeNode2> nodes = jsTreeService.getChildNodesFlatFormat(parentLevel, parentId, parentDatabaseId);
+
+		return nodes;
+	}
+
+	private List<JsTreeNode2> generateDummyChildNodes(String parentId, String parentLevel) {
 		List<JsTreeNode2> nodes = new ArrayList<>();
 
-		if ("LV1".equals(level)) {
+		if ("LV1".equals(parentLevel)) {
 			Map<String, Object> data = new HashMap<>();
 			data.put("level", "LV2");
 			nodes.add(new JsTreeNode2(parentId + "_LV2_1", "Child A1", parentId, data, true));
 			nodes.add(new JsTreeNode2(parentId + "_LV2_2", "Child A2", parentId, data, true));
-		} else if ("LV2".equals(level)) {
+		} else if ("LV2".equals(parentLevel)) {
 			Map<String, Object> data = new HashMap<>();
 			data.put("level", "LV3");
 			nodes.add(new JsTreeNode2(parentId + "_LV3_1", "Child A1-1", parentId, data, true));
-		} else if ("LV3".equals(level)) {
+		} else if ("LV3".equals(parentLevel)) {
 			Map<String, Object> data = new HashMap<>();
 			data.put("level", "LV4");
 			nodes.add(new JsTreeNode2(parentId + "_LV4_1", "Leaf Node", parentId, data, false));
 		}
-
 		return nodes;
 	}
 
