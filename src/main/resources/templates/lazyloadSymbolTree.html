@@ -168,6 +168,68 @@
 let selectedNode = null;
 
 $(function () {
+	
+	$.ajax({
+	    url: "[[@{'/api/tree/getJsTreeDataForChangeRequest'}]]",  // endpoint that returns saved JSON or 404 / empty
+	    type: "GET",
+	    dataType: "json",
+	    success: function (savedJson) {
+	      // Init jsTree with saved JSON + lazy loading enabled
+	      $('#jstree').jstree({
+	        'core': {
+	          'check_callback': true,
+	          'data': function (node, cb) {
+	            if (node.id === "#") {
+	              // root: use saved JSON if available
+	              cb(savedJson);
+	            } else {
+	              // child nodes: lazy load from backend
+	              $.ajax({
+	                url: "[[@{'/api/tree/getChildren/'}]]" + node.id,
+	                data: {
+	                  id: node.id,
+	                  databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+	                  level: node.data && node.data.level ? node.data.level : "LV1"
+	                },
+	                dataType: "json",
+	                success: cb,
+	                error: () => cb([])
+	              });
+	            }
+	          }
+	        }
+	      });
+	    },
+	    error: function () {
+	      // If no JSON saved in DB → lazy-load from backend
+	      $('#jstree').jstree({
+	        'core': {
+	          'check_callback': true,
+	          'data': {
+	            'url': function (node) {
+	              if (node.id === "#") {
+	                return "[[@{'/api/tree/getRootNodes'}]]";
+	              } else {
+	                return "[[@{'/api/tree/getChildren/'}]]" + node.id;
+	              }
+	            },
+	            'data': function (node) {
+	              return {
+	                id: node.id,
+	                databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+	                level: node.data && node.data.level ? node.data.level : "LV1"
+	              };
+	            }
+	          }
+	        }
+	      });
+	    }
+	  });
+	
+	//--------------------------------------------------------------------------
+	//DON'T REMOVE: Only for lazily constructing nodes on the fly
+	//--------------------------------------------------------------------------
+	/*
 	$('#jstree').jstree({
 	  'core': {
 	    'check_callback': true,
@@ -195,6 +257,7 @@ $(function () {
 	  },
 	  
 	});
+	*/
 	
   // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree', colorNodes);

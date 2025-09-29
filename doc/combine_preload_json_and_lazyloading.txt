@@ -1,0 +1,85 @@
+Perfect 👍 — we’ll combine both worlds:
+
+* If DB has saved JSON → initialize jsTree with that as the initial dataset.
+* Still keep your lazy-loading `url`/`data` functions so jsTree continues to fetch children dynamically when expanding a node with `children:true`.
+* If no saved JSON → fall back to lazy-loading from `/getRootNodes`.
+
+Here’s the modified code:
+
+```javascript
+$(function () {
+  $.ajax({
+    url: "[[@{'/api/tree/loadTree'}]]",  // endpoint that returns saved JSON or 404 / empty
+    type: "GET",
+    dataType: "json",
+    success: function (savedJson) {
+      // Init jsTree with saved JSON + lazy loading enabled
+      $('#jstree').jstree({
+        'core': {
+          'check_callback': true,
+          'data': function (node, cb) {
+            if (node.id === "#") {
+              // root: use saved JSON if available
+              cb(savedJson);
+            } else {
+              // child nodes: lazy load from backend
+              $.ajax({
+                url: "[[@{'/api/tree/getChildren/'}]]" + node.id,
+                data: {
+                  id: node.id,
+                  databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+                  level: node.data && node.data.level ? node.data.level : "LV1"
+                },
+                dataType: "json",
+                success: cb,
+                error: () => cb([])
+              });
+            }
+          }
+        }
+      });
+    },
+    error: function () {
+      // If no JSON saved in DB → lazy-load from backend
+      $('#jstree').jstree({
+        'core': {
+          'check_callback': true,
+          'data': {
+            'url': function (node) {
+              if (node.id === "#") {
+                return "[[@{'/api/tree/getRootNodes'}]]";
+              } else {
+                return "[[@{'/api/tree/getChildren/'}]]" + node.id;
+              }
+            },
+            'data': function (node) {
+              return {
+                id: node.id,
+                databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+                level: node.data && node.data.level ? node.data.level : "LV1"
+              };
+            }
+          }
+        }
+      });
+    }
+  });
+});
+```
+
+---
+
+### 🔑 How this works
+
+1. On **page load**:
+
+   * `success`: The DB JSON is used to render the initial root structure.
+   * For any node with `children:true`, expanding it will still call your `/getChildren/{id}` backend.
+2. On **error** (no DB JSON):
+
+   * Falls back to your original lazy mode (`/getRootNodes` → `/getChildren/{id}`).
+
+So lazy loading works in both cases ✅
+
+---
+
