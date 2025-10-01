@@ -314,6 +314,15 @@ $(function () {
   // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree open_node.jstree after_open.jstree', colorNodes);
   
+  	// Apply to ALL modals on the page when modal is being hidden, deselect all nodes.
+  	// When the pop-up modal is closed, we don't want the node is still selected because if we click it again, it won't pop up the modal window.
+	$(document).on('hidden.bs.modal', '.modal', function () {
+	  const tree = $('#jstree').jstree(true);
+	  if (tree) {
+	    tree.deselect_all(true);
+	  }
+	});
+  
   // Enable Bootstrap tooltips globally
   $('body').tooltip({
     selector: '[data-toggle="node-tooltip"]',
