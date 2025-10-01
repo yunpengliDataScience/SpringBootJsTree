@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree with Sticky Form Demo</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/themes/default/style.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/jstree.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .layout {
+      display: flex;
+      align-items: flex-start;
+    }
+    /* Tree panel */
+    .tree-panel {
+      width: 60%;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      height: 100vh;
+      overflow-y: auto; /* allow tree to scroll */
+    }
+    /* Sticky form panel */
+    .form-panel {
+      width: 40%;
+      padding: 10px;
+      position: sticky;
+      top: 0;   /* stick to top while scrolling */
+      height: 100vh;
+      overflow-y: auto;
+      background: #f9f9f9;
+      border-left: 1px solid #ccc;
+    }
+    .form-panel form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .form-panel input {
+      padding: 6px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+    .form-panel button {
+      padding: 8px 12px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .form-panel button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Left: jsTree -->
+  <div class="tree-panel">
+    <div id="jstree"></div>
+  </div>
+
+  <!-- Right: Sticky form -->
+  <div class="form-panel">
+    <form id="nodeForm">
+      <h3>Node Details</h3>
+      <label for="nodeName">Name</label>
+      <input type="text" id="nodeName" readonly />
+
+      <label for="nodeStatus">Status</label>
+      <input type="text" id="nodeStatus" readonly />
+
+      <button type="button">Save</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Generate a lot of sample nodes to make tree scrollable
+  const data = [];
+  for (let i = 1; i <= 50; i++) {
+    const parentId = `root_${i}`;
+    data.push({
+      id: parentId,
+      parent: "#",
+      text: `Root ${i}`,
+      data: { status: i % 2 === 0 ? "Modified" : "Normal" }
+    });
+
+    for (let j = 1; j <= 5; j++) {
+      data.push({
+        id: `${parentId}_child_${j}`,
+        parent: parentId,
+        text: `Child ${i}-${j}`,
+        data: { status: j % 2 === 0 ? "Modified" : "Normal" }
+      });
+    }
+  }
+
+  // Initialize jsTree
+  $('#jstree').jstree({
+    core: {
+      data: data,
+      check_callback: true
+    },
+    plugins: ["wholerow"]
+  });
+
+  // When node is selected, update form
+  $('#jstree').on("select_node.jstree", function (e, data) {
+    $("#nodeName").val(data.node.text);
+    $("#nodeStatus").val(data.node.data?.status || "");
+  });
+</script>
+
+</body>
+</html>
