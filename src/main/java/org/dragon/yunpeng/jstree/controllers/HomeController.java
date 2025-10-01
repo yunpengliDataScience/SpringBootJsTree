@@ -47,4 +47,10 @@ public class HomeController {
 
 		return "lazyloadSymbolTree";
 	}
+	
+	@GetMapping("/lazyloadTreePopupForm")
+	public String lazyloadTreeWithPopupForm() {
+
+		return "lazyloadSymbolTreePopupForm";
+	}
 }

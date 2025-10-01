@@ -1,0 +1,811 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	
+  <!--
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  -->
+  <link rel="stylesheet" th:href="@{/jstree/3.3.17/themes/default/style.min.css}" />
+  
+  <!--
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  -->
+  <link rel="stylesheet" th:href="@{/bootstrap/4.5.3/css/bootstrap.min.css}" />
+  
+  <!--
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+  -->
+  
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />    
+</head>
+<body>
+	
+<div class="container">
+  <div class="row">
+    <!-- Left: Tree -->
+    <div class="col-md-6">
+      <h5>Symbol Tree (Lazy Loading and Popup Form)</h5>
+      <div id="jstree"></div>
+      <br/>
+      <br/>
+      <br/>
+      <div><a th:href="@{/demo}" target="_blank">Other Demo</a></div>
+      <br/>
+      <div><a th:href="@{/}" target="_blank">Symbol Tree</a></div>
+      <br/>
+      <div><a th:href="@{/h2-console}" target="_blank">Access H2 Database</a></div>
+    </div>
+
+	<!-- Modal Forms -->
+	<!-- Bootstrap 4 modals for forms -->
+	<div class="modal fade" id="formModal1" tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document"><div class="modal-content">
+	    <div class="modal-header"><h5 class="modal-title">LV1 Node</h5>
+	      <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body">
+	      <form id="1fieldForm">
+	        <div class="form-group">
+	          <label for="1fieldForm_nodeName">Node Name:</label>
+	          <input type="text" class="form-control" id="1fieldForm_nodeName">
+	        </div>
+	        <div class="form-group">
+	          <label for="1fieldForm_field1Id">Field 1:</label>
+	          <input type="text" class="form-control" id="1fieldForm_field1Id">
+	        </div>
+	      </form>
+	    </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-primary" onclick="saveNodeToDOM1()" data-dismiss="modal">Save</button>
+	      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	    </div>
+	  </div></div>
+	</div>
+	
+	<!-- 2 field form -->
+	<div class="modal fade" id="formModal2" tabindex="-1" role="dialog">
+	  <div class="modal-dialog"><div class="modal-content">
+	    <div class="modal-header"><h5 class="modal-title">LV2 Node</h5>
+	      <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body">
+	      <form id="2fieldsForm">
+	        <div class="form-group">
+	          <label for="2fieldsForm_nodeName">Node Name:</label>
+	          <input type="text" class="form-control" id="2fieldsForm_nodeName">
+	        </div>
+	        <div class="form-group">
+	          <label for="2fieldsForm_field1Id">Field 1:</label>
+	          <input type="text" class="form-control" id="2fieldsForm_field1Id">
+	        </div>
+	        <div class="form-group">
+	          <label for="2fieldsForm_field2Id">Field 2:</label>
+	          <input type="text" class="form-control" id="2fieldsForm_field2Id">
+	        </div>
+	      </form>
+	    </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-primary" onclick="saveNodeToDOM2()" data-dismiss="modal">Save</button>
+	      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	    </div>
+	  </div></div>
+	</div>
+	
+	<!-- 3 field form -->
+	<div class="modal fade" id="formModal3" tabindex="-1" role="dialog">
+	  <div class="modal-dialog"><div class="modal-content">
+	    <div class="modal-header"><h5 class="modal-title">LV3 Node</h5>
+	      <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body">
+	      <form id="3fieldsForm">
+	        <div class="form-group">
+			  <label for="3fieldsForm_nodeName">Node Name:</label>
+	          <input type="text" class="form-control" id="3fieldsForm_nodeName">
+	        </div>
+	        <div class="form-group">
+			  <label for="3fieldsForm_field1Id">Field 1:</label>
+	          <input type="text" class="form-control" id="3fieldsForm_field1Id">
+	        </div>
+	        <div class="form-group">
+			  <label for="3fieldsForm_field2Id">Field 2:</label>
+	          <input type="text" class="form-control" id="3fieldsForm_field2Id">
+	        </div>
+	        <div class="form-group">
+	          <label for="3fieldsForm_field3Id">Field 3:</label>
+	          <input type="text" class="form-control" id="3fieldsForm_field3Id">
+	        </div>
+	      </form>
+	    </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-primary" onclick="saveNodeToDOM3()" data-dismiss="modal">Save</button>
+	      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	    </div>
+	  </div></div>
+	</div>
+	
+	<!-- 4 field form -->
+	<div class="modal fade" id="formModal4" tabindex="-1" role="dialog">
+	  <div class="modal-dialog"><div class="modal-content">
+	    <div class="modal-header"><h5 class="modal-title">LV4 Node</h5>
+	      <button type="button" class="close" data-dismiss="modal">&times;</button>
+	    </div>
+	    <div class="modal-body">
+	      <form id="4fieldsForm">
+	        <div class="form-group">
+			  <label for="4fieldsForm_nodeName">Node Name:</label>
+	          <input type="text" class="form-control" id="4fieldsForm_nodeName">
+	        </div>
+	        <div class="form-group">
+			  <label for="4fieldsForm_field1Id">Field 1:</label>
+	          <input type="text" class="form-control" id="4fieldsForm_field1Id">
+	        </div>
+	        <div class="form-group">
+			  <label for="4fieldsForm_field2Id">Field 2:</label>
+	          <input type="text" class="form-control" id="4fieldsForm_field2Id">
+	        </div>
+	        <div class="form-group">
+	          <label for="4fieldsForm_field3Id">Field 3:</label>
+	          <input type="text" class="form-control" id="4fieldsForm_field3Id">
+	        </div>
+	        <div class="form-group">
+	          <label for="4fieldsForm_field4Id">Field 4:</label>
+	          <input type="text" class="form-control" id="4fieldsForm_field4Id">
+	        </div>
+	      </form>
+	    </div>
+	    <div class="modal-footer">
+	      <button type="button" class="btn btn-primary" onclick="saveNodeToDOM4()" data-dismiss="modal">Save</button>
+	      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	    </div>
+	  </div></div>
+	</div>
+	
+    <!-- Right: Form -->
+    <div class="col-md-6">
+      
+	  
+	<div class="row">
+		<div class="btn-group" role="group">
+		  <button type="button" class="btn btn-primary mr-2" onclick="addNode()">Add Child Node</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="deleteNode()">Delete Node</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveTree()">Save Full Tree to File</button>
+	    </div>
+    </div>
+    <div class="row">
+		<div class="col-md-6">
+		<br/>
+		</div>
+	</div>
+    <div class="row">
+	    <div class="btn-group" role="group">
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveMiniTree()">Save Mini Tree to File</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveDraftChangeRequest()">Save Changes</button>
+		  <button type="button" class="btn btn-primary mr-2" onclick="saveAndApproveChangeRequest()">Approve Changes</button>
+	    </div>
+    </div>
+    
+  </div>
+</div>
+	
+	
+  <!-- jQuery first -->
+  <!--
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  -->
+  <script type="text/javascript" th:src="@{/jquery/3.6.0/jquery-3.6.0.min.js}"></script>
+  
+  <!-- Popper.js (required by Bootstrap 4 tooltips) -->
+  <!--
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  -->
+  <script type="text/javascript" th:src="@{/popper/1.16.1/popper.min.js}"></script>
+  
+  <!-- Bootstrap 4 JS -->
+  <!--
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	-->
+  <script type="text/javascript" th:src="@{/bootstrap/4.5.3/js/bootstrap.min.js}"></script>
+
+  <!-- jsTree JS -->
+  <!--
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+  -->
+  <script type="text/javascript" th:src="@{/jstree/3.3.17/jstree.min.js}"></script>
+
+<script>
+let selectedNode = null;
+
+$(function () {
+	
+	$.ajax({
+	    url: "[[@{'/api/tree/getJsTreeDataForChangeRequest'}]]",  // endpoint that returns saved JSON or 404 / empty
+	    type: "GET",
+	    dataType: "json",
+	    success: function (savedJson) {
+	      // Init jsTree with saved JSON + lazy loading enabled
+	      $('#jstree').jstree({
+	        'core': {
+	          'check_callback': true,
+	          'data': function (node, cb) {
+	            if (node.id === "#") {
+	              // root: use saved JSON if available
+	              cb(savedJson);
+	            } else {
+	              // child nodes: lazy load from backend
+	              $.ajax({
+	                url: "[[@{'/api/tree/getChildren/'}]]" + node.id,
+	                data: {
+					  //parameters passed to the backend:
+	                  id: node.id,
+	                  databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+	                  level: node.data && node.data.level ? node.data.level : "LV1"
+	                },
+	                dataType: "json",
+	                success: cb,
+	                error: () => cb([])
+	              });
+	            }
+	          }
+	        }
+	      });
+	    },
+	    error: function () {
+	      // If no JSON saved in DB → lazy-load from backend
+	      $('#jstree').jstree({
+	        'core': {
+	          'check_callback': true,
+	          'data': {
+	            'url': function (node) {
+	              if (node.id === "#") {
+	                return "[[@{'/api/tree/getRootNodes'}]]";
+	              } else {
+	                return "[[@{'/api/tree/getChildren/'}]]" + node.id;
+	              }
+	            },
+	            'data': function (node) {
+	              return {
+					//parameters passed to the backend:
+	                id: node.id,
+	                databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+	                level: node.data && node.data.level ? node.data.level : "LV1"
+	              };
+	            }
+	          }
+	        }
+	      });
+	    }
+	  });
+	
+	//--------------------------------------------------------------------------
+	//DON'T REMOVE: Only for lazily constructing nodes on the fly
+	//--------------------------------------------------------------------------
+	/*
+	$('#jstree').jstree({
+	  'core': {
+	    'check_callback': true,
+	    
+	    'data': {
+	      'url': function (node) {
+	        if (node.id === "#") {
+	          // First call, fetch root nodes
+	          return "[[@{'/api/tree/getRootNodes'}]]";
+	        } else {
+	          // Fetch children of expanded node (pass current node id as parent id)
+	          return "[[@{'/api/tree/getChildren/'}]]" + node.id;
+	        }
+	      },
+	      'data': function (node) {
+	        // Pass node id, databaseId, and level as parameters to the backend.
+	        return {
+	          id: node.id,
+	          databaseId: node.data && node.data.databaseId ? node.data.databaseId : "",
+	          level: node.data && node.data.level ? node.data.level : "LV1" // fallback for root
+	        };
+	      }
+	    },
+	    
+	  },
+	  
+	});
+	*/
+	
+  // call colorNodes() when tree is refreshed or redrawn
+  $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree open_node.jstree after_open.jstree', colorNodes);
+  
+  // Enable Bootstrap tooltips globally
+  $('body').tooltip({
+    selector: '[data-toggle="node-tooltip"]',
+    placement: 'right',
+    html: true,
+    trigger: 'hover'
+  });
+  
+  //When a node is selected
+  $('#jstree').on("select_node.jstree", function (e, nodeData) {
+	  
+	//nodeData: {node: {…}, selected: Array(1), event: {…}, instance: {…}}
+	console.log("Full data object:", nodeData);
+	  
+    selectedNode = nodeData.node;
+    
+    nodeLevel = nodeData.node.data?.level || '';
+    
+    //alert("nodeLevel: " + nodeLevel);
+    
+    if(nodeLevel === 'LV1'){
+		$('#1fieldForm_nodeName').val(nodeData.node.text);
+    	$('#1fieldForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	
+    	$('#formModal1').modal('show');
+	}else if(nodeLevel === 'LV2'){
+		$('#2fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#2fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#2fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	
+    	$('#formModal2').modal('show');
+	}else if(nodeLevel === 'LV3'){
+		$('#3fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#3fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#3fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	$('#3fieldsForm_field3Id').val(nodeData.node.data?.field3 || '');
+    	
+    	$('#formModal3').modal('show');
+	}else if(nodeLevel === 'LV4'){
+		$('#4fieldsForm_nodeName').val(nodeData.node.text);
+    	$('#4fieldsForm_field1Id').val(nodeData.node.data?.field1 || '');
+    	$('#4fieldsForm_field2Id').val(nodeData.node.data?.field2 || '');
+    	$('#4fieldsForm_field3Id').val(nodeData.node.data?.field3 || '');
+    	$('#4fieldsForm_field4Id').val(nodeData.node.data?.field4 || '');
+    	
+    	$('#formModal4').modal('show');
+	}
+   
+  });
+  
+  //Tootip
+   $('#jstree').on('mouseover', '.jstree-anchor', function () {
+      const nodeId = $(this).closest('li').attr('id');
+      const tree = $('#jstree').jstree(true);
+      const node = tree.get_node(nodeId);
+
+      let tooltipHtml = '';
+
+	  if (node.data && typeof node.data === 'object') {
+	    for (const key in node.data) {
+	      if (node.data.hasOwnProperty(key)) {
+	        tooltipHtml += `<strong>${key}:</strong> ${node.data[key]}<br>`;
+	      }
+	    }
+	  } else {
+	    tooltipHtml = 'No data';
+	  }
+
+      $(this)
+        .attr('data-toggle', 'node-tooltip')
+        .attr('data-html', 'true') // Enable HTML
+        .attr('title', tooltipHtml)
+        .tooltip('dispose')  // Reset tooltip
+        .tooltip('show');
+    });
+    
+    bindAutoSave('1fieldsForm');
+    bindAutoSave('2fieldsForm');
+    bindAutoSave('3fieldsForm');
+    bindAutoSave('4fieldsForm');
+  
+});
+
+function hasSameNameSibling(nodeId, nodeText) {
+  var tree = $('#jstree').jstree(true);
+  var node = tree.get_node(nodeId);
+
+  if (!node) {
+    return false; // invalid node
+  }
+
+  var parentId = node.parent;
+
+  // root node has no siblings
+  if (parentId === "#") {
+    return false;
+  }
+
+  var siblings = tree.get_node(parentId).children;
+
+  // check if any sibling has the same text
+  var sameNameSiblings = siblings.filter(function (siblingId) {
+    var sibling = tree.get_node(siblingId);
+    return sibling.text === nodeText && sibling.id !== node.id;
+  });
+
+  return sameNameSiblings.length > 0;
+}
+
+
+function saveNodeToDOM1() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#1fieldForm_nodeName').val();
+  const newField1 = $('#1fieldForm_field1Id').val();
+  
+  if (selectedNode) {
+	  
+	if(!hasSameNameSibling(selectedNode.id, newText)) {
+		backupBaseLineData(selectedNode);
+	
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
+   
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	//$('#1fieldForm').hide();
+	} else {
+		alert("This node has a sibling with the same name!");
+	}
+	
+  }
+}
+
+function saveNodeToDOM2() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#2fieldsForm_nodeName').val();
+  const newField1 = $('#2fieldsForm_field1Id').val();
+  const newField2 = $('#2fieldsForm_field2Id').val();
+  
+  if (selectedNode) {
+	if(!hasSameNameSibling(selectedNode.id, newText)) {
+		
+		backupBaseLineData(selectedNode);
+	
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
+    	selectedNode.data.field2 = newField2;
+   
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	//$('#2fieldsForm').hide();
+    } else {
+		alert("This node has a sibling with the same name!");
+	}
+  }
+
+}
+
+function saveNodeToDOM3() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#3fieldsForm_nodeName').val();
+  const newField1 = $('#3fieldsForm_field1Id').val();
+  const newField2 = $('#3fieldsForm_field2Id').val();
+  const newField3 = $('#3fieldsForm_field3Id').val();
+  
+  if (selectedNode) {
+	if(!hasSameNameSibling(selectedNode.id, newText)){
+		backupBaseLineData(selectedNode);
+	
+    	tree.rename_node(selectedNode, newText);
+    	selectedNode.data = selectedNode.data || {};
+    	selectedNode.data.field1 = newField1;
+    	selectedNode.data.field2 = newField2;
+    	selectedNode.data.field3 = newField3;
+   
+    	selectedNode.data.name = newText;
+    	selectedNode.data.status = 'Modified';
+    	tree.redraw(true);
+    	
+    	//$('#3fieldsForm').hide();
+	} else{
+		alert("This node has a sibling with the same name!");
+	}
+	
+  }
+  
+}
+
+function saveNodeToDOM4() {
+  const tree = $('#jstree').jstree(true);
+  const newText = $('#4fieldsForm_nodeName').val();
+  const newField1 = $('#4fieldsForm_field1Id').val();
+  const newField2 = $('#4fieldsForm_field2Id').val();
+  const newField3 = $('#4fieldsForm_field3Id').val();
+  const newField4 = $('#4fieldsForm_field4Id').val();
+  
+  if (selectedNode) {
+	
+	if(!hasSameNameSibling(selectedNode.id, newText)){
+		backupBaseLineData(selectedNode);
+	
+    	tree.rename_node(selectedNode, newText);
+	    selectedNode.data = selectedNode.data || {};
+	    selectedNode.data.field1 = newField1;
+	    selectedNode.data.field2 = newField2;
+	    selectedNode.data.field3 = newField3;
+	    selectedNode.data.field4 = newField4;
+	   
+	    selectedNode.data.name = newText;
+	    selectedNode.data.status = 'Modified';
+	    tree.redraw(true);backupBaseLineData(selectedNode);
+		
+	    tree.rename_node(selectedNode, newText);
+	    selectedNode.data = selectedNode.data || {};
+	    selectedNode.data.field1 = newField1;
+	    selectedNode.data.field2 = newField2;
+	    selectedNode.data.field3 = newField3;
+	    selectedNode.data.field4 = newField4;
+   
+	    selectedNode.data.name = newText;
+	    selectedNode.data.status = 'Modified';
+	    tree.redraw(true);
+	    
+	    //$('#4fieldsForm').hide();
+	} else{
+		alert("This node has a sibling with the same name!");
+	}
+	
+  }
+}
+
+//Backup the data in the data attribute to be the baseline data if the node was never modified before.
+function backupBaseLineData(node){
+	if(node){
+		//very first time modification, back up old values
+		if(node.data.status === null || node.data.status === undefined){
+			
+			// Create a DEEP COPY of the data object
+	        var baseLineData = JSON.parse(JSON.stringify(node.data || {}));
+	        
+	        // Assign the copy, not the reference
+	        node.data.baseLineData = baseLineData;
+		}
+	}
+}
+//Increment LV0 to LV1 or LVn to LVn+1
+function incrementLevel(levelStr) {
+  const prefix = levelStr.match(/[^\d]+/)[0]; // Extract non-digit part (e.g., 'LV')
+  const number = parseInt(levelStr.match(/\d+/)[0]); // Extract number part (e.g., 0)
+  return `${prefix}${number + 1}`;
+}
+
+function addNode() {
+  const tree = $('#jstree').jstree(true);
+  if (!selectedNode) {
+    alert("Select a node to add a child to.");
+    return;
+  }
+
+  const newNodeId = Date.now().toString(); // unique ID only for tree view
+  
+  parentNodeType = selectedNode.data?.level || '';
+  
+  nodeObject = {};
+  
+  //Parent id will be automatically generated.
+  //Add different properties for child node based on parent node type 
+  if(parentNodeType === 'LV1'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { name: "", databaseId: "", field1: "", field2: "", level : "LV2" }
+	  }
+  }else if(parentNodeType === 'LV2'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { name: "", databaseId: "", field1: "", field2: "", field3: "", level : "LV3" }
+	  }
+  }else if(parentNodeType === 'LV3'){
+	  nodeObject = {
+		   	id: newNodeId,
+    		text: "New Node",
+    		data: { name: "", databaseId: "", field1: "", field2: "", field3: "", field4: "", level : "LV4" }
+	  }
+  }else{
+	  alert("Cannot add a child node due to level limit.");
+      return;
+  }
+  
+  const newNode = tree.create_node(selectedNode, nodeObject);
+
+  if (newNode) {
+    //tree.edit(newNode); // allow inline renaming
+  }
+  
+  // Immediately select the newly created node
+	if (newNodeId) {
+	  // Use setTimeout to ensure the node is created/rendered before selection
+	  setTimeout(() => {
+	    tree.deselect_all();
+	    tree.select_node(newNodeId); // This will fire select_node.jstree
+	  }, 0);
+	}
+}
+
+function deleteNode() {
+	
+  	const tree = $('#jstree').jstree(true);
+	if (selectedNode) {
+	    tree.delete_node(selectedNode);
+	    selectedNode = null;
+	} else {
+	    alert('Please select a node to delete.');
+	}
+
+}
+
+function saveTree() {
+	
+  const tree = $('#jstree').jstree(true);
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true }); // # means from root, flat:true means flat
+  
+  //Only add children:true (lazy loading indicator) for nodes that have no child loaded yet.
+  //If a node has child node loaded, adding children:true will cause errors.
+  fullTreeJson.forEach(n => {
+    // Look up the live node in jsTree
+    const liveNode = tree.get_node(n.id);
+
+    // If node has no children loaded, mark as lazy
+    if (!liveNode.children || liveNode.children.length === 0) {
+      n.children = true;
+    } else {
+      // Otherwise, remove children:true and let jsTree build array
+      delete n.children;
+    }
+  });
+  
+  alert(JSON.stringify(fullTreeJson));
+  
+  url = "[[@{'/api/tree/saveTree/full-lazyloadSymbolTree-data.json'}]]";
+
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(fullTreeJson),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveMiniTree() {
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
+  
+  const minimalTreeJson = simplifyTree(fullTreeJson);
+  alert(JSON.stringify(minimalTreeJson));
+  
+  console.log(JSON.stringify(minimalTreeJson, null, 2));
+
+  url = "[[@{'/api/tree/saveTree/mini-lazyloadSymbolTree-data.json'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(minimalTreeJson),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveDraftChangeRequest() {
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
+  
+  const tree = $('#jstree').jstree(true);
+  
+  //Only add children:true (lazy loading indicator) for nodes that have no child loaded yet.
+  //If a node has child node loaded, adding children:true will cause errors.
+  fullTreeJson.forEach(n => {
+    // Look up the live node in jsTree
+    const liveNode = tree.get_node(n.id);
+
+    // If node has no children loaded, mark as lazy
+    if (!liveNode.children || liveNode.children.length === 0) {
+      n.children = true;
+    } else {
+      // Otherwise, remove children:true and let jsTree build array
+      delete n.children;
+    }
+  });
+  
+  
+  //const minimalTree = simplifyTree(fullTree);
+  //alert(JSON.stringify(minimalTree));
+  
+  console.log(JSON.stringify(fullTreeJson, null, 2));
+
+  url = "[[@{'/api/tree/saveDraftChangeRequest'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(fullTreeJson),
+    success: () => alert("Tree saved successfully!"),
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function saveAndApproveChangeRequest() {
+  const fullTreeJson = $('#jstree').jstree(true).get_json('#', { flat: true });
+  
+  const minimalTreeJson = simplifyTree(fullTreeJson);
+  //alert(JSON.stringify(minimalTreeJson));
+  
+  console.log(JSON.stringify(minimalTreeJson, null, 2));
+
+  url = "[[@{'/api/tree/saveAndApproveChangeRequest'}]]";
+  
+  $.ajax({
+    url: url,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(minimalTreeJson),
+    success: () => {alert("Tree saved successfully!");
+    				
+    				setTimeout(function() {location.reload();}, 100);  // delay a little so reload works after alert
+    				},
+    error: () => alert("Error saving tree.")
+  });
+}
+
+function simplifyTree(fullTreeNodes) {
+  return fullTreeNodes.map(node => {
+    const simplified = {  //keep id and text fields
+      id: node.id,
+      parent: node.parent,
+      text: node.text
+    };
+
+    // Include 'data' if it exists
+    if (node.data) {
+      simplified.data = node.data;
+    }
+
+    return simplified;
+  });
+}
+
+function colorNodes() {
+	//alert("colorNodes");
+    $('#jstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
+        const $anchor = $('#' + node.id + '_anchor');
+        if (node.data && node.data.status === 'Modified') {
+            $anchor.addClass('red-node');
+        } else {
+            $anchor.removeClass('red-node');
+        }
+    });
+}
+
+function resetStatus() {
+    const tree = $('#jstree').jstree(true);
+    tree.get_json('#', { flat: true }).forEach(function (node) {
+        if (node.data && node.data.status === 'Modified') {
+            const liveNode = tree.get_node(node.id); // live reference so as to persist change to the DOM.
+            $('#' + node.id + '_anchor').removeClass('red-node');
+            delete liveNode.data.status;
+        }
+    });
+}
+
+//--------- TODO ----------------------------------
+function bindAutoSave(formId) {
+  // Attach listener to *all inputs* in the form
+  $("#" + formId + " input, #" + formId + " select, #" + formId + " textarea")
+    .off("change input") // avoid duplicate bindings
+    .on("change input", function () {
+      //saveNodeToDOM(formId, fieldCount);
+      console.log('autosave!');
+      //this: is the specific form field that was modified
+      console.log("Field changed: " + this.id + " | New value: " + $(this).val());
+    });
+}
+
+</script>
+</body>
+</html>
