@@ -46,6 +46,8 @@ public class JsTreeSaveService {
 	private ChangeRequestSandboxRepository changeRequestSandboxRepo;
 	@Autowired
 	private ChangeLogRepository changeLogRepo;
+	@Autowired
+	private JsTreeService jsTreeService;
 
 	@Transactional
 	public void saveModifiedNodesHierarchicalFormat(List<JsTreeNode> nodes) {
@@ -175,7 +177,15 @@ public class JsTreeSaveService {
 		if (changeRequest == null) {
 			changeRequest = new ChangeRequestSandbox();
 		}
+
+		String filteredJson = jsTreeService.filterModifiedWithAncestorsFlat(json);
+		
+		System.out.println("============= Filtered Json ==========");
+		System.out.println(filteredJson);
+		System.out.println("============= End ==========");
+
 		changeRequest.setJsonContent(json);
+		changeRequest.setSummarizedJsonContent(filteredJson);
 		changeRequest.setStatus(status);
 		changeRequest.setUserName(userName);
 		changeRequest.setTimestamp(LocalDateTime.now());

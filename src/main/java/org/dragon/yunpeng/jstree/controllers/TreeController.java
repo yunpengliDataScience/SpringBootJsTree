@@ -212,6 +212,24 @@ public class TreeController {
 		}
 	}
 
+	@GetMapping("/getSummarizedTree")
+	public ResponseEntity<String> getSummarizedJsTreeDataForChangeRequest() {
+		try {
+			System.out.println("Retrieving data through /getSummarizedTree");
+
+			String jsonString = jsTreeService.getSummarizedJsTreeDataForChangeRequest();
+
+			// Return raw string, but flagged as JSON; otherwise, the JsTree is unable to
+			// consume the raw string.
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(jsonString);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).contentType(MediaType.APPLICATION_JSON)
+					.body("{\"error\":\"Failed to getSummarizedJsTreeDataForChangeRequest\"}");
+		}
+	}
+
 	// --------------------------------------------------------------
 	private Map<String, Object> node(String id, String parent, String text, boolean hasChildren) {
 		Map<String, Object> map = new HashMap<>();

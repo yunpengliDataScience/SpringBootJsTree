@@ -174,9 +174,7 @@
 	    </div>
     </div>
     <div class="row">
-		<div class="col-md-6">
 		<br/>
-		</div>
 	</div>
     <div class="row">
 	    <div class="btn-group" role="group">
@@ -185,6 +183,16 @@
 		  <button type="button" class="btn btn-primary mr-2" onclick="saveAndApproveChangeRequest()">Approve Changes</button>
 	    </div>
     </div>
+    <div class="row">
+		<br/>
+	</div>
+	<div class="row">
+		<br/>
+	</div>
+    <div class="row">
+		<h5>Summarized Symbol Change Tree</h5>
+    	<div id="summarizedJstree"></div>
+	</div>
     
   </div>
 </div>
@@ -311,8 +319,28 @@ $(function () {
 	});
 	*/
 	
+	// Retrieve summarized flat JSON from backend
+      $.ajax({
+        url: "[[@{'/api/tree/getSummarizedTree'}]]",
+        method: 'GET',
+        dataType: 'json',
+        success: function(filteredData) {
+          // Initialize jsTree with backend data
+          $('#summarizedJstree').jstree({
+            core: {
+              data: filteredData
+            }
+          });
+        },
+        error: function(xhr, status, error) {
+          alert("Failed to load modified nodes: " + error);
+        }
+      });	
+	
   // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree open_node.jstree after_open.jstree', colorNodes);
+  
+  $('#summarizedJstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree open_node.jstree after_open.jstree', colorNodes);
   
   	// Apply to ALL modals on the page when modal is being hidden, deselect all nodes.
   	// When the pop-up modal is closed, we don't want the node is still selected because if we click it again, it won't pop up the modal window.
@@ -734,7 +762,9 @@ function saveDraftChangeRequest() {
     type: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(fullTreeJson),
-    success: () => alert("Tree saved successfully!"),
+    success: () => {alert("Tree saved successfully!");
+    				setTimeout(function() {location.reload();}, 100);  // delay a little so reload works after alert
+    				},
     error: () => alert("Error saving tree.")
   });
 }
@@ -782,6 +812,15 @@ function simplifyTree(fullTreeNodes) {
 function colorNodes() {
 	//alert("colorNodes");
     $('#jstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
+        const $anchor = $('#' + node.id + '_anchor');
+        if (node.data && node.data.status === 'Modified') {
+            $anchor.addClass('red-node');
+        } else {
+            $anchor.removeClass('red-node');
+        }
+    });
+    
+    $('#summarizedJstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
         const $anchor = $('#' + node.id + '_anchor');
         if (node.data && node.data.status === 'Modified') {
             $anchor.addClass('red-node');

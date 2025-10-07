@@ -23,11 +23,15 @@ public class ChangeRequestSandbox {
 	@Column(columnDefinition = "CLOB")
 	private String jsonContent;
 
+	@Lob
+	@Column(columnDefinition = "CLOB")
+	private String summarizedJsonContent;
+
 	private String userName; // optional: who performed the action
 
 	private LocalDateTime timestamp;
-	
-	private String status;  //TODO
+
+	private String status; // TODO
 
 	@PrePersist
 	public void onCreate() {
@@ -74,5 +78,13 @@ public class ChangeRequestSandbox {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
+	public String getSummarizedJsonContent() {
+		return summarizedJsonContent;
+	}
+
+	public void setSummarizedJsonContent(String summarizedJsonContent) {
+		this.summarizedJsonContent = summarizedJsonContent;
+	}
+
 }

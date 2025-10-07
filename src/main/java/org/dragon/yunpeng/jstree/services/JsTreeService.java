@@ -20,11 +20,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class JsTreeService {
@@ -160,7 +166,7 @@ public class JsTreeService {
 			data.put("name", lv1.getName());
 			data.put("level", lv1.getLevel());
 			data.put("field1", lv1.getField1());
-			
+
 			node.setData(data);
 			node.setChildren(true);
 
@@ -195,7 +201,7 @@ public class JsTreeService {
 					data.put("level", lv2.getLevel());
 					data.put("field1", lv2.getField1());
 					data.put("field2", lv2.getField2());
-					
+
 					node.setData(data);
 					node.setChildren(true);
 
@@ -219,7 +225,7 @@ public class JsTreeService {
 					data.put("field1", lv3.getField1());
 					data.put("field2", lv3.getField2());
 					data.put("field3", lv3.getField3());
-					
+
 					node.setData(data);
 					node.setChildren(true);
 
@@ -378,5 +384,84 @@ public class JsTreeService {
 		System.out.println(jsonString);
 
 		return jsonString;
+	}
+
+	// Retrieve the summarized change Json
+	public String getSummarizedJsTreeDataForChangeRequest() throws JsonProcessingException {
+		String jsonString = "{}";
+
+		ChangeRequestSandbox changeRequestSandbox = changeRequestSandboxRepo
+				.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);
+
+		if (changeRequestSandbox != null) {
+			System.out.println("Json is retrieved from CHANGE_REQUEST_SANDBOX table.");
+
+			jsonString = changeRequestSandbox.getSummarizedJsonContent();
+		}
+
+		System.out.println(jsonString);
+
+		return jsonString;
+	}
+
+	// Construct a summarized Json that only contains the modified nodes and their
+	// ancestors.
+	public String filterModifiedWithAncestorsFlat(String json) {
+
+		JsonArray flatNodes = JsonParser.parseString(json).getAsJsonArray();
+
+		Map<String, JsonObject> nodeMap = new HashMap<>();
+		Set<String> includedIds = new LinkedHashSet<>();
+
+		// Build a lookup map by id
+		for (JsonElement el : flatNodes) {
+			JsonObject node = el.getAsJsonObject();
+			nodeMap.put(node.get("id").getAsString(), node);
+		}
+
+		// For each node that is Modified, add ancestors
+		for (JsonElement el : flatNodes) {
+			JsonObject node = el.getAsJsonObject();
+
+			String status = null;
+			if (node.has("data")) {
+				JsonObject data = node.getAsJsonObject("data");
+				if (data.has("status")) {
+					status = data.get("status").getAsString();
+				}
+			}
+
+			// String status = node.has("status") ? node.get("status").getAsString() : "";
+			if ("Modified".equalsIgnoreCase(status)) {
+				String currentId = node.get("id").getAsString();
+				while (currentId != null && !currentId.equals("#")) {
+					if (!includedIds.contains(currentId)) {
+						includedIds.add(currentId);
+					}
+					JsonObject current = nodeMap.get(currentId);
+					if (current == null)
+						break;
+					String parent = current.has("parent") ? current.get("parent").getAsString() : null;
+					if (parent == null || parent.equals("#"))
+						break;
+					currentId = parent;
+				}
+			}
+		}
+
+		// Collect selected nodes preserving order
+		JsonArray filtered = new JsonArray();
+		for (JsonElement el : flatNodes) {
+			JsonObject node = el.getAsJsonObject();
+			if (includedIds.contains(node.get("id").getAsString())) {
+				filtered.add(node);
+			}
+		}
+
+		GsonBuilder gsonBuilder = new GsonBuilder();
+
+		String filterdJson = gsonBuilder.setPrettyPrinting().create().toJson(filtered);
+
+		return filterdJson;
 	}
 }

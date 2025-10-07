@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Dynamic Font Awesome Icons Demo</title>
+  <!-- Bootstrap 4 (for styling, optional) -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- jsTree CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    body {
+      padding: 20px;
+    }
+    #tree {
+      border: 1px solid #ccc;
+      padding: 10px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3 class="mb-4">jsTree with Dynamic Font Awesome Icons</h3>
+
+    <div id="tree"></div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+  <!-- jsTree JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+
+  <script>
+    $(function() {
+      // Initialize jsTree with Font Awesome icons
+      $('#tree').jstree({
+        'core': {
+          'data': [
+            {
+              "id": "root1",
+              "text": "Root Folder 1",
+              "icon": "fa fa-folder text-warning",
+              "children": [
+                { "id": "lv2_1", "text": "Level 2 - Folder", "icon": "fa fa-folder text-primary",
+                  "children": [
+                    { "id": "lv3_1", "text": "Level 3 - Item", "icon": "fa fa-file text-secondary" }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "root2",
+              "text": "Root Folder 2",
+              "icon": "fa fa-folder text-success",
+              "children": true // lazy example
+            }
+          ]
+        },
+        'themes': {
+          'dots': true,
+          'icons': true
+        }
+      });
+
+      // Change icons dynamically after tree is ready
+      $('#tree').on('ready.jstree', function () {
+        const tree = $('#tree').jstree(true);
+
+        // Example: change root1’s icon to a database
+        tree.set_icon('root1', 'fa fa-database text-danger');
+
+        // Example: change lv2_1 to a gear icon
+        tree.set_icon('lv2_1', 'fa fa-cogs text-info');
+
+        // Example: change lv3_1 to a file-alt icon
+        tree.set_icon('lv3_1', 'fa fa-file-alt text-secondary');
+      });
+
+      // Example: when a node is selected, temporarily change its icon
+      $('#tree').on('select_node.jstree', function (e, data) {
+        const nodeId = data.node.id;
+        const tree = $('#tree').jstree(true);
+
+        // Save old icon (for restoration)
+        data.node.data = data.node.data || {};
+        data.node.data.oldIcon = data.node.icon;
+
+        // Highlight selected node icon
+        tree.set_icon(nodeId, 'fa fa-star text-warning');
+      });
+
+      // Restore icon on deselect
+      $('#tree').on('deselect_node.jstree', function (e, data) {
+        const nodeId = data.node.id;
+        const tree = $('#tree').jstree(true);
+        if (data.node.data && data.node.data.oldIcon) {
+          tree.set_icon(nodeId, data.node.data.oldIcon);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
