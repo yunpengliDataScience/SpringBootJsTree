@@ -320,6 +320,7 @@ $(function () {
 	*/
 	
 	// Retrieve summarized flat JSON from backend
+	/*
       $.ajax({
         url: "[[@{'/api/tree/getSummarizedTree'}]]",
         method: 'GET',
@@ -335,7 +336,40 @@ $(function () {
         error: function(xhr, status, error) {
           alert("Failed to load modified nodes: " + error);
         }
-      });	
+      });
+     */
+     
+    $.ajax({
+	  url: "[[@{'/api/tree/getSummarizedTree'}]]",
+	  method: 'GET',
+	  dataType: 'json',
+	  success: function(filteredData) {
+	    // Prefix all node IDs and their parent references
+	    const prefixedData = filteredData.map(node => {
+		  const newNode = { ...node };
+		  const newId = 'summary_' + node.id;
+		  newNode.id = newId;
+		  if (node.parent && node.parent !== '#') {
+		    newNode.parent = 'summary_' + node.parent;
+		  }
+		  newNode.li_attr = { id: newId + '_li' };
+		  newNode.a_attr = { id: newId + '_anchor' };
+		  return newNode;
+		});
+		  
+	
+	    // Initialize summarized jsTree
+	    $('#summarizedJstree').jstree({
+	      core: {
+	        data: prefixedData,
+	        check_callback: true
+	      }
+	    });
+	  },
+	  error: function(xhr, status, error) {
+	    alert("Failed to load modified nodes: " + error);
+	  }
+	});
 	
   // call colorNodes() when tree is refreshed or redrawn
   $('#jstree').on('changed.jstree refresh.jstree redraw.jstree ready.jstree open_node.jstree after_open.jstree', colorNodes);
@@ -822,6 +856,8 @@ function colorNodes() {
     
     $('#summarizedJstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
         const $anchor = $('#' + node.id + '_anchor');
+        
+        //alert(node.id);
         if (node.data && node.data.status === 'Modified') {
             $anchor.addClass('red-node');
         } else {
