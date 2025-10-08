@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Side-by-Side Modals with Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 40px;
+    }
+
+    .btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      border: 1px solid #007bff;
+      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      padding: 20px;
+      width: 320px;
+      z-index: 1000;
+    }
+
+    /* Main modal (left) */
+    #mainModal {
+      left: calc(50% - 340px);
+    }
+
+    /* Sub modal (right) */
+    #subModal {
+      left: calc(50% + 20px);
+      border: 2px solid #007bff;
+      z-index: 1100;
+    }
+
+    #submittedData {
+      margin-top: 30px;
+      padding: 15px;
+      background: #e9f7ef;
+      border: 1px solid #28a745;
+      border-radius: 6px;
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin-top: 8px;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+  </style>
+</head>
+<body>
+
+<button id="openMain" class="btn">Open Main Form Modal</button>
+
+<!-- === Main Modal === -->
+<div id="mainModal" class="modal">
+  <h3>Main Form Modal</h3>
+  <form id="mainForm">
+    <label for="mainName">Name:</label>
+    <input type="text" id="mainName" name="mainName" required>
+
+    <label for="mainEmail">Email:</label>
+    <input type="text" id="mainEmail" name="mainEmail" required>
+
+    <label for="mainNote">Notes (from Sub Modal):</label>
+    <textarea id="mainNote" name="mainNote" rows="3" readonly></textarea>
+
+    <button type="button" id="openSub" class="btn">Open Sub Modal</button>
+    <button type="submit" class="btn">Submit</button>
+    <button type="button" id="closeMain" class="btn">Close</button>
+  </form>
+</div>
+
+<!-- === Sub Modal === -->
+<div id="subModal" class="modal">
+  <h3>Sub Modal</h3>
+  <label>Enter Additional Note:</label>
+  <textarea id="subInput" rows="4"></textarea>
+  <button id="saveSub" class="btn">Save & Close</button>
+</div>
+
+<!-- === Submitted Data Display === -->
+<div id="submittedData"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function() {
+
+  // === Open Main Modal ===
+  $("#openMain").on("click", function() {
+    $("#mainModal").fadeIn(200);
+  });
+
+  // === Close Main Modal ===
+  $("#closeMain").on("click", function() {
+    $("#mainModal, #subModal").fadeOut(200);
+  });
+
+  // === Open Sub Modal (beside Main) ===
+  $("#openSub").on("click", function() {
+    $("#subModal").fadeIn(200);
+  });
+
+  // === Save data from Sub Modal back to Main ===
+  $("#saveSub").on("click", function() {
+    const value = $("#subInput").val().trim() || "No note";
+    $("#mainNote").val(value);
+    $("#subModal").fadeOut(200);
+  });
+
+  // === Submit Main Form ===
+  $("#mainForm").on("submit", function(e) {
+    e.preventDefault();
+    const name = $("#mainName").val();
+    const email = $("#mainEmail").val();
+    const note = $("#mainNote").val();
+
+    $("#submittedData")
+      .html(
+        `<h4>Submitted Data:</h4>
+         <p><strong>Name:</strong> ${name}</p>
+         <p><strong>Email:</strong> ${email}</p>
+         <p><strong>Note:</strong> ${note}</p>`
+      )
+      .fadeIn(300);
+
+    // Close modals after submit
+    $("#mainModal, #subModal").fadeOut(200);
+  });
+
+});
+</script>
+
+</body>
+</html>

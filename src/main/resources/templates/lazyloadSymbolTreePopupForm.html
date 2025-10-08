@@ -843,27 +843,37 @@ function simplifyTree(fullTreeNodes) {
   });
 }
 
+function isTreeReady(selector) {
+  const tree = $(selector).jstree(true);
+  return tree && tree._data && tree._data.core && tree._data.core.ready === true;
+}
+
 function colorNodes() {
 	//alert("colorNodes");
-    $('#jstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
-        const $anchor = $('#' + node.id + '_anchor');
-        if (node.data && node.data.status === 'Modified') {
-            $anchor.addClass('red-node');
-        } else {
-            $anchor.removeClass('red-node');
-        }
-    });
+	
+	if(isTreeReady('#jstree')) {
+	    $('#jstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
+	        const $anchor = $('#' + node.id + '_anchor');
+	        if (node.data && node.data.status === 'Modified') {
+	            $anchor.addClass('red-node');
+	        } else {
+	            $anchor.removeClass('red-node');
+	        }
+	    });
+    }
     
-    $('#summarizedJstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
-        const $anchor = $('#' + node.id + '_anchor');
-        
-        //alert(node.id);
-        if (node.data && node.data.status === 'Modified') {
-            $anchor.addClass('red-node');
-        } else {
-            $anchor.removeClass('red-node');
-        }
-    });
+    if(isTreeReady('#summarizedJstree')) {
+	    $('#summarizedJstree').jstree(true).get_json('#', { flat: true }).forEach(function (node) {
+	        const $anchor = $('#' + node.id + '_anchor');
+	        
+	        //alert(node.id);
+	        if (node.data && node.data.status === 'Modified') {
+	            $anchor.addClass('red-node');
+	        } else {
+	            $anchor.removeClass('red-node');
+	        }
+	    });
+    }
 }
 
 function resetStatus() {

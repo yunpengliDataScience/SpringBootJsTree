@@ -388,7 +388,7 @@ public class JsTreeService {
 
 	// Retrieve the summarized change Json
 	public String getSummarizedJsTreeDataForChangeRequest() throws JsonProcessingException {
-		String jsonString = "{}";
+		String jsonString = "[{}]";
 
 		ChangeRequestSandbox changeRequestSandbox = changeRequestSandboxRepo
 				.getChangeRequestByNotEqualStatus(Constants.CR_APPROVED);

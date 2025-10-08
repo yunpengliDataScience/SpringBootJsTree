@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chained Modals Demo (No Bootstrap)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  /* Common modal overlay */
+  .modal {
+    display: none; /* hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Inner modal box */
+  .modal-content {
+    background: #fff;
+    width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .button {
+    margin-top: 10px;
+    padding: 6px 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<h2>Click button to open main modal</h2>
+<button id="openMainModal" class="button">Open Main Modal</button>
+
+<!-- Main Modal -->
+<div id="mainModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeMain">&times;</span>
+    <div class="modal-header">Main Modal Form</div>
+    <label>Node Name:</label>
+    <input type="text" id="mainNodeName" value="Node A"><br><br>
+    <label>Extra Data:</label>
+    <input type="text" id="extraData" readonly placeholder="Filled by subform">
+    <br><br>
+    <button id="openSubModal" class="button">Open Sub Modal</button>
+    <button id="saveMain" class="button">Save</button>
+  </div>
+</div>
+
+<!-- Sub Modal -->
+<div id="subModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeSub">&times;</span>
+    <div class="modal-header">Sub Modal Form</div>
+    <label>Enter Extra Info:</label>
+    <input type="text" id="subInput" placeholder="Type something...">
+    <br><br>
+    <button id="saveSub" class="button">Save & Return</button>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function() {
+  const $mainModal = $('#mainModal');
+  const $subModal = $('#subModal');
+
+  // --- Open and close main modal ---
+  $('#openMainModal').on('click', function() {
+    $mainModal.fadeIn(200);
+  });
+
+  $('#closeMain').on('click', function() {
+    $mainModal.fadeOut(200);
+  });
+
+  // --- Open sub modal from main modal ---
+  $('#openSubModal').on('click', function() {
+    $mainModal.hide(); // hide main temporarily
+    $subModal.fadeIn(200);
+  });
+
+  // --- Close sub modal and go back to main ---
+  $('#closeSub').on('click', function() {
+    $subModal.fadeOut(200, function() {
+      $mainModal.fadeIn(200);
+    });
+  });
+
+  // --- When "Save" clicked in sub modal ---
+  $('#saveSub').on('click', function() {
+    const extraValue = $('#subInput').val().trim();
+    if (extraValue) {
+      // Transfer data to main modal input
+      $('#extraData').val(extraValue);
+    }
+
+    // Close sub modal and reopen main
+    $subModal.fadeOut(200, function() {
+      $mainModal.fadeIn(200);
+    });
+  });
+
+  // --- Save main modal (demo) ---
+  $('#saveMain').on('click', function() {
+    const nodeName = $('#mainNodeName').val();
+    const extra = $('#extraData').val();
+    alert('Saved:\nNode Name: ' + nodeName + '\nExtra: ' + extra);
+    $mainModal.fadeOut(200);
+  });
+});
+</script>
+
+</body>
+</html>
