@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jsTree reselect demo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+</head>
+<body>
+  <div id="jstree"></div>
+
+  <script>
+    // Initialize the jsTree
+    $('#jstree').jstree({
+      'core': {
+        'data': [
+          { "id": "1", "parent": "#", "text": "Root node" },
+          { "id": "2", "parent": "1", "text": "Child node" }
+        ]
+      }
+    });
+
+    // Listen for selection events
+    $('#jstree').on('select_node.jstree', function (e, data) {
+      alert('Selected: ' + data.node.text);
+    });
+
+    // Allow clicking a selected node to retrigger the event
+    $('#jstree').on('click', '.jstree-anchor', function (e) {
+      const tree = $('#jstree').jstree(true);
+      const nodeId = $(this).closest('li').attr('id');
+      const node = tree.get_node(nodeId);
+
+      // If the node is already selected, manually trigger the event
+      if (tree.is_selected(node)) {
+        tree.trigger('select_node.jstree', { node: node, selected: [nodeId] });
+      }
+    });
+  </script>
+</body>
+</html>

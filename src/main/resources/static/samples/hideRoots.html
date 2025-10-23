@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jsTree - Hide Other Root Branches</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #jstree {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 300px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>jsTree Example - Hide Other Roots</h3>
+  <div id="jstree"></div>
+  <button id="showAll">Show All Roots</button>
+  <button id="saveTree">Save Tree JSON</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    $(function () {
+      // Initialize jsTree with multiple roots
+      $('#jstree').jstree({
+        'core': {
+          'data': [
+            { "id": "root1", "text": "Root 1", "children": [
+              { "id": "r1c1", "text": "Child 1" },
+              { "id": "r1c2", "text": "Child 2" }
+            ]},
+            { "id": "root2", "text": "Root 2", "children": [
+              { "id": "r2c1", "text": "Child A" },
+              { "id": "r2c2", "text": "Child B" }
+            ]},
+            { "id": "root3", "text": "Root 3", "children": [
+              { "id": "r3c1", "text": "Child X" },
+              { "id": "r3c2", "text": "Child Y" }
+            ]}
+          ]
+        }
+      });
+
+      // When a node is selected
+      $('#jstree').on('select_node.jstree', function (e, data) {
+        var selectedId = data.node.id;
+        var tree = $('#jstree').jstree(true);
+
+        // Get all root nodes
+        var rootNodes = tree.get_json('#', { 'flat': true }).filter(n => n.parent === '#');
+
+        // Determine the root id of the selected node
+        var rootId = (data.node.parent === '#')
+            ? selectedId
+            : tree.get_path(data.node, '#')[0];
+
+        // Show only this root and hide others
+        rootNodes.forEach(root => {
+          if (root.id !== rootId) {
+            $('#' + root.id, '#jstree').closest('li').hide();
+          } else {
+            $('#' + root.id, '#jstree').closest('li').show();
+          }
+        });
+      });
+
+      // Show all roots again
+      $('#showAll').click(function () {
+        $('#jstree li').show();
+      });
+
+      // Save and show JSON data
+      $('#saveTree').click(function () {
+        var jsonData = $('#jstree').jstree(true).get_json('#', { flat: false });
+        $('#output').text(JSON.stringify(jsonData, null, 2));
+      });
+    });
+  </script>
+</body>
+</html>
