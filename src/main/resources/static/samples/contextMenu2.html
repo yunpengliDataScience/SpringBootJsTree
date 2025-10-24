@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Custom Context Menu (on click)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/themes/default/style.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.15/dist/jstree.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    #tree {
+      width: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    /* Context menu */
+    #contextMenu {
+      display: none;
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    #contextMenu ul {
+      list-style: none;
+      margin: 0;
+      padding: 5px 0;
+    }
+
+    #contextMenu li {
+      padding: 6px 15px;
+      cursor: pointer;
+    }
+
+    #contextMenu li:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Popup form */
+    #popupForm {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 1px solid #888;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      z-index: 2000;
+    }
+
+    #popupForm input[type="text"] {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h3>jsTree Custom Context Menu Example</h3>
+<div id="tree"></div>
+
+<!-- Context Menu -->
+<div id="contextMenu">
+  <ul>
+    <li id="editNode">Edit</li>
+    <li id="addChild">Add Child</li>
+  </ul>
+</div>
+
+<!-- Popup Form -->
+<div id="popupForm">
+  <h3>Edit Node</h3>
+  <input type="text" id="nodeText">
+  <button id="saveEdit">Save</button>
+  <button id="cancelEdit">Cancel</button>
+</div>
+
+<script>
+$(function() {
+  // Initialize jsTree
+  $('#tree').jstree({
+    'core': {
+      'check_callback': true,
+      'data': [
+        { "id": "1", "parent": "#", "text": "Root 1" },
+        { "id": "2", "parent": "1", "text": "Child 1-1" },
+        { "id": "3", "parent": "#", "text": "Root 2" }
+      ]
+    }
+  });
+
+  let selectedNode = null;
+  const $contextMenu = $('#contextMenu');
+
+  // Ensure event binding happens AFTER tree is ready
+  $('#tree').on('ready.jstree', function () {
+
+    // Click event for any node
+    $('#tree').on('click.jstree', '.jstree-anchor', function(e) {
+      const nodeId = $(this).closest('li').attr('id');
+      selectedNode = $('#tree').jstree(true).get_node(nodeId);
+
+      // Show context menu at click position
+      $contextMenu.css({
+        top: e.pageY + 'px',
+        left: e.pageX + 'px'
+      }).show();
+
+      e.preventDefault();
+    });
+  });
+
+  // Hide context menu when clicking outside
+  $(document).click(function(e) {
+    if (!$(e.target).closest('#contextMenu, .jstree-anchor').length) {
+      $contextMenu.hide();
+    }
+  });
+
+  // Edit node
+  $('#editNode').click(function() {
+    $contextMenu.hide();
+    if (!selectedNode) return;
+    $('#nodeText').val(selectedNode.text);
+    $('#popupForm').show();
+  });
+
+  // Add child
+  $('#addChild').click(function() {
+    $contextMenu.hide();
+    if (!selectedNode) return;
+    const newNodeId = 'node_' + Date.now();
+    $('#tree').jstree().create_node(selectedNode, {
+      "id": newNodeId,
+      "text": "New Child"
+    }, "last");
+    $('#tree').jstree('open_node', selectedNode);
+  });
+
+  // Save edit
+  $('#saveEdit').click(function() {
+    if (!selectedNode) return;
+    const newText = $('#nodeText').val();
+    $('#tree').jstree('rename_node', selectedNode, newText);
+    $('#popupForm').hide();
+  });
+
+  // Cancel edit
+  $('#cancelEdit').click(function() {
+    $('#popupForm').hide();
+  });
+});
+</script>
+
+</body>
+</html>
