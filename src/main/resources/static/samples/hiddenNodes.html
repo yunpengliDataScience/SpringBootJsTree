@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Hide/Show Hidden Nodes (Keep in JSON)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    #controls {
+      margin-bottom: 10px;
+    }
+
+    /* Hide nodes but keep them in DOM */
+    .hidden-node {
+      display: none !important;
+    }
+
+    pre {
+      background: #f4f4f4;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h3>jsTree - Toggle Hidden Nodes (Keep in JSON)</h3>
+
+  <div id="controls">
+    <button id="toggleHidden">Show Hidden Nodes</button>
+    <button id="export">Export Full JSON</button>
+  </div>
+
+  <div id="jstree"></div>
+
+  <h4>Exported JSON:</h4>
+  <pre id="output"></pre>
+
+  <script>
+    $(function () {
+      // ✅ Example jsTree data
+      const treeData = [
+        { id: "1", parent: "#", text: "Root 1" },
+        { id: "1_1", parent: "1", text: "Visible Child 1" },
+        { id: "1_2", parent: "1", text: "Hidden Child 2", data: { hidden: true } },
+        { id: "1_3", parent: "1", text: "Visible Child 3" },
+        { id: "2", parent: "#", text: "Root 2" },
+        { id: "2_1", parent: "2", text: "Hidden Child A", data: { hidden: true } },
+        { id: "2_2", parent: "2", text: "Visible Child B" }
+      ];
+
+      let showHidden = false; // Toggle flag
+
+      // ✅ Initialize jsTree
+      $('#jstree').jstree({
+        core: {
+          data: treeData,
+          check_callback: true
+        }
+      });
+
+      // ✅ Function to apply hiding logic
+      function applyHiddenState() {
+        treeData.forEach(node => {
+          const nodeEl = $('#' + node.id + '_anchor').closest('li');
+          if (node.data && node.data.hidden) {
+            if (showHidden) {
+              nodeEl.removeClass('hidden-node');
+            } else {
+              nodeEl.addClass('hidden-node');
+            }
+          }
+        });
+      }
+
+      // ✅ Apply hide logic when tree is ready or expanded
+      $('#jstree').on('ready.jstree after_open.jstree', function () {
+        applyHiddenState();
+      });
+
+      // ✅ Toggle button
+      $('#toggleHidden').on('click', function () {
+        showHidden = !showHidden;
+        applyHiddenState();
+        $(this).text(showHidden ? "Hide Hidden Nodes" : "Show Hidden Nodes");
+      });
+
+      // ✅ Export button — includes all nodes, hidden or not
+      $('#export').on('click', function () {
+        const tree = $('#jstree').jstree(true);
+        const flatJson = tree.get_json('#', { flat: true });
+        $('#output').text(JSON.stringify(flatJson, null, 2));
+      });
+    });
+  </script>
+</body>
+</html>
