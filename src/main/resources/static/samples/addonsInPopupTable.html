@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>jsTree Node Addons Popup Example</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+
+  #jstree {
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  /* Popup styles */
+  #addonPopup {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 35%;
+    width: 30%;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    padding: 15px;
+  }
+
+  #addonPopup h3 {
+    margin-top: 0;
+  }
+
+  #addonTable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #addonTable th, #addonTable td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: left;
+  }
+
+  #popupClose {
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  #popupClose:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<h2>jsTree with Addons Popup</h2>
+<div id="jstree"></div>
+
+<!-- Popup Window -->
+<div id="addonPopup">
+  <h3>Node Addons</h3>
+  <table id="addonTable">
+    <thead>
+      <tr><th>Name</th><th>Version</th><th>Description</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button id="popupClose">Close</button>
+</div>
+
+<script>
+$(function() {
+  // --- Sample jsTree data ---
+  const treeData = [
+    {
+      id: "1",
+      parent: "#",
+      text: "Root Node",
+      data: {
+        addons: [
+          { name: "Add-on A", version: "1.0", description: "First add-on" },
+          { name: "Add-on B", version: "1.2", description: "Second add-on" }
+        ]
+      }
+    },
+    {
+      id: "2",
+      parent: "1",
+      text: "Child Node 1",
+      data: {
+        addons: [
+          { name: "Child Add-on X", version: "2.0", description: "Child feature X" }
+        ]
+      }
+    },
+    {
+      id: "3",
+      parent: "1",
+      text: "Child Node 2",
+      data: {
+        addons: []
+      }
+    }
+  ];
+
+  // --- Initialize jsTree ---
+  $('#jstree').jstree({
+    core: { data: treeData }
+  });
+
+  // --- Handle node click ---
+  $('#jstree').on('select_node.jstree', function (e, data) {
+    const node = data.node;
+    const addons = node.data?.addons || [];
+
+    // Clear table body
+    const tbody = $('#addonTable tbody');
+    tbody.empty();
+
+    if (addons.length === 0) {
+      tbody.append('<tr><td colspan="3" style="text-align:center;">No Add-ons</td></tr>');
+    } else {
+      addons.forEach(addon => {
+        tbody.append(`
+          <tr>
+            <td>${addon.name}</td>
+            <td>${addon.version}</td>
+            <td>${addon.description}</td>
+          </tr>
+        `);
+      });
+    }
+
+    // Show popup
+    $('#addonPopup').fadeIn(200);
+  });
+
+  // --- Close popup ---
+  $('#popupClose').on('click', function() {
+    $('#addonPopup').fadeOut(200);
+  });
+});
+</script>
+
+</body>
+</html>

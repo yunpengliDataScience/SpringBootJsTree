@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hide jsTree Vertical Lines and Nodes</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+
+<style>
+#jstree {
+  margin-top: 15px;
+}
+
+/* 1️. Completely hide the dotted vertical connector lines (the background “line image”) */
+.jstree-default .jstree-node,
+.jstree-default .jstree-children {
+  background-image: none !important;
+}
+
+/* 2️. Hide pseudo-element lines as well */
+.jstree-default .jstree-node::before,
+.jstree-default .jstree-children::before {
+  content: none !important;
+  background: none !important;
+  border: none !important;
+}
+
+/* 3️. Hide certain nodes visually but keep in DOM */
+.hidden-node {
+  display: none !important;
+}
+
+/* 4️. Optional: add faint background for visual check */
+#jstree {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 300px;
+}
+</style>
+</head>
+<body>
+<button id="toggleHidden">Show Hidden Nodes</button>
+<div id="jstree"></div>
+
+<script>
+$(function() {
+  let showHidden = false;
+
+  const data = [
+    {
+      id: 'r1',
+      text: 'Root 1',
+      children: [
+        { id: 'r1c1', text: 'Visible Child' },
+        { id: 'r1c2', text: 'Hidden Child', hidden: true }
+      ]
+    },
+    {
+      id: 'r2',
+      text: 'Root 2 (Hidden)',
+      hidden: true,
+      children: [
+        { id: 'r2c1', text: 'Child 2-1' },
+        { id: 'r2c2', text: 'Child 2-2 (Hidden)', hidden: true }
+      ]
+    }
+  ];
+
+  $('#jstree').jstree({
+    core: { data: data, check_callback: true }
+  });
+
+  // hide nodes initially
+  $('#jstree').on('ready.jstree', function() {
+    applyHiddenState();
+  });
+
+  function applyHiddenState() {
+    const tree = $('#jstree').jstree(true);
+    $('#jstree li').each(function() {
+      const node = tree.get_node(this.id);
+      if (node && node.original.hidden) {
+        $(this).addClass('hidden-node');
+      }
+    });
+  }
+
+  $('#toggleHidden').on('click', function() {
+    showHidden = !showHidden;
+    const tree = $('#jstree').jstree(true);
+
+    $('#jstree li').each(function() {
+      const node = tree.get_node(this.id);
+      if (node && node.original.hidden) {
+        if (showHidden) {
+          $(this).removeClass('hidden-node');
+        } else {
+          $(this).addClass('hidden-node');
+        }
+      }
+    });
+
+    $(this).text(showHidden ? 'Hide Hidden Nodes' : 'Show Hidden Nodes');
+  });
+
+  // export full tree (still includes hidden nodes)
+  window.exportFullTree = function() {
+    const json = $('#jstree').jstree(true).get_json('#', { flat: true });
+    console.log(JSON.stringify(json, null, 2));
+  };
+});
+</script>
+</body>
+</html>
