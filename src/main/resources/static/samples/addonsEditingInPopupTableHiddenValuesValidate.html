@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>jsTree Editable Add-ons Popup (with Validation)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+
+  #jstree {
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  /* Popup styling */
+  #addonPopup {
+    display: none;
+    position: fixed;
+    top: 15%;
+    left: 30%;
+    width: 40%;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    padding: 15px;
+  }
+
+  #addonPopup h3 {
+    margin-top: 0;
+  }
+
+  #addonTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+
+  #addonTable th, #addonTable td {
+    border: 1px solid #ccc;
+    padding: 5px;
+  }
+
+  #addonTable input[type="text"] {
+    width: 95%;
+    padding: 3px;
+  }
+
+  #addonButtons {
+    text-align: right;
+  }
+
+  button {
+    padding: 5px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+  }
+
+  #addRowBtn { background-color: #28a745; color: white; }
+  #saveBtn { background-color: #007bff; color: white; }
+  #popupClose { background-color: #dc3545; color: white; }
+
+  button:hover { opacity: 0.85; }
+
+  /* Validation highlight */
+  .error {
+    border: 2px solid #dc3545 !important;
+    background-color: #ffe6e6;
+  }
+
+  .error-msg {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h2>jsTree with Editable Add-ons (Validation Example)</h2>
+<div id="jstree"></div>
+
+<!-- Popup -->
+<div id="addonPopup">
+  <h3>Node Add-ons</h3>
+  <table id="addonTable">
+    <thead>
+      <tr><th>Name</th><th>Version</th><th>Description <span style="color:red">*</span></th><th>Action</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div class="error-msg" id="errorMsg"></div>
+  <div id="addonButtons">
+    <button id="addRowBtn">Add Add-on</button>
+    <button id="saveBtn">Save</button>
+    <button id="popupClose">Close</button>
+  </div>
+</div>
+
+<script>
+$(function() {
+  const treeData = [
+    {
+      id: "1",
+      parent: "#",
+      text: "Root Node",
+      data: {
+        addons: [
+          { id: "a1", name: "Add-on A", version: "1.0", description: "First add-on", secretKey: "XYZ123" },
+          { id: "a2", name: "Add-on B", version: "1.2", description: "Second add-on", secretKey: "ABC789" }
+        ]
+      }
+    },
+    {
+      id: "2",
+      parent: "1",
+      text: "Child Node 1",
+      data: {
+        addons: [
+          { id: "b1", name: "Child Add-on X", version: "2.0", description: "Child feature X", secretKey: "HIDDEN999" }
+        ]
+      }
+    }
+  ];
+
+  let currentNode = null;
+
+  $('#jstree').jstree({ core: { data: treeData } });
+
+  // Node click opens popup
+  $('#jstree').on('select_node.jstree', function (e, data) {
+    currentNode = data.node;
+    const addons = currentNode.data?.addons || [];
+    populateTable(addons);
+    $('#errorMsg').text('');
+    $('#addonPopup').fadeIn(200);
+  });
+
+  // Close popup
+  $('#popupClose').on('click', function() {
+    $('#addonPopup').fadeOut(200);
+  });
+
+  // Add row
+  $('#addRowBtn').on('click', function() {
+    $('#addonTable tbody').append(newAddonRow());
+  });
+
+  // Delete row
+  $(document).on('click', '.deleteRowBtn', function() {
+    $(this).closest('tr').remove();
+  });
+
+  // Save and validate
+  $('#saveBtn').on('click', function() {
+    if (!currentNode) return;
+
+    let valid = true;
+    $('#errorMsg').text('');
+    $('#addonTable tbody tr').find('input').removeClass('error');
+
+    const addons = [];
+    $('#addonTable tbody tr').each(function() {
+      const $row = $(this);
+      const desc = $row.find('.addon-desc').val().trim();
+
+      if (!desc) {
+        $row.find('.addon-desc').addClass('error');
+        valid = false;
+      }
+
+      const addon = {
+        id: $row.find('.addon-id').val().trim(),
+        name: $row.find('.addon-name').val().trim(),
+        version: $row.find('.addon-version').val().trim(),
+        description: desc,
+        secretKey: $row.find('.addon-secretKey').val().trim()
+      };
+      addons.push(addon);
+    });
+
+    if (!valid) {
+      $('#errorMsg').text('⚠️ Description is required for each add-on.');
+      return;
+    }
+
+    currentNode.data.addons = addons;
+    const tree = $('#jstree').jstree(true);
+    tree.set_text(currentNode, currentNode.text.replace(/\s\*$/, '') + ' *');
+    $('#addonPopup').fadeOut(200);
+
+    console.log(`✅ Saved addons for node "${currentNode.text}":`, addons);
+  });
+
+  // Helper: create new row
+  function newAddonRow(addon = {}) {
+    return `
+      <tr>
+        <td>
+          <input type="hidden" class="addon-id" value="${addon.id || ''}">
+          <input type="hidden" class="addon-secretKey" value="${addon.secretKey || 'NEW_KEY'}">
+          <input type="text" class="addon-name" value="${addon.name || ''}" placeholder="Name">
+        </td>
+        <td><input type="text" class="addon-version" value="${addon.version || ''}" placeholder="Version"></td>
+        <td><input type="text" class="addon-desc" value="${addon.description || ''}" placeholder="Description (required)"></td>
+        <td><button class="deleteRowBtn">Delete</button></td>
+      </tr>
+    `;
+  }
+
+  // Helper: fill table
+  function populateTable(addons) {
+    const tbody = $('#addonTable tbody');
+    tbody.empty();
+    if (!addons || addons.length === 0) {
+      tbody.append(newAddonRow());
+    } else {
+      addons.forEach(addon => tbody.append(newAddonRow(addon)));
+    }
+  }
+});
+</script>
+
+</body>
+</html>
