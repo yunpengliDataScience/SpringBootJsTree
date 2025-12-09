@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>jsTree Editable Add-ons Popup (with Validation)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+<style>
+
+  /* Popup styling */
+  #addonPopup {
+    display: none;
+    position: fixed;
+    top: 15%;
+    left: 30%;
+    width: 40%;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    padding: 15px;
+  }
+
+  /* --- Scrollable table area --- */
+	#tableContainer {
+	  max-height: 200px;
+	  overflow-y: auto;
+	  border: 1px solid #ccc;
+	  margin-top: 10px;
+	}
+	
+  #addonTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+
+  #addonTable th, #addonTable td {
+    border: 1px solid #ccc;
+    padding: 5px;
+  }
+
+  #addonTable input[type="text"] {
+    width: 95%;
+    padding: 3px;
+  }
+
+  #addonButtons {
+    text-align: right;
+  }
+
+  /* Validation highlight */
+  .error {
+    border: 2px solid red !important;
+  }
+
+  .error-msg {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h2>jsTree with Editable Add-ons</h2>
+<div id="jstree"></div>
+
+<!-- Popup -->
+<div id="addonPopup">
+  <h3>Node Add-ons</h3>
+  <div class="error-msg" id="errorMsg"></div>
+  
+  <div id="tableContainer">
+	<table id="addonTable">
+		<thead>
+		  <tr><th>Name</th><th>Version</th><th>Description <span style="color:red">*</span></th><th>Action</th></tr>
+		</thead>
+		<tbody></tbody>
+	  </table>
+  </div>
+  
+  <div id="addonButtons">
+    <button id="addRowBtn">Add Add-on</button>
+    <button id="saveBtn">Save</button>
+    <button id="popupClose">Close</button>
+  </div>
+</div>
+
+<script>
+$(function() {
+  const treeData = [
+    {
+      id: "1",
+      parent: "#",
+      text: "Root Node",
+      data: {
+        addons: [
+          { id: "a1", name: "Add-on A", version: "1.0", description: "First add-on", secretKey: "XYZ123" },
+          { id: "a2", name: "Add-on B", version: "1.2", description: "Second add-on", secretKey: "ABC789" }
+        ]
+      }
+    },
+    {
+      id: "2",
+      parent: "1",
+      text: "Child Node A",
+      data: {
+        addons: [
+          { id: "a1", name: "Child Add-on X", version: "2.0", description: "Child feature X", secretKey: "ABC123" }
+        ]
+      }
+    },
+	{
+      id: "3",
+      parent: "1",
+      text: "Child Node B",
+      data: {
+        addons: [
+          { id: "b1", name: "Child Add-on Y", version: "2.0", description: "Child feature Y", secretKey: "ABC321" }
+        ]
+      }
+    }
+  ];
+
+  let currentNode = null;
+
+  $('#jstree').jstree({ core: { data: treeData } });
+
+  // Node click opens popup
+  $('#jstree').on('select_node.jstree', function (e, data) {
+    currentNode = data.node;
+	
+	//debug for printing all data 
+	console.log(currentNode.data);
+	
+    const addons = currentNode.data?.addons || [];
+    
+	populateTable(addons);
+    
+	$('#errorMsg').text('');
+    
+	//Show the popup table
+	$('#addonPopup').fadeIn(200);
+  });
+
+  // Close popup
+  $('#popupClose').on('click', function() {
+    $('#addonPopup').fadeOut(200);
+  });
+
+  // Add row
+  $('#addRowBtn').on('click', function() {
+    $('#addonTable tbody').append(newAddonRow());
+  });
+
+  // Delete row
+  $(document).on('click', '.deleteRowBtn', function() {
+    $(this).closest('tr').remove();
+  });
+
+  // Save and validate
+  $('#saveBtn').on('click', function() {
+  
+	//A node must be selected first
+    if (!currentNode) return;
+
+    let valid = true;
+	
+	//Clear out error nessages
+    $('#errorMsg').text('');
+    $('#addonTable tbody tr').find('input').removeClass('error');
+
+    const addons = [];
+	
+	//Iterate through each row of the table and assign each column value into an addon object, the put the addon object in addons array.
+    $('#addonTable tbody tr').each(function() {
+      
+	  const $row = $(this);
+      const desc = $row.find('.addon-desc').val().trim();
+
+      if (!desc) {
+        $row.find('.addon-desc').addClass('error');
+        valid = false;
+      }
+
+      const addon = {
+        id: $row.find('.addon-id').val().trim(),
+        name: $row.find('.addon-name').val().trim(),
+        version: $row.find('.addon-version').val().trim(),
+        description: desc,
+        secretKey: $row.find('.addon-secretKey').val().trim()
+      };
+	  
+      addons.push(addon);
+    });
+
+    if (!valid) {
+      $('#errorMsg').text('Description is required for each add-on.');
+      return;
+    }
+
+	//Assign addons to the data attribute of the node
+    currentNode.data.addons = addons;
+   
+    //close the popup
+    $('#addonPopup').fadeOut(200);
+
+    console.log(`Saved addons for node "${currentNode.text}":`, addons);
+  });
+
+  // Create a new row 
+  function newAddonRow(addon = {}) {
+    return `
+      <tr>
+        <td>
+          <input type="hidden" class="addon-id" value="${addon.id || ''}">
+          <input type="hidden" class="addon-secretKey" value="${addon.secretKey || 'NEW_KEY'}">
+          <input type="text" class="addon-name" value="${addon.name || ''}" placeholder="Name">
+        </td>
+        <td><input type="text" class="addon-version" value="${addon.version || ''}" placeholder="Version"></td>
+        <td><input type="text" class="addon-desc" value="${addon.description || ''}" placeholder="Description (required)"></td>
+        <td><button class="deleteRowBtn">Delete</button></td>
+      </tr>
+    `;
+  }
+
+  //fill table with addons as rows
+  function populateTable(addons) {
+    
+	const tbody = $('#addonTable tbody');
+    tbody.empty();
+    
+	//if no addons, append a new empty addon row
+	if (!addons || addons.length === 0) {
+      tbody.append(newAddonRow());
+    } else { //add each addon as a new row
+      addons.forEach(addon => tbody.append(newAddonRow(addon)));
+    }
+  }
+});
+</script>
+
+</body>
+</html>

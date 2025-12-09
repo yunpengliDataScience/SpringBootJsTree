@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Table Change Detection</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+            text-align: left;
+        }
+        .status {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<h3>Input Change Detection in Table Rows</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Active?</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <tr>
+            <td><input type="text" class="name" placeholder="Enter name"></td>
+            <td style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+        </tr>
+
+        <tr>
+            <td><input type="text" class="name" placeholder="Enter name"></td>
+            <td style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+        </tr>
+
+        <tr>
+            <td><input type="text" class="name" placeholder="Enter name"></td>
+            <td style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+        </tr>
+
+    </tbody>
+</table>
+
+<script>
+$(document).on('input change', '.name, .active', function () {
+    let row = $(this).closest('tr');
+    row.find('.status').val('changed');
+});
+</script>
+
+</body>
+</html>
