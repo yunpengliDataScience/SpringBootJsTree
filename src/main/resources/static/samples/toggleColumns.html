@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toggle Table Columns</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 70%;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 6px;
+        }
+        .status {
+            background-color: #eee;
+        }
+        .hidden-col {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h3>Toggle Table Columns + Row Change Detection</h3>
+
+<button id="toggleColsBtn">Hide Optional Columns</button>
+
+<table id="mainTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th class="opt-col">Active?</th>
+            <th>Status</th>
+            <th class="opt-col">Hidden Meta</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="text" class="name"></td>
+            <td class="opt-col" style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+            <td class="opt-col"><input type="text" class="meta" value="meta1"></td>
+        </tr>
+        <tr>
+            <td><input type="text" class="name"></td>
+            <td class="opt-col" style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+            <td class="opt-col"><input type="text" class="meta" value="meta2"></td>
+        </tr>
+        <tr>
+            <td><input type="text" class="name"></td>
+            <td class="opt-col" style="text-align:center;"><input type="checkbox" class="active"></td>
+            <td><input type="text" class="status" readonly></td>
+            <td class="opt-col"><input type="text" class="meta" value="meta3"></td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+// Change detection
+$(document).on('input change', '.name, .active', function () {
+    let row = $(this).closest('tr');
+    row.find('.status').val('changed');
+});
+
+// Toggle columns
+let isHidden = false;
+
+$("#toggleColsBtn").click(function () {
+    isHidden = !isHidden;
+
+    if (isHidden) {
+        $(".opt-col").addClass("hidden-col");
+        $(this).text("Show Optional Columns");
+    } else {
+        $(".opt-col").removeClass("hidden-col");
+        $(this).text("Hide Optional Columns");
+    }
+});
+</script>
+
+</body>
+</html>
