@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Addon Name Autocomplete</title>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<style>
+  body { font-family: Arial; }
+
+  #addonPopup {
+    display: block;
+    width: 700px;
+    border: 2px solid #333;
+    padding: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px;
+  }
+
+  input[type="text"] {
+    width: 95%;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="addonPopup">
+  <h3>Add-ons</h3>
+
+  <table id="addonTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button id="addRowBtn">Add Row</button>
+</div>
+
+<script>
+$(function () {
+
+  // --- Add initial rows ---
+  for (let i = 0; i < 3; i++) {
+    $('#addonTable tbody').append(newAddonRow());
+  }
+
+  // --- Add row button ---
+  $('#addRowBtn').on('click', function () {
+    $('#addonTable tbody').append(newAddonRow());
+  });
+
+  // --- Delete row ---
+  $(document).on('click', '.deleteRowBtn', function () {
+    $(this).closest('tr').remove();
+  });
+
+  // --- Attach autocomplete when input gains focus ---
+  $(document).on('focus', '.addon-name', function () {
+    attachAutocomplete($(this));
+  });
+
+});
+
+/* ================================
+   Create table row
+================================ */
+function newAddonRow(addon = {}) {
+  return `
+    <tr>
+      <td>
+        <input type="hidden" class="addon-id" value="${addon.id || ''}">
+        <input type="hidden" class="addon-secretKey" value="${addon.secretKey || ''}">
+        <input type="text" class="addon-name" placeholder="Type to search">
+      </td>
+      <td><input type="text" class="addon-version"></td>
+      <td><input type="text" class="addon-desc"></td>
+      <td><button class="deleteRowBtn">Delete</button></td>
+    </tr>
+  `;
+}
+
+/* ================================
+   Autocomplete logic
+================================ */
+function attachAutocomplete($input) {
+
+  // Prevent attaching twice
+  if ($input.data('ui-autocomplete')) return;
+
+  $input.autocomplete({
+    minLength: 2,
+    delay: 300,
+
+    source: function (request, response) {
+      $.ajax({
+        url: '/api/addons/search',   // 🔴 your backend endpoint
+        dataType: 'json',
+        data: { term: request.term },
+        success: function (data) {
+          response(data.map(item => ({
+            label: item.name,
+            value: item.name,
+            addon: item
+          })));
+        }
+      });
+    },
+
+    select: function (event, ui) {
+      const addon = ui.item.addon;
+      const $row = $(this).closest('tr');
+
+      // Fill fields automatically
+      $row.find('.addon-name').val(addon.name);
+      $row.find('.addon-version').val(addon.version);
+      $row.find('.addon-desc').val(addon.description);
+
+      return false;
+    }
+  });
+}
+</script>
+
+</body>
+</html>

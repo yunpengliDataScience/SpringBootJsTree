@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Addon Autocomplete (Mock Backend)</title>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<style>
+  body { font-family: Arial; padding: 20px; }
+
+  #addonPopup {
+    width: 750px;
+    border: 2px solid #333;
+    padding: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+  }
+
+  input[type="text"] {
+    width: 95%;
+  }
+
+  button {
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>Add-on Autocomplete (No Backend)</h2>
+
+<div id="addonPopup">
+  <table id="addonTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <br>
+  <button id="addRowBtn">Add Row</button>
+</div>
+
+<script>
+$(function () {
+
+  // Create initial rows
+  for (let i = 0; i < 4; i++) {
+    $('#addonTable tbody').append(newAddonRow());
+  }
+
+  // Add row
+  $('#addRowBtn').on('click', function () {
+    $('#addonTable tbody').append(newAddonRow());
+  });
+
+  // Delete row
+  $(document).on('click', '.deleteRowBtn', function () {
+    $(this).closest('tr').remove();
+  });
+
+  // Attach autocomplete on focus
+  $(document).on('focus', '.addon-name', function () {
+    attachAutocomplete($(this));
+  });
+});
+
+/* ============================
+   MOCK "BACKEND DATABASE"
+============================ */
+const MOCK_ADDONS = [
+  { id: "a1", name: "Analytics Engine", version: "1.0", description: "Analytics processing module", secretKey: "AAA111" },
+  { id: "a2", name: "Auth Provider", version: "2.1", description: "Authentication service", secretKey: "BBB222" },
+  { id: "a3", name: "Cache Manager", version: "3.0", description: "Caching layer", secretKey: "CCC333" },
+  { id: "a4", name: "Data Sync", version: "1.5", description: "Data synchronization", secretKey: "DDD444" },
+  { id: "a5", name: "Event Tracker", version: "4.2", description: "Tracks system events", secretKey: "EEE555" }
+];
+
+/* ============================
+   MOCK BACKEND SEARCH FUNCTION
+============================ */
+function searchAddons(term) {
+  term = term.toLowerCase();
+  return MOCK_ADDONS.filter(a =>
+    a.name.toLowerCase().includes(term)
+  );
+}
+
+/* ============================
+   Create table row
+============================ */
+function newAddonRow(addon = {}) {
+  return `
+    <tr>
+      <td>
+        <input type="hidden" class="addon-id" value="${addon.id || ''}">
+        <input type="hidden" class="addon-secretKey" value="${addon.secretKey || ''}">
+        <input type="text" class="addon-name" placeholder="Type to search">
+      </td>
+      <td><input type="text" class="addon-version"></td>
+      <td><input type="text" class="addon-desc"></td>
+      <td><button class="deleteRowBtn">Delete</button></td>
+    </tr>
+  `;
+}
+
+/* ============================
+   Autocomplete
+============================ */
+function attachAutocomplete($input) {
+
+  if ($input.data('ui-autocomplete')) return;
+
+  $input.autocomplete({
+    minLength: 1,
+    delay: 200,
+
+    source: function (request, response) {
+      const results = searchAddons(request.term);
+
+      response(results.map(addon => ({
+        label: addon.name,
+        value: addon.name,
+        addon: addon
+      })));
+    },
+
+    select: function (event, ui) {
+      const addon = ui.item.addon;
+      const $row = $(this).closest('tr');
+
+      $row.find('.addon-name').val(addon.name);
+      $row.find('.addon-version').val(addon.version);
+      $row.find('.addon-desc').val(addon.description);
+      $row.find('.addon-id').val(addon.id);
+      $row.find('.addon-secretKey').val(addon.secretKey);
+
+      return false;
+    }
+  });
+}
+</script>
+
+</body>
+</html>
