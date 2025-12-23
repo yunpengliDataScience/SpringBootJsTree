@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Popup Table with Autocomplete (No Bootstrap)</title>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- jQuery UI (required for autocomplete) -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+/* Popup overlay */
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* Popup box */
+#popup {
+  display: none;
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 15px;
+  z-index: 1000;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+
+input[type="text"] {
+  width: 95%;
+}
+
+/* Buttons */
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* Make autocomplete visible above popup */
+.ui-autocomplete {
+  z-index: 2000 !important;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Addon Popup with Autocomplete</h2>
+<button id="openPopup">Open Popup</button>
+
+<div id="overlay"></div>
+
+<div id="popup">
+  <h3>Add-ons</h3>
+
+  <table id="addonTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- rows added dynamically -->
+    </tbody>
+  </table>
+
+  <button id="addRow">Add Row</button>
+  <button id="closePopup">Close</button>
+</div>
+
+<script>
+$(function () {
+
+  /* -------------------------------
+     Fake "backend" data source
+  -------------------------------- */
+  function fetchAddonList(term) {
+    const data = [
+      { name: "Add-on Alpha", version: "1.0" },
+      { name: "Add-on Beta", version: "2.1" },
+      { name: "Add-on Gamma", version: "3.0" },
+      { name: "Add-on Delta", version: "4.2" }
+    ];
+
+    return data.filter(a =>
+      a.name.toLowerCase().includes(term.toLowerCase())
+    );
+  }
+
+  /* -------------------------------
+     Popup open / close
+  -------------------------------- */
+  $('#openPopup').on('click', function () {
+    $('#overlay, #popup').show();
+    addRow(); // start with one row
+  });
+
+  $('#closePopup, #overlay').on('click', function () {
+    $('#overlay, #popup').hide();
+    $('#addonTable tbody').empty();
+  });
+
+  /* -------------------------------
+     Add table row
+  -------------------------------- */
+  function addRow() {
+    $('#addonTable tbody').append(`
+      <tr>
+        <td><input type="text" class="name"></td>
+        <td><input type="text" class="version"></td>
+        <td><input type="text" class="status" readonly></td>
+      </tr>
+    `);
+  }
+
+  $('#addRow').on('click', addRow);
+
+  /* -------------------------------
+     Autocomplete on Name column
+  -------------------------------- */
+  $(document).on('focus', '.name', function () {
+    const $nameInput = $(this);
+
+    if ($nameInput.data('ui-autocomplete')) return;
+
+    $nameInput.autocomplete({
+      appendTo: "#popup",   // 🔑 required for popup
+      minLength: 1,
+      source: function (request, response) {
+        const results = fetchAddonList(request.term).map(item => ({
+          label: item.name,
+          value: item.name,
+          version: item.version
+        }));
+        response(results);
+      },
+      select: function (event, ui) {
+        const $row = $(this).closest('tr');
+        $row.find('.version').val(ui.item.version);
+        $row.find('.status').val('changed');
+        return false;
+      }
+    });
+  });
+
+  /* -------------------------------
+     Detect manual changes
+  -------------------------------- */
+  $(document).on('input', '.name, .version', function () {
+    $(this).closest('tr').find('.status').val('changed');
+  });
+
+});
+</script>
+
+</body>
+</html>
