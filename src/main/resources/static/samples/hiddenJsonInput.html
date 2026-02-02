@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Table → Modal JSON Editor</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+
+button {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+/* Modal */
+#modal {
+  display: none;
+  position: fixed;
+  top: 15%;
+  left: 20%;
+  width: 60%;
+  background: #fff;
+  border: 2px solid #333;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  padding: 15px;
+  z-index: 1000;
+}
+
+#modalOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Table A (Main Table)</h2>
+
+<table id="tableA">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Row 1</td>
+      <td>
+        <button class="display-btn">Display</button>
+        <input type="hidden" class="addon-json"
+          value='[
+            {"id":"a1","name":"Camera","version":"1.0"},
+            {"id":"a2","name":"Sensor","version":"2.1"}
+          ]'>
+      </td>
+    </tr>
+    <tr>
+      <td>Row 2</td>
+      <td>
+        <button class="display-btn">Display</button>
+        <input type="hidden" class="addon-json"
+          value='[
+            {"id":"b1","name":"GPS","version":"3.0"}
+          ]'>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Modal -->
+<div id="modalOverlay"></div>
+
+<div id="modal">
+  <h3>Table B (Edit JSON Objects)</h3>
+
+  <table id="tableB">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <br>
+  <button id="addRowBtn">Add Row</button>
+  <button id="saveModalBtn">Save</button>
+  <button id="closeModalBtn">Close</button>
+</div>
+
+<script>
+let activeHiddenInput = null;
+
+/* ---------- Open modal ---------- */
+$(document).on("click", ".display-btn", function () {
+  activeHiddenInput = $(this).siblings(".addon-json");
+
+  const data = JSON.parse(activeHiddenInput.val() || "[]");
+  renderTableB(data);
+
+  $("#modalOverlay, #modal").show();
+});
+
+/* ---------- Close modal ---------- */
+$("#closeModalBtn").on("click", closeModal);
+$("#modalOverlay").on("click", closeModal);
+
+function closeModal() {
+  $("#modalOverlay, #modal").hide();
+  $("#tableB tbody").empty();
+}
+
+/* ---------- Render Table B ---------- */
+function renderTableB(data) {
+  const $tbody = $("#tableB tbody");
+  $tbody.empty();
+
+  data.forEach(obj => {
+    $tbody.append(rowTemplate(obj));
+  });
+}
+
+/* ---------- Row template ---------- */
+function rowTemplate(obj = {}) {
+  return `
+    <tr>
+      <td><input type="text" class="id" value="${obj.id || ""}"></td>
+      <td><input type="text" class="name" value="${obj.name || ""}"></td>
+      <td><input type="text" class="version" value="${obj.version || ""}"></td>
+      <td><button class="delete-row">Delete</button></td>
+    </tr>
+  `;
+}
+
+/* ---------- Add row ---------- */
+$("#addRowBtn").on("click", function () {
+  $("#tableB tbody").append(rowTemplate());
+});
+
+/* ---------- Delete row ---------- */
+$(document).on("click", ".delete-row", function () {
+  $(this).closest("tr").remove();
+});
+
+/* ---------- Save back to hidden input ---------- */
+$("#saveModalBtn").on("click", function () {
+  if (!activeHiddenInput) return;
+
+  const result = [];
+
+  $("#tableB tbody tr").each(function () {
+    const obj = {
+      id: $(this).find(".id").val().trim(),
+      name: $(this).find(".name").val().trim(),
+      version: $(this).find(".version").val().trim()
+    };
+    result.push(obj);
+  });
+
+  activeHiddenInput.val(JSON.stringify(result));
+  console.log("Saved JSON:", result);
+
+  closeModal();
+});
+</script>
+
+</body>
+</html>

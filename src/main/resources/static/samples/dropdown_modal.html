@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>jsTree + Modal + Dropdown</title>
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+/* Modal overlay */
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* Modal window */
+#modal {
+  display: none;
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 350px;
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 15px;
+  z-index: 1000;
+}
+
+#modal h3 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+select {
+  width: 100%;
+  padding: 4px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>jsTree Node → Modal → Save Data</h2>
+
+<div id="jstree"></div>
+
+<!-- Modal -->
+<div id="overlay"></div>
+
+<div id="modal">
+  <h3>Edit Node</h3>
+
+  <label for="categorySelect">Category</label>
+  <select id="categorySelect">
+    <option value="">-- Select --</option>
+    <option value="A">Category A</option>
+    <option value="B">Category B</option>
+    <option value="C">Category C</option>
+  </select>
+
+  <div style="text-align:right;">
+    <button id="saveBtn">Save</button>
+    <button id="cancelBtn">Cancel</button>
+  </div>
+</div>
+
+<script>
+$(function () {
+
+  /* -------------------------------
+     jsTree data
+  -------------------------------- */
+  const treeData = [
+    {
+      id: "n1",
+      parent: "#",
+      text: "Node 1",
+      data: { category: "" }
+    },
+    {
+      id: "n2",
+      parent: "#",
+      text: "Node 2",
+      data: { category: "" }
+    }
+  ];
+
+  let currentNode = null;
+
+  $('#jstree').jstree({
+    core: {
+      data: treeData
+    }
+  });
+
+  /* -------------------------------
+     Node click → open modal
+  -------------------------------- */
+  $('#jstree').on('select_node.jstree', function (e, data) {
+    currentNode = data.node;
+
+    // preload dropdown from node data
+    $('#categorySelect').val(currentNode.data.category || '');
+
+    $('#overlay, #modal').show();
+  });
+
+  /* -------------------------------
+     Save button
+  -------------------------------- */
+  $('#saveBtn').on('click', function () {
+    if (!currentNode) return;
+
+    const selectedValue = $('#categorySelect').val();
+
+    // ✅ Save into node memory
+    currentNode.data.category = selectedValue;
+
+    // Optional: update node text for visibility
+    const tree = $('#jstree').jstree(true);
+    const baseText = currentNode.text.split(' (')[0];
+    tree.set_text(
+      currentNode,
+      selectedValue ? `${baseText} (${selectedValue})` : baseText
+    );
+
+    console.log('Saved to node:', currentNode.data);
+
+    closeModal();
+  });
+
+  /* -------------------------------
+     Cancel / close
+  -------------------------------- */
+  $('#cancelBtn, #overlay').on('click', closeModal);
+
+  function closeModal() {
+    $('#overlay, #modal').hide();
+    currentNode = null;
+  }
+
+});
+</script>
+
+</body>
+</html>
