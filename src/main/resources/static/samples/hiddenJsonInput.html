@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Table → Modal JSON Editor</title>
+<title>Dynamic Table → Modal JSON Editor</title>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -44,10 +44,7 @@ button {
 #modalOverlay {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.4);
   z-index: 999;
 }
@@ -56,7 +53,7 @@ button {
 
 <body>
 
-<h2>Table A (Main Table)</h2>
+<h2>Table A (Loaded from Query)</h2>
 
 <table id="tableA">
   <thead>
@@ -65,36 +62,14 @@ button {
       <th>Action</th>
     </tr>
   </thead>
-  <tbody>
-    <tr>
-      <td>Row 1</td>
-      <td>
-        <button class="display-btn">Display</button>
-        <input type="hidden" class="addon-json"
-          value='[
-            {"id":"a1","name":"Camera","version":"1.0"},
-            {"id":"a2","name":"Sensor","version":"2.1"}
-          ]'>
-      </td>
-    </tr>
-    <tr>
-      <td>Row 2</td>
-      <td>
-        <button class="display-btn">Display</button>
-        <input type="hidden" class="addon-json"
-          value='[
-            {"id":"b1","name":"GPS","version":"3.0"}
-          ]'>
-      </td>
-    </tr>
-  </tbody>
+  <tbody></tbody>
 </table>
 
 <!-- Modal -->
 <div id="modalOverlay"></div>
 
 <div id="modal">
-  <h3>Table B (Edit JSON Objects)</h3>
+  <h3>Table B (Edit Add-ons)</h3>
 
   <table id="tableB">
     <thead>
@@ -115,9 +90,57 @@ button {
 </div>
 
 <script>
+/* =========================
+   Mock backend query
+   ========================= */
+function queryBackend() {
+  return [
+    {
+      itemName: "Product A",
+      addons: [
+        { id: "a1", name: "Camera", version: "1.0" },
+        { id: "a2", name: "Sensor", version: "2.1" }
+      ]
+    },
+    {
+      itemName: "Product B",
+      addons: [
+        { id: "b1", name: "GPS", version: "3.0" }
+      ]
+    },
+    {
+      itemName: "Product C",
+      addons: []
+    }
+  ];
+}
+
+/* =========================
+   Page load: populate Table A
+   ========================= */
+$(function () {
+  const result = queryBackend();
+  const $tbody = $("#tableA tbody");
+
+  result.forEach(row => {
+    $tbody.append(`
+      <tr>
+        <td>${row.itemName}</td>
+        <td>
+          <button class="display-btn">Display</button>
+          <input type="hidden" class="addon-json"
+                 value='${JSON.stringify(row.addons)}'>
+        </td>
+      </tr>
+    `);
+  });
+});
+
+/* =========================
+   Modal logic
+   ========================= */
 let activeHiddenInput = null;
 
-/* ---------- Open modal ---------- */
 $(document).on("click", ".display-btn", function () {
   activeHiddenInput = $(this).siblings(".addon-json");
 
@@ -127,26 +150,18 @@ $(document).on("click", ".display-btn", function () {
   $("#modalOverlay, #modal").show();
 });
 
-/* ---------- Close modal ---------- */
-$("#closeModalBtn").on("click", closeModal);
-$("#modalOverlay").on("click", closeModal);
+$("#closeModalBtn, #modalOverlay").on("click", closeModal);
 
 function closeModal() {
   $("#modalOverlay, #modal").hide();
   $("#tableB tbody").empty();
 }
 
-/* ---------- Render Table B ---------- */
 function renderTableB(data) {
-  const $tbody = $("#tableB tbody");
-  $tbody.empty();
-
-  data.forEach(obj => {
-    $tbody.append(rowTemplate(obj));
-  });
+  const $tbody = $("#tableB tbody").empty();
+  data.forEach(obj => $tbody.append(rowTemplate(obj)));
 }
 
-/* ---------- Row template ---------- */
 function rowTemplate(obj = {}) {
   return `
     <tr>
@@ -158,33 +173,27 @@ function rowTemplate(obj = {}) {
   `;
 }
 
-/* ---------- Add row ---------- */
-$("#addRowBtn").on("click", function () {
+$("#addRowBtn").on("click", () => {
   $("#tableB tbody").append(rowTemplate());
 });
 
-/* ---------- Delete row ---------- */
 $(document).on("click", ".delete-row", function () {
   $(this).closest("tr").remove();
 });
 
-/* ---------- Save back to hidden input ---------- */
 $("#saveModalBtn").on("click", function () {
-  if (!activeHiddenInput) return;
-
   const result = [];
 
   $("#tableB tbody tr").each(function () {
-    const obj = {
+    result.push({
       id: $(this).find(".id").val().trim(),
       name: $(this).find(".name").val().trim(),
       version: $(this).find(".version").val().trim()
-    };
-    result.push(obj);
+    });
   });
 
   activeHiddenInput.val(JSON.stringify(result));
-  console.log("Saved JSON:", result);
+  console.log("Saved back to Table A:", result);
 
   closeModal();
 });
