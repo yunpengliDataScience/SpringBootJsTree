@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jQuery Modal JSON Table</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body { font-family: Arial; }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #333;
+        }
+
+        th, td {
+            padding: 6px;
+            text-align: left;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+        }
+
+        /* Simple Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-box {
+            background: white;
+            width: 700px;
+            margin: 80px auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button { margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<button id="openModal">Open Modal</button>
+
+<!-- ================= Modal ================= -->
+<div class="modal-overlay" id="myModal">
+    <div class="modal-box">
+
+        <span class="close-btn" id="closeModal">X</span>
+
+        <h3>Main Table</h3>
+        <table id="tableA">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="radio" name="rowSelect">
+                        <input type="hidden" class="jsonData"
+                               value='[{"item":"Apple","qty":5},{"item":"Banana","qty":3}]'>
+                    </td>
+                    <td>Row 1</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="rowSelect">
+                        <input type="hidden" class="jsonData"
+                               value='[{"item":"Orange","qty":2},{"item":"Grapes","qty":7}]'>
+                    </td>
+                    <td>Row 2</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Detail Table</h3>
+        <table id="tableB">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button id="saveBtn">Save Changes</button>
+
+    </div>
+</div>
+
+<script>
+$(function () {
+
+    /* =====================
+       Open / Close Modal
+       ===================== */
+    $("#openModal").click(function () {
+        $("#myModal").fadeIn();
+    });
+
+    $("#closeModal").click(function () {
+        $("#myModal").fadeOut();
+        clearDetailTable();
+    });
+
+    /* =====================
+       Radio Selection
+       ===================== */
+    $("#tableA").on("change", "input[type='radio']", function () {
+
+        var hiddenInput = $(this).closest("tr").find(".jsonData");
+        loadDetailTable(hiddenInput);
+    });
+
+    /* =====================
+       Save Changes
+       ===================== */
+    $("#saveBtn").click(function () {
+        saveDetailTable();
+    });
+
+});
+
+
+/* =============================
+   Load JSON into Detail Table
+   ============================= */
+function loadDetailTable(hiddenInput) {
+
+    var jsonString = hiddenInput.val();
+    var dataArray = JSON.parse(jsonString);
+
+    var tbody = $("#tableB tbody");
+    tbody.empty();
+
+    $.each(dataArray, function (index, obj) {
+
+        var row = "<tr>" +
+                  "<td><input type='text' class='item' value='" + obj.item + "'></td>" +
+                  "<td><input type='number' class='qty' value='" + obj.qty + "'></td>" +
+                  "</tr>";
+
+        tbody.append(row);
+    });
+
+    // store reference
+    $("#tableB").data("sourceHiddenInput", hiddenInput);
+}
+
+
+/* =============================
+   Save Detail Table Back
+   ============================= */
+function saveDetailTable() {
+
+    var hiddenInput = $("#tableB").data("sourceHiddenInput");
+
+    if (!hiddenInput) {
+        alert("Please select a row first.");
+        return;
+    }
+
+    var newData = [];
+
+    $("#tableB tbody tr").each(function () {
+
+        var item = $(this).find(".item").val();
+        var qty = parseInt($(this).find(".qty").val(), 10);
+
+        newData.push({
+            item: item,
+            qty: qty
+        });
+    });
+
+    hiddenInput.val(JSON.stringify(newData));
+
+    alert("Data saved to hidden input!");
+    console.log(hiddenInput.val());
+}
+
+
+/* =============================
+   Clear Detail Table
+   ============================= */
+function clearDetailTable() {
+    $("#tableB tbody").empty();
+    $("#tableB").removeData("sourceHiddenInput");
+}
+</script>
+
+</body>
+</html>

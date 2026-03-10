@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Table Rows Opening Nested Modals</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Overlays */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+}
+
+#overlay1 { z-index: 1000; }
+#overlay2 { z-index: 2000; }
+
+/* Modals */
+.modal {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 2px solid #333;
+  padding: 15px;
+  display: none;
+}
+
+/* First modal */
+#modalA {
+  top: 20%;
+  width: 500px;
+  z-index: 1100;
+}
+
+/* Second modal */
+#modalB {
+  top: 30%;
+  width: 350px;
+  z-index: 2100;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: left;
+}
+
+button {
+  padding: 4px 8px;
+}
+</style>
+</head>
+
+<body>
+
+<button id="openMain">Open Modal With Table</button>
+
+<!-- Overlays -->
+<div id="overlay1" class="overlay"></div>
+<div id="overlay2" class="overlay"></div>
+
+<!-- Modal A -->
+<div id="modalA" class="modal">
+  <h3>Modal A – Table</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-row="Row 1">
+        <td>Row 1</td>
+        <td><button class="openRowModal">Open</button></td>
+      </tr>
+      <tr data-row="Row 2">
+        <td>Row 2</td>
+        <td><button class="openRowModal">Open</button></td>
+      </tr>
+      <tr data-row="Row 3">
+        <td>Row 3</td>
+        <td><button class="openRowModal">Open</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <br>
+  <button id="closeA">Close</button>
+</div>
+
+<!-- Modal B -->
+<div id="modalB" class="modal">
+  <h3>Modal B – Row Details</h3>
+  <p id="rowInfo"></p>
+
+  <button id="closeB">Close</button>
+</div>
+
+<script>
+$(function() {
+
+  /* Open Modal A */
+  $("#openMain").on("click", function() {
+    $("#overlay1").fadeIn(200);
+    $("#modalA").fadeIn(200);
+  });
+
+  /* Close Modal A */
+  $("#closeA").on("click", function() {
+    $("#overlay1").fadeOut(200);
+    $("#modalA").fadeOut(200);
+  });
+
+  /* Row button opens Modal B */
+  $(document).on("click", ".openRowModal", function() {
+    const rowName = $(this).closest("tr").data("row");
+
+    $("#rowInfo").text("You clicked: " + rowName);
+
+    $("#overlay2").fadeIn(200);
+    $("#modalB").fadeIn(200);
+  });
+
+  /* Close Modal B */
+  $("#closeB").on("click", function() {
+    $("#overlay2").fadeOut(200);
+    $("#modalB").fadeOut(200);
+  });
+
+});
+</script>
+
+</body>
+</html>

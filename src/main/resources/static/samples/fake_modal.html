@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dual Modal Without Closing</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+
+<style>
+/* Fake modal overlay */
+.fake-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+}
+
+/* Fake modal */
+.fake-modal {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  width: 500px;
+  padding: 15px;
+  border-radius: 6px;
+  z-index: 2001;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td, th {
+  border: 1px solid #ccc;
+  padding: 6px;
+}
+</style>
+</head>
+<body>
+
+<button id="openModalA">Open Modal A</button>
+
+<!-- Modal A (jquery-modal) -->
+<div id="modalA" class="modal">
+  <h3>Modal A</h3>
+  <button id="openModalB">Open Modal B</button>
+</div>
+
+<!-- Fake Modal B -->
+<div class="fake-overlay" id="overlayB">
+  <div class="fake-modal">
+    <h3>Modal B (on top)</h3>
+
+    <table>
+      <tr><th>Name</th><th>Qty</th></tr>
+      <tr><td><input></td><td><input></td></tr>
+    </table>
+
+    <button id="closeModalB">Close</button>
+  </div>
+</div>
+
+<script>
+$('#openModalA').on('click', function () {
+  $('#modalA').modal({
+    escapeClose: false,
+    clickClose: false
+  });
+});
+
+$('#openModalB').on('click', function () {
+  $('#overlayB').fadeIn(150);
+});
+
+$('#closeModalB').on('click', function () {
+  $('#overlayB').fadeOut(150);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Autocomplete Spinner Example</title>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<style>
+
+body{
+    font-family: Arial;
+    padding:40px;
+}
+
+#searchField{
+    width:350px;
+    padding:8px;
+    font-size:16px;
+}
+
+/* bigger spinner */
+.loading{
+    background-image:url("https://upload.wikimedia.org/wikipedia/commons/c/c7/Loading_2.gif");
+    background-repeat:no-repeat;
+    background-size:32px 32px;
+    background-position:right 10px center;
+}
+
+</style>
+</head>
+
+<body>
+
+<h3>Autocomplete with Visible Spinner</h3>
+
+<input id="searchField" placeholder="Type a fruit...">
+
+<script>
+
+$(function(){
+
+    var data = [
+        "Apple","Apricot","Avocado",
+        "Banana","Blueberry","Blackberry",
+        "Cherry","Coconut","Cranberry",
+        "Grape","Guava",
+        "Lemon","Lime","Lychee",
+        "Mango","Melon",
+        "Orange","Papaya","Peach","Pear","Pineapple",
+        "Strawberry"
+    ];
+
+    $("#searchField").autocomplete({
+
+        minLength:1,
+
+        source:function(request,response){
+
+            $("#searchField").addClass("loading");
+
+            // simulate slow server (5 seconds)
+            setTimeout(function(){
+
+                var results = $.ui.autocomplete.filter(data, request.term);
+                response(results);
+
+                $("#searchField").removeClass("loading");
+
+            },5000);
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

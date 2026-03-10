@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Row JSON Editor</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        table { border-collapse: collapse; margin-bottom: 20px; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 8px; }
+        input[type="text"] { width: 100px; }
+    </style>
+</head>
+<body>
+
+<h3>Table A (Main Table)</h3>
+<table id="tableA">
+    <tr>
+        <th>Select</th>
+        <th>Name</th>
+    </tr>
+    <tr>
+        <td>
+            <input type="radio" name="rowSelect">
+            <input type="hidden" class="jsonData"
+                   value='[{"item":"Apple","qty":5},{"item":"Banana","qty":3}]'>
+        </td>
+        <td>Row 1</td>
+    </tr>
+    <tr>
+        <td>
+            <input type="radio" name="rowSelect">
+            <input type="hidden" class="jsonData"
+                   value='[{"item":"Orange","qty":2},{"item":"Grapes","qty":7}]'>
+        </td>
+        <td>Row 2</td>
+    </tr>
+</table>
+
+<h3>Table B (Detail Table)</h3>
+<table id="tableB">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<button id="saveBtn">Save Changes</button>
+
+<script>
+$(document).ready(function() {
+
+    let selectedHiddenInput = null;
+
+    // When radio button clicked
+    $("#tableA").on("change", "input[type='radio']", function() {
+
+        selectedHiddenInput = $(this).closest("tr").find(".jsonData");
+
+        let jsonString = selectedHiddenInput.val();
+        let dataArray = JSON.parse(jsonString);
+
+        let tbody = $("#tableB tbody");
+        tbody.empty();
+
+        $.each(dataArray, function(index, obj) {
+            let row = `
+                <tr>
+                    <td><input type="text" class="item" value="${obj.item}"></td>
+                    <td><input type="text" class="qty" value="${obj.qty}"></td>
+                </tr>
+            `;
+            tbody.append(row);
+        });
+    });
+
+    // Save back to hidden input
+    $("#saveBtn").click(function() {
+
+        if (!selectedHiddenInput) {
+            alert("Please select a row first.");
+            return;
+        }
+
+        let newData = [];
+
+        $("#tableB tbody tr").each(function() {
+            let item = $(this).find(".item").val();
+            let qty = $(this).find(".qty").val();
+
+            newData.push({
+                item: item,
+                qty: parseInt(qty)
+            });
+        });
+
+        selectedHiddenInput.val(JSON.stringify(newData));
+
+        alert("Data saved back to hidden input!");
+        console.log(selectedHiddenInput.val());
+    });
+
+});
+</script>
+
+</body>
+</html>
