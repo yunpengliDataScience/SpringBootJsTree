@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Programs - Dropdown Version</title>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    padding: 30px;
+}
+
+#modalOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+#modalBox {
+    background: white;
+    width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.tableContainer {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 1;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+select {
+    width: 95%;
+    padding: 4px;
+}
+
+button {
+    margin: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+#errorMsg {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.invalid {
+    border: 2px solid red !important;
+}
+</style>
+</head>
+
+<body>
+
+<button id="openModal">Manage Programs</button>
+
+<div id="modalOverlay">
+    <div id="modalBox">
+        <h3>Manage Programs</h3>
+
+        <div id="errorMsg"></div>
+
+        <div class="tableContainer">
+            <table id="programTable">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Program *</th>
+                        <th>Program Obsolete</th>
+                        <th>Program Type *</th>
+                        <th>Type Obsolete</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div style="margin-top:15px;">
+            <button id="createRow">Create Program</button>
+            <button id="saveData">Save</button>
+            <button id="deleteRowBtn" disabled>Delete</button>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+$(function(){
+
+    // Program -> available types
+    const programTypeMap = {
+        "Program A": [
+            { type_id: 101, type: "Type 1" },
+            { type_id: 102, type: "Type 2" }
+        ],
+        "Program B": [
+            { type_id: 201, type: "Type 3" },
+            { type_id: 202, type: "Type 4" }
+        ],
+        "Program C": [
+            { type_id: 301, type: "Type 5" },
+            { type_id: 302, type: "Type 6" }
+        ]
+    };
+
+    let programData = [
+        { program_id: 1, name: "Program A", type_id: 101, type: "Type 1", program_obsolete: false, type_obsolete: false },
+        { program_id: 2, name: "Program B", type_id: 202, type: "Type 4", program_obsolete: true, type_obsolete: false }
+    ];
+
+    let nextProgramId = 1000;
+
+    function buildProgramOptions(selectedProgram = ""){
+        let html = '<option value="">-- Select Program --</option>';
+
+        $.each(Object.keys(programTypeMap), function(i, programName){
+            let selected = programName === selectedProgram ? "selected" : "";
+            html += `<option value="${programName}" ${selected}>${programName}</option>`;
+        });
+
+        return html;
+    }
+
+    function buildTypeOptions(programName, selectedType = ""){
+        let html = '<option value="">-- Select Program Type --</option>';
+
+        if(programName && programTypeMap[programName]){
+            $.each(programTypeMap[programName], function(i, item){
+                let selected = item.type === selectedType ? "selected" : "";
+                html += `<option value="${item.type}" data-type-id="${item.type_id}" ${selected}>${item.type}</option>`;
+            });
+        }
+
+        return html;
+    }
+
+    function createRowHtml(item = null){
+        let programName = item ? item.name : "";
+        let selectedType = item ? item.type : "";
+        let programId = item ? item.program_id : nextProgramId++;
+
+        return `
+            <tr>
+                <td><input type="radio" name="rowSelect"></td>
+
+                <td>
+                    <select class="programName">
+                        ${buildProgramOptions(programName)}
+                    </select>
+                </td>
+
+                <td>
+                    <input type="checkbox" class="programObsolete" ${item && item.program_obsolete ? "checked" : ""}>
+                </td>
+
+                <td>
+                    <select class="programType">
+                        ${buildTypeOptions(programName, selectedType)}
+                    </select>
+                </td>
+
+                <td>
+                    <input type="checkbox" class="typeObsolete" ${item && item.type_obsolete ? "checked" : ""}>
+                </td>
+
+                <input type="hidden" class="programId" value="${programId}">
+                <input type="hidden" class="typeId" value="${item ? item.type_id : ""}">
+            </tr>
+        `;
+    }
+
+    function renderTable(){
+        let tbody = $("#programTable tbody");
+        tbody.empty();
+
+        $.each(programData, function(i, item){
+            tbody.append(createRowHtml(item));
+        });
+    }
+
+    function clearValidation(){
+        $("#errorMsg").html("");
+        $(".programName, .programType").removeClass("invalid");
+    }
+
+    function updateTypeDropdown($row, selectedType = ""){
+        let programName = $row.find(".programName").val();
+        let $typeSelect = $row.find(".programType");
+        let $typeId = $row.find(".typeId");
+
+        $typeSelect.html(buildTypeOptions(programName, selectedType));
+
+        if(selectedType){
+            let typeId = $typeSelect.find("option:selected").data("type-id") || "";
+            $typeId.val(typeId);
+        } else {
+            $typeId.val("");
+        }
+    }
+
+    $("#openModal").click(function(){
+        renderTable();
+        clearValidation();
+        $("#modalOverlay").show();
+        $("#deleteRowBtn").prop("disabled", true);
+    });
+
+    $("#closeModal").click(function(){
+        $("#modalOverlay").hide();
+    });
+
+    $("#createRow").click(function(){
+        let $tbody = $("#programTable tbody");
+        let $container = $(".tableContainer");
+
+        $tbody.append(createRowHtml());
+
+        $container.animate({
+            scrollTop: $container[0].scrollHeight
+        }, 200);
+
+        setTimeout(function(){
+            $("#programTable tbody tr:last .programName").focus();
+        }, 220);
+    });
+
+    $(document).on("change", "input[name='rowSelect']", function(){
+        $("#deleteRowBtn").prop("disabled", false);
+    });
+
+    $(document).on("change", ".programName", function(){
+        let $row = $(this).closest("tr");
+        updateTypeDropdown($row, "");
+    });
+
+    $(document).on("change", ".programType", function(){
+        let $selected = $(this).find("option:selected");
+        let typeId = $selected.data("type-id") || "";
+        $(this).closest("tr").find(".typeId").val(typeId);
+    });
+
+    $("#deleteRowBtn").click(function(){
+        let selectedRow = $("input[name='rowSelect']:checked").closest("tr");
+
+        if(selectedRow.length === 0){
+            $("#errorMsg").text("Please select a row to delete.");
+            return;
+        }
+
+        selectedRow.remove();
+        $("#deleteRowBtn").prop("disabled", true);
+    });
+
+    $("#saveData").click(function(){
+        clearValidation();
+
+        let newData = [];
+        let errorMessages = [];
+        let hasError = false;
+
+        $("#programTable tbody tr").each(function(index){
+            let $row = $(this);
+            let $programSelect = $row.find(".programName");
+            let $typeSelect = $row.find(".programType");
+
+            let program = $programSelect.val();
+            let type = $typeSelect.val();
+
+            $programSelect.removeClass("invalid");
+            $typeSelect.removeClass("invalid");
+
+            let rowErrors = [];
+
+            if(program === "" && type === ""){
+                rowErrors.push("Program is required");
+                rowErrors.push("Program type is required");
+                $programSelect.addClass("invalid");
+                $typeSelect.addClass("invalid");
+                hasError = true;
+            } else {
+                if(program === ""){
+                    rowErrors.push("Program is required");
+                    $programSelect.addClass("invalid");
+                    hasError = true;
+                }
+
+                if(type === ""){
+                    rowErrors.push("Program type is required");
+                    $typeSelect.addClass("invalid");
+                    hasError = true;
+                }
+            }
+
+            if(rowErrors.length > 0){
+                errorMessages.push("Row " + (index + 1) + ": " + rowErrors.join(", "));
+            }
+
+            if(program !== "" && type !== ""){
+                let selectedTypeOption = $typeSelect.find("option:selected");
+
+                newData.push({
+                    program_id: parseInt($row.find(".programId").val(), 10),
+                    name: program,
+                    type_id: parseInt(selectedTypeOption.data("type-id"), 10),
+                    type: type,
+                    program_obsolete: $row.find(".programObsolete").is(":checked"),
+                    type_obsolete: $row.find(".typeObsolete").is(":checked")
+                });
+            }
+        });
+
+        if(hasError){
+            $("#errorMsg").html(errorMessages.join("<br>"));
+            return;
+        }
+
+        programData = newData;
+
+        console.log("Saved JSON:", programData);
+
+        alert("Data saved!");
+        $("#modalOverlay").hide();
+    });
+
+    $("#modalOverlay").click(function(e){
+        if(e.target === this){
+            $(this).hide();
+        }
+    });
+
+});
+</script>
+
+</body>
+</html>
