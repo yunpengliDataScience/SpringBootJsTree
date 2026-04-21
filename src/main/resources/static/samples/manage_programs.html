@@ -75,7 +75,6 @@ button:disabled {
     margin-bottom: 10px;
 }
 
-/* invalid field highlight */
 .invalid {
     border: 2px solid red !important;
 }
@@ -91,7 +90,6 @@ button:disabled {
 
         <h3>Manage Programs</h3>
 
-        <!-- Validation messages -->
         <div id="errorMsg"></div>
 
         <div class="tableContainer">
@@ -109,7 +107,6 @@ button:disabled {
             </table>
         </div>
 
-        <!-- Buttons -->
         <div style="margin-top:15px;">
             <button id="createRow">Create Program</button>
             <button id="saveData">Save</button>
@@ -141,13 +138,9 @@ $(function(){
             let row = `
                 <tr>
                     <td><input type="radio" name="rowSelect"></td>
-
                     <td><input type="text" class="programName" value="${item.name}"></td>
-
                     <td><input type="checkbox" class="programObsolete" ${item.program_obsolete ? "checked" : ""}></td>
-
                     <td><input type="text" class="programType" value="${item.type}"></td>
-
                     <td><input type="checkbox" class="typeObsolete" ${item.type_obsolete ? "checked" : ""}></td>
 
                     <input type="hidden" class="programId" value="${item.program_id}">
@@ -164,7 +157,6 @@ $(function(){
         $(".programName, .programType").removeClass("invalid");
     }
 
-    // Open modal
     $("#openModal").click(function(){
         renderTable();
         clearValidation();
@@ -172,16 +164,15 @@ $(function(){
         $("#deleteRowBtn").prop("disabled", true);
     });
 
-    // Close modal
     $("#closeModal").click(function(){
         $("#modalOverlay").hide();
     });
 
-    // Create row
+    // ✅ CREATE ROW WITH AUTO-SCROLL + AUTO-FOCUS
     $("#createRow").click(function(){
 
         let row = `
-            <tr>
+            <tr class="newRow">
                 <td><input type="radio" name="rowSelect"></td>
                 <td><input type="text" class="programName"></td>
                 <td><input type="checkbox" class="programObsolete"></td>
@@ -193,15 +184,26 @@ $(function(){
             </tr>
         `;
 
-        $("#programTable tbody").append(row);
+        let container = $(".tableContainer");
+        let tbody = $("#programTable tbody");
+
+        tbody.append(row);
+
+        // 🔥 smooth scroll to bottom
+        container.animate({
+            scrollTop: container[0].scrollHeight
+        }, 200);
+
+        // 🎯 auto focus first input of new row
+        setTimeout(() => {
+            $(".newRow:last").find(".programName").focus();
+        }, 200);
     });
 
-    // Enable delete button when radio selected
     $(document).on("change", "input[name='rowSelect']", function(){
         $("#deleteRowBtn").prop("disabled", false);
     });
 
-    // Delete row
     $("#deleteRowBtn").click(function(){
 
         let selectedRow = $("input[name='rowSelect']:checked").closest("tr");
@@ -215,7 +217,6 @@ $(function(){
         $("#deleteRowBtn").prop("disabled", true);
     });
 
-    // Save with FULL validation logic
     $("#saveData").click(function(){
 
         clearValidation();
@@ -237,7 +238,6 @@ $(function(){
 
             let rowErrors = [];
 
-            // CASE 1: both missing
             if(program === "" && type === ""){
                 rowErrors.push("Program is required");
                 rowErrors.push("Program type is required");
@@ -248,14 +248,12 @@ $(function(){
                 hasError = true;
             }
             else {
-                // CASE 2
                 if(program === ""){
                     rowErrors.push("Program is required");
                     programInput.addClass("invalid");
                     hasError = true;
                 }
 
-                // CASE 3
                 if(type === ""){
                     rowErrors.push("Program type is required");
                     typeInput.addClass("invalid");
@@ -292,7 +290,6 @@ $(function(){
         $("#modalOverlay").hide();
     });
 
-    // Click outside modal
     $("#modalOverlay").click(function(e){
         if(e.target === this){
             $(this).hide();
