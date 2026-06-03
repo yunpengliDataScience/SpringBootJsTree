@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Lazy Load Copy Subtree</title>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.17/themes/default/style.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.17/jstree.min.js"></script>
+</head>
+
+<body>
+<h2>jsTree Copy Full Lazy-Loaded Subtree</h2>
+
+<button id="copyBtn" disabled>Copy</button>
+<button id="pasteBtn" disabled>Paste</button>
+
+<p id="status"></p>
+<div id="tree"></div>
+
+<script>
+let copiedSubtree = null;
+let selectedNodeId = null;
+
+const rootData = [
+  { id: "1", parent: "#", text: "Parent 1", children: true },
+  { id: "2", parent: "#", text: "Parent 2", children: true },
+  { id: "3", parent: "#", text: "Parent 3" }
+];
+
+const lazyData = {
+  "1": [
+    { id: "1_1", parent: "1", text: "Child 1.1", children: true },
+    { id: "1_2", parent: "1", text: "Child 1.2" }
+  ],
+  "1_1": [
+    { id: "1_1_1", parent: "1_1", text: "Grandchild 1.1.1" },
+    { id: "1_1_2", parent: "1_1", text: "Grandchild 1.1.2", children: true }
+  ],
+  "1_1_2": [
+    { id: "1_1_2_1", parent: "1_1_2", text: "Great Grandchild 1.1.2.1" }
+  ],
+  "2": [
+    { id: "2_1", parent: "2", text: "Child 2.1" },
+    { id: "2_2", parent: "2", text: "Child 2.2", children: true }
+  ],
+  "2_2": [
+    { id: "2_2_1", parent: "2_2", text: "Grandchild 2.2.1" }
+  ]
+};
+
+$(function () {
+  $("#tree").jstree({
+    core: {
+      check_callback: true,
+      data: function (node, callback) {
+        setTimeout(function () {
+          if (node.id === "#") {
+            callback(rootData);
+          } else {
+            callback(lazyData[node.id] || []);
+          }
+        }, 300);
+      }
+    }
+  });
+
+  $("#tree").on("select_node.jstree", function (e, data) {
+    selectedNodeId = data.node.id;
+    $("#copyBtn").prop("disabled", false);
+
+    if (copiedSubtree) {
+      $("#pasteBtn").prop("disabled", false);
+    }
+
+    $("#status").text("Selected: " + data.node.text);
+  });
+
+  $("#copyBtn").on("click", async function () {
+    const tree = $("#tree").jstree(true);
+    const selectedNode = tree.get_node(selectedNodeId);
+
+    if (!selectedNode) return;
+
+    $("#copyBtn").prop("disabled", true).text("Loading...");
+    $("#pasteBtn").prop("disabled", true);
+    $("#status").text("Loading full subtree before copy...");
+
+    await loadFullSubtree(tree, selectedNode.id);
+
+    copiedSubtree = collectFlatSubtree(tree, selectedNode.id);
+
+    $("#copyBtn").prop("disabled", false).text("Copy");
+    $("#pasteBtn").prop("disabled", false);
+    $("#status").text("Copied full subtree: " + selectedNode.text);
+  });
+
+  $("#pasteBtn").on("click", function () {
+    const tree = $("#tree").jstree(true);
+
+    if (!copiedSubtree || !selectedNodeId) return;
+
+    const newNodes = makeCopiedFlatNodes(copiedSubtree, selectedNodeId);
+
+    newNodes.forEach(function (node) {
+      tree.create_node(node.parent, {
+        id: node.id,
+        text: node.text
+      }, "last");
+    });
+
+    tree.open_node(selectedNodeId);
+    $("#status").text("Pasted copied subtree under selected node.");
+  });
+});
+
+async function loadFullSubtree(tree, nodeId) {
+  const node = tree.get_node(nodeId);
+  if (!node) return;
+
+  if (!node.state.loaded) {
+    await new Promise(function (resolve) {
+      tree.load_node(node, function () {
+        resolve();
+      });
+    });
+  }
+
+  const refreshedNode = tree.get_node(nodeId);
+
+  for (const childId of refreshedNode.children) {
+    await loadFullSubtree(tree, childId);
+  }
+}
+
+function collectFlatSubtree(tree, rootId) {
+  const root = tree.get_node(rootId);
+  const allIds = [rootId].concat(root.children_d);
+
+  return allIds.map(function (id) {
+    const node = tree.get_node(id);
+
+    return {
+      oldId: node.id,
+      oldParent: node.parent,
+      text: node.text
+    };
+  });
+}
+
+function makeCopiedFlatNodes(copiedNodes, newParentId) {
+  const idMap = {};
+  const copySuffix =
+    "_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+
+  copiedNodes.forEach(function (node) {
+    idMap[node.oldId] = node.oldId + copySuffix;
+  });
+
+  return copiedNodes.map(function (node, index) {
+    return {
+      id: idMap[node.oldId],
+      parent: index === 0 ? newParentId : idMap[node.oldParent],
+      text: node.text
+    };
+  });
+}
+</script>
+
+</body>
+</html>
