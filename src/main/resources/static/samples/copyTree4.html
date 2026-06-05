@@ -1,0 +1,3731 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>jsTree Copy/Paste Subtree - Database Safe Copy</title>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.17/themes/default/style.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.17/jstree.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    button {
+      padding: 6px 14px;
+      margin-right: 8px;
+    }
+
+    #tree {
+      margin-top: 20px;
+      max-width: 900px;
+    }
+
+    #status {
+      margin-top: 12px;
+      color: #444;
+    }
+
+    .note {
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>jsTree Copy/Paste Subtree</h2>
+
+<button id="copyBtn" disabled>Copy</button>
+<button id="pasteBtn" disabled>Paste</button>
+
+<div id="status">Select a node first.</div>
+<div class="note">
+  On paste, each new node gets a new jsTree id. Inside <code>data</code>, <code>id</code> and <code>parentId</code> are cleared, and <code>baseLineData</code> is removed.
+</div>
+
+<div id="tree"></div>
+
+<script>
+// ---------------------------------------------------------------------
+// Global state used by the buttons
+// ---------------------------------------------------------------------
+let selectedNodeId = null;     // The node currently selected in jsTree
+let copiedRootId = null;       // The root node id of the subtree user copied
+
+// ---------------------------------------------------------------------
+// Your flat jsTree JSON data from sampleJson.txt
+// ---------------------------------------------------------------------
+const rawTreeData = [
+  {
+    "id": "0_1",
+    "text": "OD30669",
+    "icon": true,
+    "li_attr": {
+      "id": "0_1"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "0_1_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false,
+      "failed": false,
+      "loading": false
+    },
+    "data": {
+      "id": 1,
+      "level": 0,
+      "name": "OD30669",
+      "obsolete": "F",
+      "lastChangeDate": "13 Jan 2026",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "13 Jan 2026",
+      "editorAccessible": "T",
+      "hidden": "F"
+    },
+    "parent": "#"
+  },
+  {
+    "id": "1_1",
+    "text": "Volume: 1",
+    "icon": true,
+    "li_attr": {
+      "id": "1_1"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "1_1_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false,
+      "failed": false,
+      "loading": false
+    },
+    "data": {
+      "id": 1,
+      "parentId": 1,
+      "level": 1,
+      "name": "1",
+      "obsolete": "F",
+      "lastChangeDate": "13 Jan 2026",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "13 Jan 2026",
+      "volno": 1,
+      "tfrCountriesId": "US",
+      "hidden": "F"
+    },
+    "parent": "0_1"
+  },
+  {
+    "id": "2_637",
+    "text": "Subsystem: ATTE-SSI4",
+    "icon": true,
+    "li_attr": {
+      "id": "2_637"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_637_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 637,
+      "parentId": 1,
+      "level": 2,
+      "name": "ATTE-SSI4",
+      "obsolete": "F",
+      "lastChangeDate": "22 May 2018",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "22 May 2018",
+      "odNom": "Auxiliary Targeting Training Equipment - SSI4",
+      "hardcopyNomenclature": "Auxiliary Targeting Training Equipment - SSI4",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "FC",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_3",
+    "text": "Subsystem: HCMT",
+    "icon": true,
+    "li_attr": {
+      "id": "2_3"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_3_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false,
+      "failed": false,
+      "loading": false
+    },
+    "data": {
+      "id": 3,
+      "parentId": 1,
+      "level": 2,
+      "name": "HCMT",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "Hovering Compensation Maintenance Training Device",
+      "hardcopyNomenclature": "Hovering Compensation Maintenance Training Device",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "SE",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1"
+  },
+  {
+    "id": "3_3",
+    "text": "Mk Mod: Dash (-)",
+    "icon": true,
+    "li_attr": {
+      "id": "3_3"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "3_3_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false,
+      "failed": false,
+      "loading": false
+    },
+    "data": {
+      "id": 3,
+      "parentId": 3,
+      "level": 3,
+      "name": "-",
+      "obsolete": "F",
+      "lastChangeDate": "02 May 2018",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "02 May 2018",
+      "odNom": "Enter dash (-)",
+      "hardcopyNomenclature": "Enter dash (-)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "programs": [],
+      "hidden": "F"
+    },
+    "parent": "2_3"
+  },
+  {
+    "id": "4_32",
+    "text": "Equipment: .",
+    "icon": true,
+    "li_attr": {
+      "id": "4_32"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_32_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 32,
+      "parentId": 3,
+      "level": 4,
+      "name": ".",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Hovering Compensation Maintenance Training Device",
+      "hardcopyNomenclature": "Hovering Compensation Maintenance Training Device",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "T"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_33",
+    "text": "Equipment: BCP*",
+    "icon": true,
+    "li_attr": {
+      "id": "4_33"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_33_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false,
+      "failed": false,
+      "loading": false
+    },
+    "data": {
+      "id": 33,
+      "parentId": 3,
+      "level": 4,
+      "name": "BCP*",
+      "obsolete": "F",
+      "lastChangeDate": "28 May 2026",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "F",
+      "editRequestApproved": "T",
+      "implementationDate": "",
+      "odNom": "Ballast Control Panel",
+      "hardcopyNomenclature": "Ballast Control Panel",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [
+        {
+          "id": -1,
+          "partsId": 10917,
+          "partno": "2-520129-2",
+          "nsn": "test",
+          "family": "a",
+          "schRef": "b",
+          "comments": "",
+          "obsolete": "F",
+          "addDeleteChange": "C",
+          "lastChangeDate": "28 May 2026",
+          "lastEditUser": "luan.vu",
+          "editRequestImplemented": "F",
+          "implementationDate": ""
+        },
+        {
+          "id": -1,
+          "partsId": 9765,
+          "partno": "3001500-901",
+          "nsn": "6605-LL-S00-1493",
+          "family": "",
+          "schRef": "",
+          "comments": "",
+          "obsolete": "F",
+          "addDeleteChange": "A",
+          "lastChangeDate": "Jun 14, 2012",
+          "lastEditUser": "",
+          "editRequestImplemented": "T",
+          "implementationDate": "Jun 14, 2012"
+        }
+      ],
+      "notes": [],
+      "addons": [
+        {
+          "id": -1,
+          "nomenclature": "x",
+          "comments": "",
+          "descriptor": "x",
+          "obsolete": "F",
+          "parts": [
+            {
+              "id": -1,
+              "partsId": 7945,
+              "partno": "400-9427-341",
+              "nsn": "5961-01-308-6115",
+              "family": "",
+              "schRef": "",
+              "comments": "",
+              "obsolete": "F",
+              "addDeleteChange": "A",
+              "lastChangeDate": "Jun 14, 2012",
+              "lastEditUser": "",
+              "editRequestImplemented": "T",
+              "implementationDate": "Jun 14, 2012"
+            },
+            {
+              "id": -1,
+              "partsId": 20569,
+              "partno": "50-57-9412",
+              "nsn": "",
+              "family": "",
+              "schRef": "",
+              "comments": "",
+              "obsolete": "F",
+              "addDeleteChange": "A",
+              "lastChangeDate": "Aug 29, 2018",
+              "lastEditUser": "",
+              "editRequestImplemented": "T",
+              "implementationDate": "Aug 29, 2018"
+            }
+          ],
+          "addDeleteChange": "A",
+          "lastChangeDate": "28 May 2026",
+          "lastEditUser": "luan.vu",
+          "editRequestImplemented": "F",
+          "implementationDate": ""
+        },
+        {
+          "id": -1,
+          "nomenclature": "y",
+          "comments": "",
+          "descriptor": "y",
+          "obsolete": "F",
+          "parts": [
+            {
+              "id": -1,
+              "partsId": 13605,
+              "partno": "600RJS2",
+              "nsn": "",
+              "family": "",
+              "schRef": "",
+              "comments": "",
+              "obsolete": "F",
+              "addDeleteChange": "A",
+              "lastChangeDate": "Jun 14, 2012",
+              "lastEditUser": "",
+              "editRequestImplemented": "T",
+              "implementationDate": "Jun 14, 2012"
+            }
+          ],
+          "addDeleteChange": "A",
+          "lastChangeDate": "28 May 2026",
+          "lastEditUser": "luan.vu",
+          "editRequestImplemented": "F",
+          "implementationDate": ""
+        }
+      ],
+      "hidden": "F",
+      "baseLineData": {
+        "id": 33,
+        "parentId": 3,
+        "level": 4,
+        "name": "BCP",
+        "obsolete": "F",
+        "lastChangeDate": "05 Sep 2014",
+        "addDeleteChange": "C",
+        "editRequestImplemented": "T",
+        "editRequestApproved": "T",
+        "implementationDate": "05 Sep 2014",
+        "odNom": "Ballast Control Panel",
+        "hardcopyNomenclature": "Ballast Control Panel",
+        "requireSn": "T",
+        "noPublish": "F",
+        "cots": "F",
+        "limitAddOns": "F",
+        "concatinateAddOns": "F",
+        "parts": [],
+        "notes": [],
+        "addons": [],
+        "hidden": "F"
+      },
+      "status": "Modified",
+      "comments": "",
+      "lastEditUser": "luan.vu"
+    },
+    "parent": "3_3"
+  },
+  {
+    "id": "5_8240",
+    "text": "Component: Dash (-)",
+    "icon": true,
+    "li_attr": {
+      "id": "5_8240"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_8240_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 8240,
+      "parentId": 33,
+      "level": 5,
+      "name": "-",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Enter dash (-)",
+      "hardcopyNomenclature": "Enter dash (-)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "T"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_140",
+    "text": "Component: .",
+    "icon": true,
+    "li_attr": {
+      "id": "5_140"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_140_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 140,
+      "parentId": 33,
+      "level": 5,
+      "name": ".",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Ballast Control Panel",
+      "hardcopyNomenclature": "Ballast Control Panel",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "T"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_141",
+    "text": "Component: COMP-CONT",
+    "icon": true,
+    "li_attr": {
+      "id": "5_141"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_141_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 141,
+      "parentId": 33,
+      "level": 5,
+      "name": "COMP-CONT",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Compensation Controller",
+      "hardcopyNomenclature": "Compensation Controller",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_142",
+    "text": "Component: MAT-SW",
+    "icon": true,
+    "li_attr": {
+      "id": "5_142"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_142_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 142,
+      "parentId": 33,
+      "level": 5,
+      "name": "MAT-SW",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Matrix Switch",
+      "hardcopyNomenclature": "Matrix Switch",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_143",
+    "text": "Component: MTS-MOD",
+    "icon": true,
+    "li_attr": {
+      "id": "5_143"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_143_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 143,
+      "parentId": 33,
+      "level": 5,
+      "name": "MTS-MOD",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Missile Tube Status Modules",
+      "hardcopyNomenclature": "Missile Tube Status Modules",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_6816",
+    "text": "Component: UNLISTED - *",
+    "icon": true,
+    "li_attr": {
+      "id": "5_6816"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_6816_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 6816,
+      "parentId": 33,
+      "level": 5,
+      "name": "UNLISTED - *",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Enter Item Name or dash (-) in adjacent field",
+      "hardcopyNomenclature": "Enter Item Name or dash (-) in adjacent field",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "T"
+    },
+    "parent": "4_33",
+    "children": true
+  },
+  {
+    "id": "5_1780669829479",
+    "text": "Component: MYCOMP",
+    "icon": true,
+    "li_attr": {
+      "id": "5_1780669829479"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "5_1780669829479_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": true,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "parentId": 33,
+      "level": 5,
+      "name": "MYCOMP",
+      "obsolete": "F",
+      "comments": "Hello world",
+      "odNom": "test comp",
+      "hardcopyNomenclature": "test comp",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "T",
+      "limitAddOns": "T",
+      "concatinateAddOns": "T",
+      "hidden": "F",
+      "status": "Modified",
+      "addDeleteChange": "A",
+      "lastChangeDate": "05 Jun 2026",
+      "lastEditUser": "luan.vu",
+      "implementationDate": "",
+      "editRequestImplemented": "F",
+      "notes": [
+        {
+          "notetextId": -1,
+          "notetext": "My notes",
+          "comments": "my notes comments",
+          "obsolete": "F",
+          "addDeleteChange": "",
+          "editRequestImplemented": "F",
+          "editRequestApproved": "T",
+          "lastChangeDate": "",
+          "lastEditUser": "",
+          "implementationDate": ""
+        }
+      ]
+    },
+    "parent": "4_33"
+  },
+  {
+    "id": "6_1780669876054",
+    "text": "Other: Dash (-)",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876054"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876054_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "-",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "Enter dash (-)",
+      "hardcopyNomenclature": "Enter dash (-)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876055",
+    "text": "Other: .",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876055"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876055_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": ".",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "test comp",
+      "hardcopyNomenclature": "test comp",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876056",
+    "text": "Other: UNLISTED - *",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876056"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876056_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "UNLISTED - *",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "Enter Item Name in Adjacent Field",
+      "hardcopyNomenclature": "Enter Item Name in Adjacent Field",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876057",
+    "text": "Other: SHIPALT *",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876057"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876057_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "SHIPALT *",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "SHIPALT (Enter SHIPALT Number in adjacent field)",
+      "hardcopyNomenclature": "SHIPALT (Enter SHIPALT Number)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876058",
+    "text": "Other: SPALT *",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876058"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876058_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "SPALT *",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "SPALT (Enter SPALT Number in adjacent field)",
+      "hardcopyNomenclature": "SPALT (Enter SPALT Number)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876059",
+    "text": "Other: TFR *",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876059"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876059_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "TFR *",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "TFR (Enter TFR Number in adjacent field)",
+      "hardcopyNomenclature": "TFR (Enter TFR Number)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780669876060",
+    "text": "Other: TFR/CAR *",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780669876060"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780669876060_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "level": 6,
+      "status": "Modified",
+      "name": "TFR/CAR *",
+      "obsolete": "F",
+      "addDeleteChange": "A",
+      "comments": "",
+      "odNom": "TFR/CAR (Enter TFR/CAR Number in adjacent field)",
+      "hardcopyNomenclature": "TFR/CAR (Enter TFR/CAR Number)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "hidden": "T",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "6_1780670447078",
+    "text": "Other: MYOTHER",
+    "icon": true,
+    "li_attr": {
+      "id": "6_1780670447078"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "6_1780670447078_anchor"
+    },
+    "state": {
+      "loaded": true,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "level": 6,
+      "name": "MYOTHER",
+      "obsolete": "F",
+      "comments": "test other comments",
+      "odNom": "test other",
+      "hardcopyNomenclature": "test other",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "T",
+      "limitAddOns": "T",
+      "concatinateAddOns": "T",
+      "hidden": "F",
+      "status": "Modified",
+      "addDeleteChange": "A",
+      "lastChangeDate": "05 Jun 2026",
+      "lastEditUser": "luan.vu",
+      "implementationDate": "",
+      "editRequestImplemented": "F",
+      "notes": []
+    },
+    "parent": "5_1780669829479",
+    "children": true
+  },
+  {
+    "id": "4_34",
+    "text": "Equipment: FRT",
+    "icon": true,
+    "li_attr": {
+      "id": "4_34"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_34_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 34,
+      "parentId": 3,
+      "level": 4,
+      "name": "FRT",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Flow Rate Transducer",
+      "hardcopyNomenclature": "Flow Rate Transducer",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_3483",
+    "text": "Equipment: GPTE",
+    "icon": true,
+    "li_attr": {
+      "id": "4_3483"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_3483_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 3483,
+      "parentId": 3,
+      "level": 4,
+      "name": "GPTE",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "GPTE: Enter GPTE item name in Component level",
+      "hardcopyNomenclature": "GPTE: Enter GPTE item name in Component level",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_35",
+    "text": "Equipment: HOV-CONT",
+    "icon": true,
+    "li_attr": {
+      "id": "4_35"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_35_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 35,
+      "parentId": 3,
+      "level": 4,
+      "name": "HOV-CONT",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Hovering Controller",
+      "hardcopyNomenclature": "Hovering Controller",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_36",
+    "text": "Equipment: KDT",
+    "icon": true,
+    "li_attr": {
+      "id": "4_36"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_36_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 36,
+      "parentId": 3,
+      "level": 4,
+      "name": "KDT",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Keel Depth Transducers",
+      "hardcopyNomenclature": "Keel Depth Transducers",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_37",
+    "text": "Equipment: SIM",
+    "icon": true,
+    "li_attr": {
+      "id": "4_37"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_37_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 37,
+      "parentId": 3,
+      "level": 4,
+      "name": "SIM",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Simulator",
+      "hardcopyNomenclature": "Simulator",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_3423",
+    "text": "Equipment: SPARES",
+    "icon": true,
+    "li_attr": {
+      "id": "4_3423"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_3423_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 3423,
+      "parentId": 3,
+      "level": 4,
+      "name": "SPARES",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Bad Spare - Enter item name/description at component level",
+      "hardcopyNomenclature": "Bad Spare - Enter item name/description at component level",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "4_2782",
+    "text": "Equipment: UNLISTED - *",
+    "icon": true,
+    "li_attr": {
+      "id": "4_2782"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "4_2782_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 2782,
+      "parentId": 3,
+      "level": 4,
+      "name": "UNLISTED - *",
+      "obsolete": "F",
+      "lastChangeDate": "05 Sep 2014",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "05 Sep 2014",
+      "odNom": "Enter Item Name or dash (-) in adjacent field",
+      "hardcopyNomenclature": "Enter Item Name or dash (-) in adjacent field",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "F",
+      "parts": [],
+      "notes": [],
+      "addons": [],
+      "hidden": "T"
+    },
+    "parent": "3_3",
+    "children": true
+  },
+  {
+    "id": "3_1072",
+    "text": "Mk Mod: .",
+    "icon": true,
+    "li_attr": {
+      "id": "3_1072"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "3_1072_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false,
+      "hidden": true
+    },
+    "data": {
+      "id": 1072,
+      "parentId": 3,
+      "level": 3,
+      "name": ".",
+      "obsolete": "F",
+      "lastChangeDate": "23 Aug 2017",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "23 Aug 2017",
+      "odNom": "Hovering/Comp Maint Training Device",
+      "hardcopyNomenclature": "Hovering/Comp Maint Training Device",
+      "requireSn": "F",
+      "noPublish": "F",
+      "programs": [],
+      "hidden": "T"
+    },
+    "parent": "2_3",
+    "children": true
+  },
+  {
+    "id": "2_5",
+    "text": "Subsystem: MI-D5/TNG",
+    "icon": true,
+    "li_attr": {
+      "id": "2_5"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_5_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 5,
+      "parentId": 1,
+      "level": 2,
+      "name": "MI-D5/TNG",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "D5 Missile Training Equipment",
+      "hardcopyNomenclature": "D5 Missile Training Equipment",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "MI",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_7",
+    "text": "Subsystem: MK6-T-GU",
+    "icon": true,
+    "li_attr": {
+      "id": "2_7"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_7_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 7,
+      "parentId": 1,
+      "level": 2,
+      "name": "MK6-T-GU",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "MK6 Guidance Training Equipment",
+      "hardcopyNomenclature": "MK6 Guidance Training Equipment",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GU",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_173",
+    "text": "Subsystem: NCT/ML-D5BF",
+    "icon": true,
+    "li_attr": {
+      "id": "2_173"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_173_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 173,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/ML-D5BF",
+      "obsolete": "F",
+      "lastChangeDate": "26 Sep 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "26 Sep 2012",
+      "odNom": "NCT/Maintenance Laboratory (D5BF)",
+      "hardcopyNomenclature": "NCT/Maintenance Laboratory (D5BF)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_137",
+    "text": "Subsystem: NCT/NOT-D5BF",
+    "icon": true,
+    "li_attr": {
+      "id": "2_137"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_137_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 137,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-D5BF",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "NCT/Navigation Operational Trainer (D5BF)",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer (D5BF)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_657",
+    "text": "Subsystem: NCT/NOT-SSI4",
+    "icon": true,
+    "li_attr": {
+      "id": "2_657"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_657_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 657,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-SSI4",
+      "obsolete": "F",
+      "lastChangeDate": "30 Jul 2018",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "30 Jul 2018",
+      "odNom": "NAV 400 HZ Switchboard Simulator (3SF cabinet)(23000-301)",
+      "hardcopyNomenclature": "NAV 400 HZ Switchboard Simulator (3SF cabinet)(23000-301)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_737",
+    "text": "Subsystem: NCT/NOT-SSI4",
+    "icon": true,
+    "li_attr": {
+      "id": "2_737"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_737_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 737,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-SSI4",
+      "obsolete": "F",
+      "lastChangeDate": "07 Jan 2021",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "07 Jan 2021",
+      "comments": " (Copied from Subsystem Id = 137)",
+      "odNom": "NCT/Navigation Operational Trainer (SSI4)",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer (SSI4)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_959",
+    "text": "Subsystem: NCT/NOT-SSI8",
+    "icon": true,
+    "li_attr": {
+      "id": "2_959"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_959_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 959,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-SSI8",
+      "obsolete": "F",
+      "lastChangeDate": "26 Aug 2025",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "26 Aug 2025",
+      "comments": "(Copied from Subsystem Id = 737)  -8/26/25 late pull through from previous LMRMS, B.W., request.  -R.Acuna",
+      "odNom": "NCT/Navigation Operational Trainer(SSI8)",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer(SSI8)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_34",
+    "text": "Subsystem: NON-TSS-30",
+    "icon": true,
+    "li_attr": {
+      "id": "2_34"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_34_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 34,
+      "parentId": 1,
+      "level": 2,
+      "name": "NON-TSS-30",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "Non-Training Stimulation System - Training Equipment",
+      "hardcopyNomenclature": "Non-Training Stimulation System - Training Equipment",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_163",
+    "text": "Subsystem: NON-TSS-TETS",
+    "icon": true,
+    "li_attr": {
+      "id": "2_163"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_163_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 163,
+      "parentId": 1,
+      "level": 2,
+      "name": "NON-TSS-TETS",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "Non-Training Stimulation System - Training Engineering Test System",
+      "hardcopyNomenclature": "Non-Training Stimulation System - Training Engineering Test System",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_170",
+    "text": "Subsystem: SE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_170"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_170_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 170,
+      "parentId": 1,
+      "level": 2,
+      "name": "SE",
+      "obsolete": "F",
+      "lastChangeDate": "26 Sep 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "26 Sep 2012",
+      "odNom": "SWS Support System",
+      "hardcopyNomenclature": "SWS Support System",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "SE",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_37",
+    "text": "Subsystem: TL-46",
+    "icon": true,
+    "li_attr": {
+      "id": "2_37"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_37_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 37,
+      "parentId": 1,
+      "level": 2,
+      "name": "TL-46",
+      "obsolete": "F",
+      "lastChangeDate": "23 Aug 2017",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "23 Aug 2017",
+      "odNom": "Training Launcher (D5) (KB)",
+      "hardcopyNomenclature": "Training Launcher (D5) (KB)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "LA",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_138",
+    "text": "Subsystem: TL-46BF",
+    "icon": true,
+    "li_attr": {
+      "id": "2_138"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_138_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 138,
+      "parentId": 1,
+      "level": 2,
+      "name": "TL-46BF",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "Training Launcher (D5) (at Bangor)",
+      "hardcopyNomenclature": "Training Launcher (D5) (at Bangor)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "LA",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_171",
+    "text": "Subsystem: TSS",
+    "icon": true,
+    "li_attr": {
+      "id": "2_171"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_171_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 171,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS",
+      "obsolete": "F",
+      "lastChangeDate": "26 Sep 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "26 Sep 2012",
+      "odNom": "Training Stimulation System",
+      "hardcopyNomenclature": "Training Stimulation System",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_162",
+    "text": "Subsystem: TSS-TETS",
+    "icon": true,
+    "li_attr": {
+      "id": "2_162"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_162_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 162,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS-TETS",
+      "obsolete": "F",
+      "lastChangeDate": "14 Jun 2012",
+      "addDeleteChange": "C",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "14 Jun 2012",
+      "odNom": "Training Stimulation System - Training Engineering Test System",
+      "hardcopyNomenclature": "Training Stimulation System - Training Engineering Test System",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_1",
+    "text": "Subsystem: CSC - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_1"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_1_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 1,
+      "parentId": 1,
+      "level": 2,
+      "name": "CSC",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Central Stimulation Complex",
+      "hardcopyNomenclature": "Central Stimulation Complex",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "FC",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_2",
+    "text": "Subsystem: GETS - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_2"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_2_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 2,
+      "parentId": 1,
+      "level": 2,
+      "name": "GETS",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "General Electric Training System",
+      "hardcopyNomenclature": "General Electric Training System",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_4",
+    "text": "Subsystem: MI-C4/TNG - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_4"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_4_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 4,
+      "parentId": 1,
+      "level": 2,
+      "name": "MI-C4/TNG",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "C4 Missile Training Equipment",
+      "hardcopyNomenclature": "C4 Missile Training Equipment",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "MI",
+      "equipClassesId": 1,
+      "equipClass": "C4",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_6",
+    "text": "Subsystem: MK5-T-GU - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_6"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_6_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 6,
+      "parentId": 1,
+      "level": 2,
+      "name": "MK5-T-GU",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "MK5 Guidance Training Equipment",
+      "hardcopyNomenclature": "MK5 Guidance Training Equipment",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GU",
+      "equipClassesId": 1,
+      "equipClass": "C4",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_8",
+    "text": "Subsystem: NCT/* - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_8"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_8_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 8,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/*",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Advanced Maintenance Lab",
+      "hardcopyNomenclature": "NCT/Advanced Maintenance Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "T",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [
+        {
+          "id": 16,
+          "descriptor": "AML",
+          "nomenclature": "NCT/Advanced Maintenance Lab",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 17,
+          "descriptor": "AML-1",
+          "nomenclature": "NCT/Advanced Maintenance Lab (Part 1)",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 18,
+          "descriptor": "AML-2",
+          "nomenclature": "NCT/Advanced Maintenance Lab (Part 2)",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 24,
+          "descriptor": "CNC-1",
+          "nomenclature": "NCT/CNC Unit Lab 1",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 25,
+          "descriptor": "CNC-2",
+          "nomenclature": "NCT/CNC Unit Lab 2",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 28,
+          "descriptor": "ESGM",
+          "nomenclature": "NCT/ESGM Lab",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 19,
+          "descriptor": "NT-2",
+          "nomenclature": "NCT/Navigation Technician Trainer - 2",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 20,
+          "descriptor": "NT-3",
+          "nomenclature": "NCT/Navigation Technician Trainer - 3",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 21,
+          "descriptor": "NT-4",
+          "nomenclature": "NCT/Navigation Technician Trainer - 4",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 22,
+          "descriptor": "NT-5",
+          "nomenclature": "NCT/Navigation Technician Trainer - 5",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 23,
+          "descriptor": "NT-6",
+          "nomenclature": "NCT/Navigation Technician Trainer - 6",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 26,
+          "descriptor": "SONAR-1",
+          "nomenclature": "NCT/Sonar Unit Lab 1",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 27,
+          "descriptor": "SONAR-2",
+          "nomenclature": "NCT/Sonar Unit Lab 2",
+          "obsolete": "F",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        }
+      ],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_11",
+    "text": "Subsystem: NCT/C-ESGN-LAB-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_11"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_11_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 11,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/C-ESGN-LAB-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Computer ESGN Laboratory (D5)",
+      "hardcopyNomenclature": "NCT/Computer ESGN Laboratory (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_12",
+    "text": "Subsystem: NCT/CAS-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_12"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_12_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 12,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/CAS-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Courseware Authoring Site (D5)",
+      "hardcopyNomenclature": "NCT/Courseware Authoring Site (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_13",
+    "text": "Subsystem: NCT/CBT-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_13"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_13_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 13,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/CBT-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Computer Based Trainer (D5)",
+      "hardcopyNomenclature": "NCT/Computer Based Trainer (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_14",
+    "text": "Subsystem: NCT/CNC - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_14"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_14_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 14,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/CNC",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/CNC Unit Lab",
+      "hardcopyNomenclature": "NCT/CNC Unit Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_18",
+    "text": "Subsystem: NCT/ESGM-NA-LAB - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_18"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_18_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 18,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/ESGM-NA-LAB",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT / ESGM / NAVAIDS Lab",
+      "hardcopyNomenclature": "NCT / ESGM / NAVAIDS Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 1,
+      "equipClass": "C4",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_19",
+    "text": "Subsystem: NCT/IL-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_19"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_19_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 19,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/IL-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Inertial Laboratory (D5)",
+      "hardcopyNomenclature": "NCT/Inertial Laboratory (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_20",
+    "text": "Subsystem: NCT/MAR-MSR - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_20"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_20_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 20,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/MAR-MSR",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/MARDAN Lab",
+      "hardcopyNomenclature": "NCT/MARDAN Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_136",
+    "text": "Subsystem: NCT/ML-D5/D5BF - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_136"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_136_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 136,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/ML-D5/D5BF",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Maintenance Laboratory (D5/D5BF)",
+      "hardcopyNomenclature": "NCT/Maintenance Laboratory (D5/D5BF)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_21",
+    "text": "Subsystem: NCT/NA-LAB-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_21"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_21_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 21,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NA-LAB-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/NAVAIDS Laboratory (D5)",
+      "hardcopyNomenclature": "NCT/NAVAIDS Laboratory (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_22",
+    "text": "Subsystem: NCT/NIL - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_22"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_22_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 22,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NIL",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Inertial Lab",
+      "hardcopyNomenclature": "NCT/Inertial Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_130",
+    "text": "Subsystem: NCT/NOT - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_130"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_130_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 130,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Navigation Operational Trainer",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_23",
+    "text": "Subsystem: NCT/NOT-* - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_23"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_23_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 23,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-*",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Navigation Operational Trainer",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "T",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [
+        {
+          "id": 29,
+          "descriptor": "2",
+          "nomenclature": "NCT/Navigation Operational Trainer (NOT-2)",
+          "obsolete": "T",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        },
+        {
+          "id": 30,
+          "descriptor": "3",
+          "nomenclature": "NCT/Navigation Operational Trainer (NOT-3)",
+          "obsolete": "T",
+          "lastChangeDate": "13 Jan 2026",
+          "addDeleteChange": "A",
+          "editRequestImplemented": "T",
+          "editRequestApproved": "T",
+          "implementationDate": "13 Jan 2026",
+          "parts": []
+        }
+      ],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_25",
+    "text": "Subsystem: NCT/NOT-D5 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_25"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_25_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 25,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/NOT-D5",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Navigation Operational Trainer (D5)",
+      "hardcopyNomenclature": "NCT/Navigation Operational Trainer (D5)",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_33",
+    "text": "Subsystem: NCT/SUP - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_33"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_33_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 33,
+      "parentId": 1,
+      "level": 2,
+      "name": "NCT/SUP",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "NCT/Supervisor's Lab",
+      "hardcopyNomenclature": "NCT/Supervisor's Lab",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "NAV",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_125",
+    "text": "Subsystem: NON-CSC - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_125"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_125_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 125,
+      "parentId": 1,
+      "level": 2,
+      "name": "NON-CSC",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Non-CSC Training Equipment",
+      "hardcopyNomenclature": "Non-CSC Training Equipment",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "FC",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_35",
+    "text": "Subsystem: NON-TSS-ETS - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_35"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_35_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 35,
+      "parentId": 1,
+      "level": 2,
+      "name": "NON-TSS-ETS",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Non-Training Stimulation System - Engineering Test System",
+      "hardcopyNomenclature": "Non-Training Stimulation System - Engineering Test System",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_123",
+    "text": "Subsystem: PST - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_123"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_123_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 123,
+      "parentId": 1,
+      "level": 2,
+      "name": "PST",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Pressurization Subsystem Training",
+      "hardcopyNomenclature": "Pressurization Subsystem Training",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_36",
+    "text": "Subsystem: TL-35 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_36"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_36_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 36,
+      "parentId": 1,
+      "level": 2,
+      "name": "TL-35",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Training Launcher (C4)",
+      "hardcopyNomenclature": "Training Launcher (C4)",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "LA",
+      "equipClassesId": 1,
+      "equipClass": "C4",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_38",
+    "text": "Subsystem: TSS-30 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_38"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_38_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 38,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS-30",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Training Stimulation System MK 30 MOD 0",
+      "hardcopyNomenclature": "Training Stimulation System MK 30 MOD 0",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_154",
+    "text": "Subsystem: TSS-30/1 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_154"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_154_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 154,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS-30/1",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Training Stimulation System MK 30 MOD 1",
+      "hardcopyNomenclature": "Training Stimulation System MK 30 MOD 1",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_155",
+    "text": "Subsystem: TSS-30/2 - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_155"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_155_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 155,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS-30/2",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Training Stimulation System MK 30 MOD 2",
+      "hardcopyNomenclature": "Training Stimulation System MK 30 MOD 2",
+      "requireSn": "T",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "2_39",
+    "text": "Subsystem: TSS-ETS - OBSOLETE",
+    "icon": true,
+    "li_attr": {
+      "id": "2_39"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "2_39_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 39,
+      "parentId": 1,
+      "level": 2,
+      "name": "TSS-ETS",
+      "obsolete": "T",
+      "lastChangeDate": "10 Apr 2017",
+      "addDeleteChange": "D",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "10 Apr 2017",
+      "odNom": "Training Stimulation System - Engineering Test System",
+      "hardcopyNomenclature": "Training Stimulation System - Engineering Test System",
+      "requireSn": "F",
+      "noPublish": "F",
+      "cots": "F",
+      "limitAddOns": "F",
+      "concatinateAddOns": "T",
+      "tfrTfsrSubSymbolsId": "GT",
+      "equipClassesId": 2,
+      "equipClass": "D5",
+      "addons": [],
+      "hidden": "F"
+    },
+    "parent": "1_1",
+    "children": true
+  },
+  {
+    "id": "1_2",
+    "text": "Volume: 2",
+    "icon": true,
+    "li_attr": {
+      "id": "1_2"
+    },
+    "a_attr": {
+      "href": "#",
+      "id": "1_2_anchor"
+    },
+    "state": {
+      "loaded": false,
+      "opened": false,
+      "selected": false,
+      "disabled": false
+    },
+    "data": {
+      "id": 2,
+      "parentId": 1,
+      "level": 1,
+      "name": "2",
+      "obsolete": "F",
+      "lastChangeDate": "13 Jan 2026",
+      "addDeleteChange": "A",
+      "editRequestImplemented": "T",
+      "editRequestApproved": "T",
+      "implementationDate": "13 Jan 2026",
+      "volno": 2,
+      "tfrCountriesId": "UK",
+      "hidden": "F"
+    },
+    "parent": "0_1",
+    "children": true
+  }
+];
+
+// For this demo, the whole flat JSON is already available in the browser.
+// Some records in the sample have children:true and state.loaded:false because
+// your real app may lazy-load. For this no-lazy-load demo, normalize them so
+// jsTree treats the already-present flat data as fully available.
+const treeData = normalizeInitialTreeData(rawTreeData);
+
+$(function () {
+  // -------------------------------------------------------------------
+  // Create jsTree from flat JSON
+  // -------------------------------------------------------------------
+  $("#tree").jstree({
+    core: {
+      check_callback: true,  // Required so create_node is allowed
+      data: treeData
+    }
+  });
+
+  // -------------------------------------------------------------------
+  // When user selects a node, remember it.
+  // This selected node can be either:
+  //   1. the source node when clicking Copy, or
+  //   2. the target parent node when clicking Paste.
+  // -------------------------------------------------------------------
+  $("#tree").on("select_node.jstree", function (e, data) {
+    selectedNodeId = data.node.id;
+
+    $("#copyBtn").prop("disabled", false);
+
+    // Paste is only possible after a subtree has been copied.
+    if (copiedRootId) {
+      $("#pasteBtn").prop("disabled", false);
+    }
+
+    $("#status").text("Selected: " + data.node.text + " (" + data.node.id + ")");
+  });
+
+  // -------------------------------------------------------------------
+  // Copy button:
+  // We only remember the selected root id here.
+  // The actual JSON copy is built later during Paste, using the current tree.
+  // -------------------------------------------------------------------
+  $("#copyBtn").on("click", function () {
+    if (!selectedNodeId) return;
+
+    copiedRootId = selectedNodeId;
+
+    $("#pasteBtn").prop("disabled", false);
+    $("#status").text("Ready to copy subtree from: " + copiedRootId);
+  });
+
+  // -------------------------------------------------------------------
+  // Paste button:
+  // Build modified JSON for the copied subtree, then insert each node.
+  // -------------------------------------------------------------------
+  $("#pasteBtn").on("click", function () {
+    const tree = $("#tree").jstree(true);
+
+    if (!copiedRootId || !selectedNodeId) return;
+
+    // Optional safety check: do not paste a node into itself or its own child.
+    if (isSameNodeOrDescendant(tree, copiedRootId, selectedNodeId)) {
+      alert("Cannot paste a subtree into itself or into one of its own descendants.");
+      return;
+    }
+
+    const newSubtreeJson = buildCopiedSubtreeJson(tree, copiedRootId, selectedNodeId);
+
+    // Insert nodes one-by-one. Because newSubtreeJson is ordered as root first,
+    // then descendants, each parent exists before its children are inserted.
+    newSubtreeJson.forEach(function (node) {
+      tree.create_node(node.parent, node, "last");
+    });
+
+    tree.open_node(selectedNodeId);
+
+    $("#status").text(
+      "Pasted " + newSubtreeJson.length + " node(s) under: " + selectedNodeId
+    );
+  });
+});
+
+// ---------------------------------------------------------------------
+// Build a copied subtree as modified flat JSON.
+//
+// What this function does:
+//   1. Finds the selected root and all descendants.
+//   2. Gets their current JSON values.
+//   3. Deep-copies the JSON so the original nodes are not changed.
+//   4. Creates new jsTree ids.
+//   5. Rewires parent values to preserve the subtree structure.
+//   6. Clears database-related fields inside data.
+// ---------------------------------------------------------------------
+function buildCopiedSubtreeJson(tree, sourceRootId, targetParentId) {
+  const sourceRootNode = tree.get_node(sourceRootId);
+
+  // children_d means all descendants, not just direct children.
+  // The root itself is not included in children_d, so we add sourceRootId first.
+  const subtreeIds = [sourceRootId].concat(sourceRootNode.children_d);
+
+  // Convert each jsTree node into a plain flat JSON object.
+  const originalJsonNodes = subtreeIds.map(function (nodeId) {
+    const node = tree.get_node(nodeId);
+    return getCurrentNodeJson(node);
+  });
+
+  // Deep copy so editing copiedJsonNodes does not mutate the existing tree nodes.
+  const copiedJsonNodes = deepCopy(originalJsonNodes);
+
+  // Create a mapping from old jsTree id to new jsTree id.
+  // Example:
+  //   4_33  -> 4_1780679999999_1
+  //   5_141 -> 5_1780679999999_2
+  const idMap = createNewJsTreeIdMap(copiedJsonNodes);
+
+  copiedJsonNodes.forEach(function (node, index) {
+    const oldId = node.id;
+    const oldParent = node.parent;
+
+    // Assign new top-level jsTree node id.
+    node.id = idMap[oldId];
+
+    // Keep li_attr/a_attr ids in sync with the new jsTree id.
+    node.li_attr = node.li_attr || {};
+    node.li_attr.id = node.id;
+
+    node.a_attr = node.a_attr || {};
+    node.a_attr.href = node.a_attr.href || "#";
+    node.a_attr.id = node.id + "_anchor";
+
+    // Root of copied subtree goes under the selected paste target.
+    // Descendants go under their copied parent, not the old parent.
+    if (index === 0) {
+      node.parent = targetParentId;
+    } else {
+      node.parent = idMap[oldParent];
+    }
+
+    // Reset jsTree runtime state for the newly pasted node.
+    node.state = node.state || {};
+    node.state.selected = false;
+    node.state.loading = false;
+    node.state.failed = false;
+    node.state.loaded = true;
+
+    // Remove lazy-loading marker from the copied JSON.
+    // In this demo, the pasted subtree is already fully present.
+    delete node.children;
+
+    // This is your database-safe cleanup requirement.
+    cleanCopiedNodeData(node);
+  });
+
+  return copiedJsonNodes;
+}
+
+// ---------------------------------------------------------------------
+// Return the current live values from a jsTree node as plain flat JSON.
+// We avoid using node.original only, because node.original can be stale if the
+// node was renamed or modified after the tree was created.
+// ---------------------------------------------------------------------
+function getCurrentNodeJson(node) {
+  const original = node.original || {};
+
+  return {
+    id: node.id,
+    parent: node.parent,
+    text: node.text,
+    icon: node.icon,
+    li_attr: deepCopy(node.li_attr || original.li_attr || {}),
+    a_attr: deepCopy(node.a_attr || original.a_attr || { href: "#" }),
+    state: deepCopy(node.state || original.state || {}),
+    data: deepCopy(node.data || original.data || {})
+  };
+}
+
+// ---------------------------------------------------------------------
+// Create new jsTree ids for every copied node.
+// The sample ids look like "level_databaseId", for example "4_33".
+// For copied nodes we keep the level prefix, but replace the database part with
+// a timestamp/counter so the new jsTree id is unique and not the old DB id.
+// ---------------------------------------------------------------------
+function createNewJsTreeIdMap(nodes) {
+  const idMap = {};
+  const timestamp = Date.now();
+
+  nodes.forEach(function (node, index) {
+    const level = node.data && node.data.level !== undefined
+      ? node.data.level
+      : getPrefixBeforeUnderscore(node.id);
+
+    idMap[node.id] = level + "_" + timestamp + "_" + (index + 1);
+  });
+
+  return idMap;
+}
+
+// ---------------------------------------------------------------------
+// Clear database-related fields from the copied node's data.
+// Requirement:
+//   data.id       -> cleared
+//   data.parentId -> cleared
+//   data.baseLineData -> excluded
+//
+// This only changes the copied node's data object. It does not change the
+// visible jsTree id/parent used to display the tree structure.
+// ---------------------------------------------------------------------
+function cleanCopiedNodeData(node) {
+  if (!node.data) return;
+
+  node.data.id = null;
+  node.data.parentId = null;
+
+  delete node.data.baseLineData;
+}
+
+// ---------------------------------------------------------------------
+// Prevent invalid paste: copying a node into itself or its own descendant.
+// ---------------------------------------------------------------------
+function isSameNodeOrDescendant(tree, sourceRootId, targetParentId) {
+  if (sourceRootId === targetParentId) return true;
+
+  const sourceRootNode = tree.get_node(sourceRootId);
+  return sourceRootNode.children_d.indexOf(targetParentId) !== -1;
+}
+
+// ---------------------------------------------------------------------
+// Normalize initial data for this standalone demo.
+// Since sampleJson.txt already contains the flat data, we remove lazy markers
+// and force loaded=true so jsTree can calculate children_d correctly.
+// ---------------------------------------------------------------------
+function normalizeInitialTreeData(data) {
+  const copy = deepCopy(data);
+
+  copy.forEach(function (node) {
+    delete node.children;
+
+    node.state = node.state || {};
+    node.state.loaded = true;
+    node.state.loading = false;
+    node.state.failed = false;
+    node.state.selected = false;
+  });
+
+  return copy;
+}
+
+function getPrefixBeforeUnderscore(value) {
+  return String(value).split("_")[0];
+}
+
+function deepCopy(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+</script>
+
+</body>
+</html>
